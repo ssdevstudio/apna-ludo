@@ -494,10 +494,10 @@ export function handleRematch(io: TypedServer, socketId: string, expectedRevisio
 
   // Reset to lobby
   room.phase = "lobby";
-  room.game = undefined;
+  room.game = null;
   
   // Unready all players
-  for (const player of room.players) {
+  for (const player of room.players.values()) {
     if (!player.isBot) {
       player.ready = false;
     }

@@ -677,7 +677,7 @@ function Room() {
           navigate(`/?join=${pc}`);
         } else {
           const n=sessionStorage.getItem("apna-player")??"Player";
-          s.emit("room:join",{code:pc,name:n,color:joinColor},(res:CommandResult<JoinResult>)=>{
+          s.emit("room:join",{code:pc,name:n,color:joinColor as import("@apna-ludo/shared").PlayerColor},(res:CommandResult<JoinResult>)=>{
             if(res.ok){
               setPlayerId(res.playerId);
               setReconnectToken(res.reconnectToken);

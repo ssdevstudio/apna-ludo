@@ -139,6 +139,7 @@ export type ErrorCode =
   | "NOT_IN_ROOM"
   | "NOT_HOST"
   | "NOT_READY"
+  | "NOT_FINISHED"
   | "STALE_REVISION"
   | "COMMAND_FAILED"
   | "RECONNECT_FAILED"
