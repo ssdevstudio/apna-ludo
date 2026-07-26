@@ -642,7 +642,6 @@ function Room() {
   const [settingsOpen,setSettingsOpen]=useState(false);
   const [message,setMessage]=useState("");
   const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
-  const [localMsgs,setLocalMsgs]=useState<{name:string;text:string}[]>([]);
   const [rolling,setRolling]=useState(false);
   const [tokenAnimation,setTokenAnimation]=useState<string|null>(null);
   const [localDice,setLocalDice]=useState(6);
@@ -694,6 +693,7 @@ function Room() {
     s.on("disconnect",()=>setConnState("offline"));
     s.on("room:snapshot",(snap:RoomSnapshot)=>{
       setSnapshot(snap);
+      setChatMsgs(snap.chat || []);
       revisionRef.current=snap.revision;
       if(snap.game?.dice) {
         setLocalDice(snap.game.dice);
@@ -708,7 +708,7 @@ function Room() {
     return ()=>{s.close();};
   },[]); // eslint-disable-line
 
-  useEffect(()=>{chatEnd.current?.scrollIntoView({behavior:"smooth"});},[chatMsgs,localMsgs]);
+  useEffect(()=>{chatEnd.current?.scrollIntoView({behavior:"smooth"});},[chatMsgs]);
   
   const copyInvite=useCallback(async()=>{try{await navigator.clipboard.writeText(`${window.location.origin}/room/${snapshot?.code??code}`);}catch{}setCopied(true);setTimeout(()=>setCopied(false),1800);},[snapshot,code]);
   const toggleReady=()=>{if(!socket||!snapshot)return;cmdSeq.current+=1;socket.emit("room:ready",{expectedRevision:revisionRef.current},()=>{});};
@@ -716,7 +716,7 @@ function Room() {
   const rollDice=()=>{if(!socket||!canRoll)return;playSound("dice");setRolling(true);cmdSeq.current+=1;socket.emit("game:roll",{expectedRevision:revisionRef.current},()=>{setRolling(false);});};
   const moveToken=(tokenId:string)=>{if(!socket||!canMove)return;cmdSeq.current+=1;setTokenAnimation(tokenId);socket.emit("game:move",{tokenId,expectedRevision:revisionRef.current},()=>{setTokenAnimation(null);});};
   moveTokenRef.current=moveToken;
-  const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setLocalMsgs(p=>[...p,{name:me?.name??"You",text:message.trim()}].slice(-120));setMessage("");};
+  const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
   const leaveRoom=()=>{if(socket)socket.emit("room:leave",{},()=>{});sessionStorage.removeItem(`apna-token-${snapshot?.code??code}`);navigate("/");};
   const rematchRoom=()=>{if(socket)socket.emit("room:rematch",{expectedRevision:revisionRef.current},()=>{});};
 
@@ -724,7 +724,7 @@ function Room() {
   const finished=snapshot?.game?.phase==="finished";
   const winners=snapshot?.game?.winners??[];
   const iWon=winners.includes(playerId??"");
-  const allChatMessages=useMemo(()=>{const msgs=[...chatMsgs];for(const m of localMsgs.slice(-120))msgs.push({id:String(Date.now()),playerId:"",playerName:m.name,text:m.text,sentAt:new Date().toISOString()});return msgs.slice(-120);},[chatMsgs,localMsgs]);
+  const allChatMessages = chatMsgs;
 
   const renderCorner = (color: PlayerColor, pos: 'top-left'|'top-right'|'bottom-left'|'bottom-right') => {
     const p = snapshot?.game ? snapshot.game.players.find(p=>p.color===color) : snapshot?.players.find(p=>p.color===color);
