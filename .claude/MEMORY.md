@@ -1,0 +1,1 @@
+- [analysis-summary](analysis-summary.md) — Full code analysis: bugs, improvements, edge cases

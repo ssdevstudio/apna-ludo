@@ -1,0 +1,1 @@
+chrome-extension://10b741af-d93c-4a3d-b11f-12ba257c7205/web_accessible_resources/googlesyndication_adsbygoogle.js

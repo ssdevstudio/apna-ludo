@@ -1,0 +1,1 @@
+chrome-extension://glkommiehgjnfidnifibaembchhcceap/lib/cache-measure.js
