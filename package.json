@@ -14,7 +14,7 @@
     "test": "vitest run",
     "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client"
   },
-  "devDependencies": {
+  "dependencies": {
     "@types/node": "^24.0.0",
     "concurrently": "^9.2.0",
     "jimp": "^1.6.1",
