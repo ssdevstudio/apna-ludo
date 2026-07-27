@@ -819,7 +819,7 @@ function Room() {
       </aside>
     </div>
     {settingsOpen&&<SettingsPanel onClose={()=>setSettingsOpen(false)}/>}
-    {finished&&<div className="modal-backdrop"><div className="game-over" role="dialog" aria-modal="true"><div className="winner-burst" aria-hidden><span>✦</span><b>★</b><span>✦</span></div><p className="section-kicker">{tr("game.over")}</p><h2>{iWon?tr("win.msg"):`${snapshot?.game?.players.find(p=>p.id===winners[0])?.name??"Someone"} ${tr("win.msg")}`}</h2>
+    {finished&&<div className="modal-backdrop"><div className="game-over" role="dialog" aria-modal="true"><div className="winner-burst" aria-hidden><span>✦</span><b>★</b><span>✦</span></div><p className="section-kicker">{tr("game.over")}</p><h2>{iWon?tr("win.msg"):tr("lose.msg")}</h2>
       <p>All tokens home. Time for another round?</p><ol>{snapshot?.game?.players.slice().sort((a,b)=>{const aW=winners.includes(a.id)?0:1,bW=winners.includes(b.id)?0:1;return aW-bW;}).map((p,i)=>renderPlayerRank(p,i,winners,playerId,myAvatar))}</ol>
       <div style={{display:'flex',gap:10,marginTop:20}}>
         <button className="primary-button wide" onClick={rematchRoom}>Rematch <span>↻</span></button>

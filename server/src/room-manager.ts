@@ -463,7 +463,6 @@ export function addChatMessage(io: TypedServer, socketId: string, text: string, 
   };
   room.chat.push(message);
   if (room.chat.length > 100) room.chat = room.chat.slice(-100);
-  room.revision += 1;
   io.to(room.code).emit("chat:message", message);
   return { ok: true, commandId };
 }
