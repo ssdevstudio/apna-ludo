@@ -39,7 +39,6 @@ export const CENTER_CELL = 112; // row 7, col 7
 export const TOKENS_PER_PLAYER = 4;
 export const HOME_START = 51;      // progress 51 = first home lane cell
 export const FINISH_PROGRESS = 56; // progress 56 = reached the center (home)
-export const STAR_JUMP = 5;        // star teleport distance
 
 // ─── Path generation (clockwise, 52 cells) ──────────────────
 // Generated from (row, col) pairs. No manual coordinate arrays.

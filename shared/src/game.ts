@@ -6,11 +6,10 @@ import {
   TOKENS_PER_PLAYER,
   SAFE_SQUARE_SET,
   STAR_SQUARE_SET,
-  STAR_JUMP,
   START_OFFSETS,
 } from "./board.js";
 
-export { PLAYER_COLORS, type PlayerColor, TRACK_LENGTH, HOME_START, FINISH_PROGRESS, STAR_JUMP, TOKENS_PER_PLAYER } from "./board.js";
+export { PLAYER_COLORS, type PlayerColor, TRACK_LENGTH, HOME_START, FINISH_PROGRESS, TOKENS_PER_PLAYER } from "./board.js";
 
 export type GamePhase = "playing" | "finished";
 export type PlayerGameStatus = "active" | "won" | "forfeited";
@@ -118,31 +117,12 @@ function nextActivePlayerId(state: GameState, fromPlayerId: string): string {
   return fromPlayerId;
 }
 
-function blockadeSquares(state: GameState): Set<number> {
-  const counts = new Map<string, { square: number; count: number }>();
-  for (const player of state.players) {
-    for (const token of player.tokens) {
-      const square = globalSquare(player.color, token.progress);
-      if (square === null) continue;
-      const key = `${player.id}:${square}`;
-      const entry = counts.get(key) ?? { square, count: 0 };
-      entry.count += 1;
-      counts.set(key, entry);
-    }
-  }
-  return new Set(
-    [...counts.values()]
-      .filter((entry) => entry.count >= 2 && !SAFE_SQUARE_SET.has(entry.square))
-      .map((entry) => entry.square),
-  );
-}
 
 export function canMoveToken(
   state: GameState,
   playerId: string,
   tokenId: string,
   dice: number,
-  blockades?: Set<number>,
 ): boolean {
   if (!Number.isInteger(dice) || dice < 1 || dice > 6) return false;
   const player = state.players.find((candidate) => candidate.id === playerId);
@@ -157,27 +137,6 @@ export function canMoveToken(
   const finalDestination = diceDestination;
   if (finalDestination > FINISH_PROGRESS) return false;
 
-  const resolvedBlockades = blockades ?? blockadeSquares(state);
-  const firstStep = token.progress === -1 ? 0 : token.progress + 1;
-  for (let progress = firstStep; progress <= finalDestination; progress += 1) {
-    const square = globalSquare(player.color, progress);
-    if (square === null || !resolvedBlockades.has(square)) continue;
-
-    // A token may not pass or land on any blockade (2+ tokens), including its own.
-    return false;
-  }
-
-  const destinationSquare = globalSquare(player.color, finalDestination);
-  if (destinationSquare !== null && !SAFE_SQUARE_SET.has(destinationSquare)) {
-    const opponentCount = state.players
-      .filter((candidate) => candidate.id !== player.id)
-      .flatMap((candidate) => candidate.tokens.map((candidateToken) => ({ candidate, candidateToken })))
-      .filter(
-        ({ candidate, candidateToken }) =>
-          globalSquare(candidate.color, candidateToken.progress) === destinationSquare,
-      ).length;
-    if (opponentCount >= 2) return false;
-  }
   return true;
 }
 
@@ -185,17 +144,15 @@ export function legalTokenIds(state: GameState, playerId: string, dice: number):
   const player = state.players.find((candidate) => candidate.id === playerId);
   if (!player) return [];
 
-  const blockades = blockadeSquares(state);
-
   if (dice === 6) {
     const yardTokens = player.tokens
-      .filter((token) => token.progress === -1 && canMoveToken(state, playerId, token.id, dice, blockades))
+      .filter((token) => token.progress === -1 && canMoveToken(state, playerId, token.id, dice))
       .map((token) => token.id);
     if (yardTokens.length > 0) return yardTokens;
   }
 
   return player.tokens
-    .filter((token) => canMoveToken(state, playerId, token.id, dice, blockades))
+    .filter((token) => canMoveToken(state, playerId, token.id, dice))
     .map((token) => token.id);
 }
 
