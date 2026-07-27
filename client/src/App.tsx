@@ -364,10 +364,21 @@ function Landing() {
 function Die({ value, rolling }: { value:number; rolling:boolean }) {
   const dots:Record<number,number[]>={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
   const faces=[1,2,3,4,5,6];
+  
+  let transform = 'rotateX(0deg) rotateY(0deg)';
+  if (value === 1) transform = 'rotateX(0deg) rotateY(0deg)';
+  if (value === 2) transform = 'rotateX(90deg)';
+  if (value === 3) transform = 'rotateY(-90deg)';
+  if (value === 4) transform = 'rotateY(90deg)';
+  if (value === 5) transform = 'rotateX(-90deg)';
+  if (value === 6) transform = 'rotateX(-180deg)';
+
   return <span className={`die ${rolling?"die--rolling":""}`} aria-label={`Dice shows ${value}`}>
-    {faces.map(f=><span key={f} className={`die-face die-face--${f} ${value===f?"die-face--show":""}`}>
-      {Array.from({length:9},(_,i)=><i key={i} className={dots[f]?.includes(i)?"dot":""}/>)}
-    </span>)}
+    <div className="die-inner" style={{ transform: rolling ? undefined : transform }}>
+      {faces.map(f=><span key={f} className={`die-face die-face--${f}`}>
+        {Array.from({length:9},(_,i)=><i key={i} className={dots[f]?.includes(i)?"dot":""}/>)}
+      </span>)}
+    </div>
   </span>;
 }
 
@@ -441,49 +452,59 @@ function tokenCellIndex(color:PlayerColor,progress:number,tokenIdx=0):number|nul
 const STAR_CELLS_SET=new Set(STAR_CELLS);
 const SAFE_CELLS_SET=new Set(SAFE_CELLS);
 function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotation=0}:{game:GameState;myPlayerId:string|null;legalTokens:string[];onMove:(id:string)=>void;tokenAnimation:string|null;boardRotation?:number}){
-  const me=game.players.find(p=>p.id===myPlayerId);
-  const visualProgressRef = useRef<Record<string, number>>({});
-  const [, setForceRender] = useState(0);
+    const me=game.players.find(p=>p.id===myPlayerId);
+    const visualProgressRef = useRef<Record<string, number>>({});
+    const [, setForceRender] = useState(0);
+    const [footprints, setFootprints] = useState<{id:string;color:PlayerColor;top:string;left:string}[]>([]);
 
-  useEffect(() => {
-    const tokensToAnimate:{id:string;start:number;end:number}[] = [];
-    let instantChange = false;
-
-    game.players.forEach(p => p.tokens.forEach(t => {
-      let current = visualProgressRef.current[t.id];
-      if (current === undefined) {
-        current = t.progress;
-        visualProgressRef.current[t.id] = t.progress;
-      }
-
-      if (current !== t.progress && current !== -1 && t.progress !== -1 && t.progress > current) {
-        tokensToAnimate.push({id: t.id, start: current, end: t.progress});
-      } else if (current !== t.progress) {
-        visualProgressRef.current[t.id] = t.progress;
-        instantChange = true;
-      }
-    }));
-
-    if (instantChange && tokensToAnimate.length === 0) {
-      setForceRender(x => x + 1);
-    }
-
-    if (tokensToAnimate.length > 0) {
-      const t = tokensToAnimate[0]!;
-      let step = t.start;
-      const interval = setInterval(() => {
-        if (step < t.end) {
-          step++;
-          visualProgressRef.current[t.id] = step;
-          setForceRender(x => x + 1);
-          playSound("move");
-        } else {
-          clearInterval(interval);
+    useEffect(() => {
+      const tokensToAnimate:{id:string;color:PlayerColor;start:number;end:number}[] = [];
+      let instantChange = false;
+  
+      game.players.forEach(p => p.tokens.forEach(t => {
+        let current = visualProgressRef.current[t.id];
+        if (current === undefined) {
+          current = t.progress;
+          visualProgressRef.current[t.id] = t.progress;
         }
-      }, 150);
-      return () => clearInterval(interval);
-    }
-  }, [game]);
+  
+        if (current !== t.progress && current !== -1 && t.progress !== -1 && t.progress > current) {
+          tokensToAnimate.push({id: t.id, color: p.color, start: current, end: t.progress});
+        } else if (current !== t.progress) {
+          visualProgressRef.current[t.id] = t.progress;
+          instantChange = true;
+        }
+      }));
+  
+      if (instantChange && tokensToAnimate.length === 0) {
+        setForceRender(x => x + 1);
+        if (instantChange) playSound("capture");
+      }
+  
+      if (tokensToAnimate.length > 0) {
+        const t = tokensToAnimate[0]!;
+        let step = t.start;
+        const interval = setInterval(() => {
+          if (step < t.end) {
+            step++;
+            visualProgressRef.current[t.id] = step;
+            
+            const cellIdx = tokenCellIndex(t.color, step - 1) ?? 0;
+            const r = Math.floor(cellIdx / 15);
+            const c = cellIdx % 15;
+            const top = `${(r + 0.5) * (100 / 15)}%`;
+            const left = `${(c + 0.5) * (100 / 15)}%`;
+            setFootprints(prev => [...prev.slice(-4), { id: Math.random().toString(), color: t.color, top, left }]);
+
+            setForceRender(x => x + 1);
+            playSound("move");
+          } else {
+            clearInterval(interval);
+          }
+        }, 150);
+        return () => clearInterval(interval);
+      }
+    }, [game]);
 
   const YARD_CIRCLE_COORDS: Record<PlayerColor, { left: string, top: string }[]> = {
     red: [
@@ -533,8 +554,21 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
   const allTokens:{id:string;color:PlayerColor;progress:number;ordinal:number}[]=[];
   for(const p of game.players)for(let idx=0;idx<p.tokens.length;idx++)allTokens.push({id:p.tokens[idx]!.id,color:p.color,progress:visualProgressRef.current[p.tokens[idx]!.id] ?? p.tokens[idx]!.progress,ordinal:idx+1});
 
-  return <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}><div className="ludo-board" role="grid" aria-label="15 by 15 Ludo board">
-    {game.players.map(p => {
+    return <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}>
+      <div className="ludo-board" role="grid" aria-label="15 by 15 Ludo board">
+      
+      {footprints.map(f => (
+        <div key={f.id} className="footprint-anim" style={{
+          position: 'absolute', top: f.top, left: f.left,
+          transform: 'translate(-50%, -50%)', zIndex: 6,
+          width: '24px', height: '24px', pointerEvents: 'none',
+          backgroundColor: 'white', borderRadius: '50%', opacity: 0.6,
+          boxShadow: `0 0 4px var(--${f.color}), inset 0 0 4px var(--${f.color})`,
+          animation: 'footprintFade 0.6s ease-out forwards'
+        }} />
+      ))}
+
+      {game.players.map(p => {
       if (game.currentPlayerId !== p.id) return null;
       const blinkStyle: React.CSSProperties = {
         position: 'absolute', width: '40%', height: '40%', zIndex: 10, pointerEvents: 'none', borderRadius: '10px',
@@ -546,19 +580,52 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
       else if (p.color === 'blue') { blinkStyle.bottom = '0'; blinkStyle.right = '0'; }
       return <div key={p.id} style={blinkStyle} className={`yard-blink-overlay color-${p.color}`} />;
     })}
-    {allTokens.filter(t => t.progress === -1).map(t => {
-      const pos = YARD_CIRCLE_COORDS[t.color][t.ordinal - 1];
-      const style: React.CSSProperties = {
-        top: pos?.top,
-        left: pos?.left,
-        transform: `translate(-50%, -50%) rotate(-${boardRotation}deg)`
-      };
+    {Array.from({length:CELL_COUNT},(_,i)=>{
+      const ct=cellType(i);
+      const starClass=STAR_CELLS_SET.has(i)?"star-cell":"";
+      const safeClass=SAFE_CELLS_SET.has(i)?"safe-cell":"";
+      return <div key={i} role="gridcell" className={`board-cell ${ct} ${starClass} ${safeClass}`} />;
+    })}
+
+    {allTokens.map((t) => {
+      const isYard = t.progress === -1;
+      let top: string | number | undefined, left: string | number | undefined, transform: string | undefined;
+
+      if (isYard) {
+        const pos = YARD_CIRCLE_COORDS[t.color][t.ordinal - 1];
+        top = pos?.top;
+        left = pos?.left;
+        transform = `translate(-50%, -50%) rotate(-${boardRotation}deg)`;
+      } else {
+        const idx = tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0;
+        const r = Math.floor(idx / 15);
+        const c = idx % 15;
+        top = `${(r + 0.5) * (100 / 15)}%`;
+        left = `${(c + 0.5) * (100 / 15)}%`;
+
+        const tokensHere = allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === idx);
+        const stackIdx = tokensHere.findIndex(x => x.id === t.id);
+        const styleObj = getTrackTokenStyle(stackIdx, tokensHere.length);
+        transform = styleObj.transform;
+      }
+
       const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
       const innerClass = `game-pawn-inner pawn-color-${t.color} ${isLegalToken ? "legal-token" : ""} ${tokenAnimation===t.id ? "pawn--animate" : ""}`;
       
+      const style: React.CSSProperties = {
+        position: 'absolute',
+        top,
+        left,
+        transform,
+        transition: 'top 0.25s linear, left 0.25s linear, transform 0.25s linear',
+        zIndex: isYard ? 5 : 10,
+        width: 'clamp(20px,2.8vw,36px)',
+        height: 'clamp(26px,3.6vw,46px)'
+      };
+
       if(isLegalToken) {
         return (
-          <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token from yard`}>
+          <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
             <span className={innerClass}>
               <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
                 <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
@@ -568,7 +635,7 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
         );
       }
       return (
-        <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token in yard`}>
+        <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token`}>
           <div className={innerClass}>
             <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
               <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
@@ -576,39 +643,6 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
           </div>
         </div>
       );
-    })}
-    {Array.from({length:CELL_COUNT},(_,i)=>{
-      const tokensHere=allTokens.filter(t=>t.progress >= 0 && tokenCellIndex(t.color,t.progress,t.ordinal-1)===i);
-      const ct=cellType(i);
-      const starClass=STAR_CELLS_SET.has(i)?"star-cell":"";
-      const safeClass=SAFE_CELLS_SET.has(i)?"safe-cell":"";
-      return <div key={i} role="gridcell" className={`board-cell ${ct} ${starClass} ${safeClass}`}>{
-      }{tokensHere.map((t, idx)=>{
-        const style = getTrackTokenStyle(idx, tokensHere.length);
-        const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
-        const innerClass = `game-pawn-inner pawn-color-${t.color} ${isLegalToken ? "legal-token" : ""} ${tokenAnimation===t.id ? "pawn--animate" : ""}`;
-        
-        if(isLegalToken) {
-          return (
-            <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
-              <span className={innerClass}>
-                <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
-                  <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
-                </div>
-              </span>
-            </button>
-          );
-        }
-        return (
-          <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token`}>
-            <div className={innerClass}>
-              <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
-                <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
-              </div>
-            </div>
-          </div>
-        );
-      })}</div>;
     })}
     <></>
   </div></div>;
@@ -653,7 +687,8 @@ function Room() {
   const [chatOpen,setChatOpen]=useState(false);
   const chatOpenRef=useRef(false);
   const [unreadCount,setUnreadCount]=useState(0);
-  useEffect(()=>{
+  useEffect(() => { if(chatOpen) setUnreadCount(0); }, [chatOpen]);
+    useEffect(()=>{
     chatOpenRef.current=chatOpen;
     if(chatOpen)setUnreadCount(0);
   },[chatOpen]);
@@ -818,6 +853,14 @@ function Room() {
       </div>
     </header>
     <div className="game-layout">
+        <div className="floating-reactions" style={{position:'absolute', inset:0, pointerEvents:'none', zIndex:999, overflow:'hidden'}}>
+          {reactions.map(r => (
+            <div key={r.id} style={{
+              position:'absolute', left:'50%', top:'50%', fontSize:'48px',
+              animation:'floatUp 2.5s ease-out forwards'
+            }}>{r.emoji}</div>
+          ))}
+        </div>
       <aside className="players-panel">
         <div className="panel-heading"><span>PLAYERS</span><b>{snapshot?.players.length}/4</b></div>
         {snapshot?.players.map(p=><PlayerSeat key={p.id} player={p} active={snapshot?.game?.currentPlayerId===p.id} avatar={p.id===playerId?myAvatar:undefined}/>)}
