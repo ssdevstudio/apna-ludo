@@ -381,8 +381,7 @@ function PlayerCorner({
   canRoll,
   canMove,
   onRoll,
-  avatar,
-  reactions
+  avatar
 }: {
   player?: GamePlayer | RoomPlayerSnapshot;
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -393,7 +392,6 @@ function PlayerCorner({
   canMove: boolean;
   onRoll: () => void;
   avatar: string;
-  reactions?: {id:string, emoji:string}[];
 }) {
   if (!player) {
     return <div className={`player-corner corner-${position} empty`}></div>;
@@ -404,10 +402,7 @@ function PlayerCorner({
 
   return (
     <div className={`player-corner corner-${position} corner-${player.color} ${isActive ? "active" : ""}`}>
-      <div className="corner-profile" style={{position: "relative"}}>
-        {reactions?.map(r => (
-          <div key={r.id} className="floating-emoji" style={{position:"absolute", top:"-20px", left:"50%", transform:"translateX(-50%)", fontSize:"2rem", zIndex:50, animation:"floatUp 3s ease-out forwards"}}>{r.emoji}</div>
-        ))}
+      <div className="corner-profile">
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
         <b>{player.name}</b>
       </div>
@@ -485,7 +480,7 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
         } else {
           clearInterval(interval);
         }
-      }, 250);
+      }, 150);
       return () => clearInterval(interval);
     }
   }, [game]);
@@ -539,6 +534,18 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
   for(const p of game.players)for(let idx=0;idx<p.tokens.length;idx++)allTokens.push({id:p.tokens[idx]!.id,color:p.color,progress:visualProgressRef.current[p.tokens[idx]!.id] ?? p.tokens[idx]!.progress,ordinal:idx+1});
 
   return <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}><div className="ludo-board" role="grid" aria-label="15 by 15 Ludo board">
+    {game.players.map(p => {
+      if (game.currentPlayerId !== p.id) return null;
+      const blinkStyle: React.CSSProperties = {
+        position: 'absolute', width: '40%', height: '40%', zIndex: 1, pointerEvents: 'none', borderRadius: '10px',
+        animation: 'yardBlink 1s infinite alternate',
+      };
+      if (p.color === 'green') { blinkStyle.top = '0'; blinkStyle.left = '0'; }
+      else if (p.color === 'yellow') { blinkStyle.top = '0'; blinkStyle.right = '0'; }
+      else if (p.color === 'red') { blinkStyle.bottom = '0'; blinkStyle.left = '0'; }
+      else if (p.color === 'blue') { blinkStyle.bottom = '0'; blinkStyle.right = '0'; }
+      return <div key={p.id} style={blinkStyle} className={`yard-blink-overlay color-${p.color}`} />;
+    })}
     {allTokens.filter(t => t.progress === -1).map(t => {
       const pos = YARD_CIRCLE_COORDS[t.color][t.ordinal - 1];
       const style: React.CSSProperties = {
@@ -776,7 +783,6 @@ function Room() {
       canMove={canMove && isMe}
       onRoll={rollDice}
       avatar={isMe ? myAvatar : ""}
-      reactions={reactions.filter((r: any) => r.playerId === p?.id)}
     />
   };
 
@@ -829,6 +835,13 @@ function Room() {
           </span>
         </div>)}</div>}
       </aside>
+
+      {reactions.map(r => (
+        <div key={r.id} className="screen-emoji-animation">
+          {r.emoji}
+        </div>
+      ))}
+
       <section className="table-area">
         <div className="board-container">
           {renderCorner(tlColor, 'top-left')}
