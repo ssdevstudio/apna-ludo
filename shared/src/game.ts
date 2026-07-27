@@ -278,17 +278,6 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   const diceDestination = previousProgress === -1 ? 0 : previousProgress + state.dice;
 
   let finalDestination = diceDestination;
-  let starJumped = false;
-
-  const destSquare = globalSquare(player.color, finalDestination);
-  if (destSquare !== null &&
-    STAR_SQUARE_SET.has(destSquare) &&
-    destSquare !== START_OFFSETS[player.color] &&
-    finalDestination + STAR_JUMP <= FINISH_PROGRESS
-  ) {
-    finalDestination += STAR_JUMP;
-    starJumped = true;
-  }
 
   const movedToken: TokenState = { ...player.tokens[tokenIndex]!, progress: finalDestination };
   const players = state.players.map((candidate) => ({
@@ -325,7 +314,7 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
     players,
     winners,
     revision: state.revision + 1,
-    lastAction: { type: "moved", playerId, tokenId, capturedTokenIds, starJumped },
+    lastAction: { type: "moved", playerId, tokenId, capturedTokenIds },
   };
 
   const extraTurn = !finished && (state.dice === 6 || capturedTokenIds.length > 0 || finalDestination === FINISH_PROGRESS);
