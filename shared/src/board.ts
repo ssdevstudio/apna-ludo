@@ -209,10 +209,10 @@ export function cellType(i: number): string {
     case "home_lane": {
       const r = Math.floor(i / GRID_SIZE);
       const c = i % GRID_SIZE;
-      if (r === 7 && c <= 4) return "lane-red";
-      if (r === 7 && c >= 9) return "lane-yellow";
-      if (c === 7 && r <= 5) return "lane-green";
-      if (c === 7 && r >= 9) return "lane-blue";
+      if (c === 7 && r >= 9) return "lane-red";
+      if (r === 7 && c <= 4) return "lane-green";
+      if (c === 7 && r <= 5) return "lane-yellow";
+      if (r === 7 && c >= 9) return "lane-blue";
       return "lane";
     }
     case "home": {

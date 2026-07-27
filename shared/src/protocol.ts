@@ -70,7 +70,7 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   currentPlayerId: z.string(),
   dice: z.number().int().min(1).max(6).nullable(),
   movableTokenIds: z.array(z.string()),
-  consecutiveSixes: z.number().int().min(0).max(2),
+  consecutiveSixes: z.number().int().min(0).max(3),
   winners: z.array(z.string()),
   lastAction: lastActionSchema.nullable(),
 }).strict();

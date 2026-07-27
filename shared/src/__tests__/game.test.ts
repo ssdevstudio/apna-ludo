@@ -94,8 +94,8 @@ describe("createGame", () => {
 
 describe("globalSquare", () => {
   const cases: [string, number, number][] = [
-    ["red", 0, 51], ["green", 0, 12], ["yellow", 0, 25], ["blue", 0, 38],
-    ["red", 1, 0], ["green", 40, 0],
+    ["red", 0, 0], ["green", 0, 13], ["yellow", 0, 26], ["blue", 0, 39],
+    ["red", 1, 1], ["green", 40, 1],
   ];
   for (const [color, progress, expected] of cases) {
     it(`maps ${color} progress ${progress} to global ${expected}`, () => {
@@ -218,13 +218,13 @@ describe("canMoveToken", () => {
     expect(canMoveToken(state, "p0", "p0:0", 3)).toBe(true);
   });
 
-  it("prevents moving past finish (57)", () => {
+  it("prevents moving past finish (56)", () => {
     const state = placeP0Token0OnTrack({ ...createGame(makePlayers(2)), dice: 2 }, 56);
     expect(canMoveToken(state, "p0", "p0:0", 2)).toBe(false);
   });
 
-  it("allows exact roll to finish", () => {
-    const state = placeP0Token0OnTrack({ ...createGame(makePlayers(2)), dice: 1 }, 56);
+  it("allows exact roll to finish (55 + 1 = 56)", () => {
+    const state = placeP0Token0OnTrack({ ...createGame(makePlayers(2)), dice: 1 }, 55);
     expect(canMoveToken(state, "p0", "p0:0", 1)).toBe(true);
   });
 });
@@ -383,14 +383,14 @@ describe("capture mechanics", () => {
 
   it("does not capture on safe squares", async () => {
     const { SAFE_SQUARE_SET } = await import("../board.js");
-    expect(SAFE_SQUARE_SET.has(51)).toBe(true);
-    expect(SAFE_SQUARE_SET.has(12)).toBe(true);
+    expect(SAFE_SQUARE_SET.has(0)).toBe(true);
+    expect(SAFE_SQUARE_SET.has(13)).toBe(true);
     expect(SAFE_SQUARE_SET.has(8)).toBe(true);
   });
 });
 
 describe("finish and win", () => {
-  it("player wins when all 4 tokens reach home (57)", () => {
+  it("player wins when all 4 tokens reach home (56)", () => {
     let state = createGame(makePlayers(2));
     state = {
       ...state,
@@ -399,10 +399,10 @@ describe("finish and win", () => {
         {
           ...state.players[0]!,
           tokens: [
-            { id: "p0:0", progress: 56 },
-            { id: "p0:1", progress: 57 },
-            { id: "p0:2", progress: 57 },
-            { id: "p0:3", progress: 57 },
+            { id: "p0:0", progress: 55 },
+            { id: "p0:1", progress: 56 },
+            { id: "p0:2", progress: 56 },
+            { id: "p0:3", progress: 56 },
           ],
         },
         {
@@ -416,10 +416,10 @@ describe("finish and win", () => {
         },
       ],
     };
-    // Roll 1 to move token 0 to finish
+    // Roll 1 to move token 0 to finish (55→56)
     state = applyRoll(state, "p0", 1);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(57);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(56);
     expect(state.players[0]!.status).toBe("won");
     expect(state.winners).toContain("p0");
   });
@@ -460,100 +460,98 @@ describe("forfeitPlayer", () => {
 });
 
 describe("star shortcut rule", () => {
-  it("landing on star progress 9 jumps to 14", () => {
-    // Red token at progress 4, roll 5 → lands on 9 (pathIndex 8 = star) → jumps to 14
+  it("landing on star progress 8 jumps to 13", () => {
+    // Red token at progress 3, roll 5 → lands on 8 (pathIndex 8 = star) → jumps to 13
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 4 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 3 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(14);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(13);
     expect(state.lastAction?.starJumped).toBe(true);
   });
 
-  it("landing on star progress 22 jumps to 27", () => {
+  it("landing on star progress 21 jumps to 26", () => {
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 17 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 16 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(27);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(26);
     expect(state.lastAction?.starJumped).toBe(true);
   });
 
-  it("landing on star progress 35 jumps to 40", () => {
+  it("landing on star progress 34 jumps to 39", () => {
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 30 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 29 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(40);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(39);
     expect(state.lastAction?.starJumped).toBe(true);
   });
 
-  it("landing on star progress 48 jumps to 53", () => {
+  it("landing on star progress 47 jumps to 52 (home lane)", () => {
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 43 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 42 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(53);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(52);
     expect(state.lastAction?.starJumped).toBe(true);
   });
 
-  it("star jump does not overshoot finish (57)", () => {
+  it("star jump does not overshoot finish (56)", () => {
+    // From progress 47, +5 = 52 which is HOME_START (home lane), not overshoot
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 43 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 42 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    // 48 pathIndex 47=star, 48+5=53 < 57 ✓
-    expect(state.players[0]!.tokens[0]!.progress).toBe(53);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(52);
     expect(state.lastAction?.starJumped).toBe(true);
   });
 
   it("does not star jump when passing over star (not landing exactly)", () => {
-    // Red token at progress 8, roll 3 → lands on 11. Star at progress 9 (pathIndex 8) is passed but NOT landed.
-    // Steps: 8→9(pathIndex 8=star, passed)→10→11. Lands on 11, not star.
+    // Red token at progress 7, roll 3 → lands on 10. Star at progress 8 is passed but NOT landed.
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 8 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 7 } : t) } : p
     )};
     state = applyRoll(state, "p0", 3);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(11);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(10);
     expect(state.lastAction?.starJumped).toBeFalsy();
   });
 
-  it("star jump from progress 48 lands on 53 (home lane) — no capture", () => {
-    // 53 is home lane (null global square) — no capture can happen after star jump
+  it("star jump from progress 47 lands on 52 (home lane) — no capture", () => {
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 43 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 42 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(53);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(52);
   });
 
-  it("star jump from progress 48 to 53 (home lane) does NOT grant extra turn — only 57 does", () => {
+  it("star jump from progress 47 to 52 (home lane) does NOT grant extra turn — only reaching 56 does", () => {
     let state = createGame(makePlayers(2));
     state = { ...state, players: state.players.map((p, i) =>
-      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 43 } : t) } : p
+      i === 0 ? { ...p, tokens: p.tokens.map((t, j) => j === 0 ? { ...t, progress: 42 } : t) } : p
     )};
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
     expect(state.currentPlayerId).toBe("p1");
   });
 
-  it("star jump from progress 22 (+5) lands on 27 — opponent not on same square = no capture", () => {
-    // Red at progress 17, roll 5 → lands on 22 (pathIndex 21 = star) → jumps to 27 (pathIndex 26).
-    // Green at progress 13 → pathIndex 25 (different square). No capture possible.
+  it("star jump from progress 21 (+5) lands on 26 — opponent not on same square = no capture", () => {
+    // Red at progress 16, roll 5 → lands on 21 (pathIndex 21 = star) → jumps to 26.
+    // Green at progress 12 → pathIndex (13+12)%52 = 25 (different square). No capture possible.
     let state = createGame(makePlayers(2));
     state = {
       ...state,
@@ -561,7 +559,7 @@ describe("star shortcut rule", () => {
         {
           ...state.players[0]!,
           tokens: [
-            { id: "p0:0", progress: 17 },
+            { id: "p0:0", progress: 16 },
             { id: "p0:1", progress: -1 },
             { id: "p0:2", progress: -1 },
             { id: "p0:3", progress: -1 },
@@ -570,7 +568,7 @@ describe("star shortcut rule", () => {
         {
           ...state.players[1]!,
           tokens: [
-            { id: "p1:0", progress: 13 },
+            { id: "p1:0", progress: 12 },
             { id: "p1:1", progress: -1 },
             { id: "p1:2", progress: -1 },
             { id: "p1:3", progress: -1 },
@@ -580,8 +578,8 @@ describe("star shortcut rule", () => {
     };
     state = applyRoll(state, "p0", 5);
     state = applyMove(state, "p0", "p0:0");
-    expect(state.players[0]!.tokens[0]!.progress).toBe(27);
-    expect(state.players[1]!.tokens[0]!.progress).toBe(13); // not captured (different square)
+    expect(state.players[0]!.tokens[0]!.progress).toBe(26);
+    expect(state.players[1]!.tokens[0]!.progress).toBe(12); // not captured (different square)
     expect(state.lastAction?.capturedTokenIds).toEqual([]);
   });
 });
@@ -727,10 +725,10 @@ describe("Ludo King 6-rule (must bring out token from yard)", () => {
         {
           ...state.players[0]!,
           tokens: [
-            { id: "p0:0", progress: 57 },
-            { id: "p0:1", progress: 57 },
-            { id: "p0:2", progress: 57 },
-            { id: "p0:3", progress: 57 },
+            { id: "p0:0", progress: 56 },
+            { id: "p0:1", progress: 56 },
+            { id: "p0:2", progress: 56 },
+            { id: "p0:3", progress: 56 },
           ],
         },
         { ...state.players[1]!, tokens: state.players[1]!.tokens.map(t => ({ ...t, progress: -1 })) },
@@ -780,9 +778,9 @@ describe("home lane and exact roll", () => {
 
 describe("safety and blockades", () => {
   it("safe squares prevent capture", () => {
-    expect(globalSquare("red", 0)).toBe(51); // red start, safe
-    expect(globalSquare("red", 8)).toBe(7);  // star, safe
-    expect(globalSquare("red", 13)).toBe(12); // green start, safe
+    expect(globalSquare("red", 0)).toBe(0);   // red start, safe
+    expect(globalSquare("red", 8)).toBe(8);   // star, safe
+    expect(globalSquare("red", 13)).toBe(13); // green start, safe
   });
 
   it("two opponent tokens cannot occupy same non-safe square", () => {

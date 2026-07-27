@@ -8,12 +8,14 @@ import {
   type RoomPlayerSnapshot,
   type ChatMessage,
   type CommandResult,
+  type TokenState,
   PLAYER_COLORS,
   createGame,
   applyRoll,
   applyMove,
   forfeitPlayer,
   legalTokenIds,
+  globalSquare,
 } from "@apna-ludo/shared";
 import type {
   ClientToServerEvents,
@@ -36,6 +38,7 @@ export interface RoomData {
   chat: ChatMessage[];
   botTimer?: ReturnType<typeof setTimeout>;
   turnTimer?: ReturnType<typeof setTimeout>;
+  lastActivity: number;
 }
 
 const TURN_TIMEOUT_MS = 30000;
@@ -141,6 +144,7 @@ export function createRoom(
     playerOrder: [playerId],
     game: null,
     chat: [],
+    lastActivity: Date.now(),
   };
   rooms.set(code, room);
   if (hostSocketId) {
@@ -432,6 +436,7 @@ export function handleDisconnect(io: TypedServer, socketId: string): void {
           }
         }
         currentRoom.players.delete(player.id);
+        if (player.reconnectToken) reconnectLookup.delete(player.reconnectToken);
         currentRoom.revision += 1;
         if (currentRoom.players.size === 0) {
           rooms.delete(roomCode);
@@ -491,9 +496,16 @@ export function handleRematch(io: TypedServer, socketId: string, expectedRevisio
     return { ok: false, code: "NOT_FINISHED", message: "Game is not finished", commandId };
   }
 
+  // Clear timers before resetting
+  clearTimeout(room.botTimer);
+  clearTimeout(room.turnTimer);
+  room.botTimer = undefined;
+  room.turnTimer = undefined;
+
   // Reset to lobby
   room.phase = "lobby";
   room.game = null;
+  room.lastActivity = Date.now();
   
   // Unready all players
   for (const player of room.players.values()) {
@@ -571,7 +583,7 @@ function doLeave(io: TypedServer, socketId: string, room: RoomData): void {
     rooms.delete(room.code);
   } else {
     if (room.game && room.phase === "playing") {
-      const remainingCount = [...room.players.values()].filter((p) => p.connected || true).length;
+      const remainingCount = [...room.players.values()].filter((p) => p.connected || p.isBot).length;
       if (remainingCount < 2) {
         room.phase = "finished";
       }
@@ -596,6 +608,22 @@ function scheduleTurnTimeout(io: TypedServer, room: RoomData): void {
     if (!r || r.phase !== "playing" || !r.game) return;
     const cp2 = r.players.get(r.game.currentPlayerId);
     if (!cp2 || cp2.isBot) return;
+
+    // If dice already rolled and there are movable tokens, auto-move the first one
+    if (r.game.dice !== null) {
+      const movable = legalTokenIds(r.game, cp2.id, r.game.dice);
+      if (movable.length > 0) {
+        try {
+          r.game = applyMove(r.game, cp2.id, movable[0]!);
+          r.revision += 1;
+          emitSnapshot(io, r.code);
+          scheduleTurnTimeout(io, r);
+          scheduleBotTurn(io, r);
+        } catch { /* ignore */ }
+        return;
+      }
+    }
+
     // Auto-skip turn with a forfeited roll effect
     const dice = rollDice();
     try {
@@ -604,9 +632,7 @@ function scheduleTurnTimeout(io: TypedServer, room: RoomData): void {
       return;
     }
     r.revision += 1;
-    // If after roll the player can't/didn't move, turn passes
     if (r.game.dice === null) {
-      // Turn already advanced (auto-skip or extra turn)
       scheduleTurnTimeout(io, r);
     }
     emitSnapshot(io, r.code);
@@ -646,25 +672,39 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
     if (!updatedCp || !r.game.dice) return;
     const movableIds = r.game.dice ? legalTokenIds(r.game, updatedCp.id, r.game.dice) : [];
     if (movableIds.length > 0) {
-      // Strategy: prefer tokens closest to home (highest progress), then tokens on track vs yard
-      const tokenScores = movableIds.map((id: string) => {
-        const token = updatedCp.tokens.find((t: {id: string}) => t.id === id);
-        if (!token) return { id, score: -1 };
-        if (token.progress === -1) return { id, score: 0 }; // in yard - needs 6
-        if (token.progress >= 52) return { id, score: 100 + token.progress }; // home lane - close to finish
-        return { id, score: 50 + token.progress }; // on track - higher = closer to home
-      });
-      tokenScores.sort((a: {score: number}, b: {score: number}) => b.score - a.score);
-      const bestId = tokenScores[0]!.id;
+      const diceValue = r.game.dice;
+      // Simple strategy: prefer token with highest progress (closest to home)
+      let bestId = movableIds[0]!;
+      for (const id of movableIds) {
+        const t = updatedCp.tokens.find((tk: {id: string}) => tk.id === id);
+        if (t && t.progress > (updatedCp.tokens.find((tk: {id: string}) => tk.id === bestId)?.progress ?? -1)) {
+          bestId = id;
+        }
+      }
+      // Prefer capturing tokens: check if any move lands on an opponent
+      for (const id of movableIds) {
+        const t = updatedCp.tokens.find((tk: TokenState) => tk.id === id);
+        if (!t || t.progress === -1) continue;
+        const dest = t.progress + diceValue;
+        const destGlobal = globalSquare(updatedCp.color, dest);
+        if (destGlobal === null) continue;
+        const anyOpponent = [...r.game.players].some((opp: GamePlayer) => {
+          if (opp.id === cp.id) return false;
+          return opp.tokens.some((ot: TokenState) => {
+            const og = globalSquare(opp.color, ot.progress);
+            return og === destGlobal;
+          });
+        });
+        if (anyOpponent) { bestId = id; break; }
+      }
 
-      setTimeout(() => {
+      room.botTimer = setTimeout(() => {
         const r2 = rooms.get(room.code);
         if (!r2 || r2.phase !== "playing" || !r2.game) return;
         try {
           r2.game = applyMove(r2.game, cp.id, bestId);
           r2.revision += 1;
           emitSnapshot(io, r2.code);
-          // Check if bot gets another turn (bonus from 6/capture/finish)
           scheduleBotTurn(io, r2);
         } catch {
           // Ignore

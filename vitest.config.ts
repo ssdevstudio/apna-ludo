@@ -13,5 +13,14 @@ export default defineConfig({
     // vitest handles vitest imports itself — no separate tsconfig project needed for running
     environment: 'node',
     globals: true,
+    coverage: {
+      provider: 'v8',
+      thresholds: {
+        branches: 60,
+        functions: 70,
+        lines: 70,
+        statements: 70,
+      },
+    },
   },
 });

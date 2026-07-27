@@ -42,9 +42,15 @@ const PORT = rawPort === undefined ? 3001 : Number(rawPort);
 
 const app = express();
 app.disable("x-powered-by");
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  next();
+});
 const ORIGIN = process.env["CORS_ORIGIN"] || (process.env["NODE_ENV"] === "production" ? false : "http://localhost:5173");
 app.use(cors({ origin: ORIGIN === "*" ? "*" : ORIGIN ? ORIGIN.split(",") : false }));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 const httpServer = createServer(app);
 
@@ -82,9 +88,15 @@ app.get("/health", (_req, res) => {
 });
 
 app.post("/api/room", (req, res) => {
-  const name = req.body?.name?.trim() || "Player";
+  const rawName = req.body?.name;
+  const name = (typeof rawName === "string" ? rawName.trim() : "Player") || "Player";
+  if (name.length > 20) { res.status(400).json({ ok: false, error: "NAME_TOO_LONG" }); return; }
   const maxPlayers = Math.min(4, Math.max(2, req.body?.maxPlayers || 4));
-  const isVsBot = req.body?.vsComputer === true;
+  const vsComputerRaw = req.body?.vsComputer;
+  if (vsComputerRaw !== undefined && typeof vsComputerRaw !== "boolean") {
+    res.status(400).json({ ok: false, error: "INVALID_VS_COMPUTER" }); return;
+  }
+  const isVsBot = vsComputerRaw === true;
   if (isVsBot) {
     const result = createRoomWithComputer(io, name, "");
     if (result.ok) {
@@ -105,13 +117,15 @@ app.post("/api/room", (req, res) => {
 // Allow the host to "claim" their socket for a room
 app.post("/api/room/:code/claim", (req, res) => {
   const code = req.params["code"]!.toUpperCase();
-  const { playerId } = req.body || {};
+  const { playerId, reconnectToken } = req.body || {};
   if (!playerId) { res.status(400).json({ ok: false, error: "MISSING_PLAYER_ID" }); return; }
+  if (!reconnectToken) { res.status(400).json({ ok: false, error: "MISSING_RECONNECT_TOKEN" }); return; }
   const room = getRoom(code);
   if (!room) { res.status(404).json({ ok: false, error: "ROOM_NOT_FOUND" }); return; }
   const player = room.players?.get(playerId);
   if (!player) { res.status(404).json({ ok: false, error: "PLAYER_NOT_FOUND" }); return; }
-  res.json({ ok: true, reconnectToken: player.reconnectToken });
+  if (player.reconnectToken !== reconnectToken) { res.status(403).json({ ok: false, error: "INVALID_TOKEN" }); return; }
+  res.json({ ok: true });
 });
 
 app.get("/api/room/:code", (req, res) => {
@@ -171,6 +185,10 @@ io.on("connection", (socket) => {
       ack({ ok: false, code: "INVALID_PAYLOAD", message: parsed.error.message, commandId: payload?.commandId });
       return;
     }
+    if (!checkRateLimit(socket.data, "create")) {
+      ack({ ok: false, code: "RATE_LIMITED", message: "Too many create attempts — slow down" });
+      return;
+    }
     const result = withIdempotency(parsed.data.commandId, () =>
       createRoom(io, parsed.data.name, parsed.data.maxPlayers, socket.id, parsed.data.color),
     );
@@ -184,6 +202,10 @@ io.on("connection", (socket) => {
     const parsed = createRoomSchema.safeParse(payload);
     if (!parsed.success) {
       ack({ ok: false, code: "INVALID_PAYLOAD", message: parsed.error.message, commandId: payload?.commandId });
+      return;
+    }
+    if (!checkRateLimit(socket.data, "create")) {
+      ack({ ok: false, code: "RATE_LIMITED", message: "Too many create attempts — slow down" });
       return;
     }
     const result = withIdempotency(parsed.data.commandId, () =>
@@ -206,8 +228,11 @@ io.on("connection", (socket) => {
       });
       return;
     }
+    if (!checkRateLimit(socket.data, "join")) {
+      ack({ ok: false, code: "RATE_LIMITED", message: "Too many join attempts — slow down" });
+      return;
+    }
     const roomCode = parsed.data.code.toUpperCase();
-    socket.join(roomCode);
     const result = joinRoom(
       io,
       roomCode,
@@ -216,6 +241,9 @@ io.on("connection", (socket) => {
       parsed.data.reconnectToken,
       parsed.data.color,
     );
+    if (result.ok) {
+      socket.join(roomCode);
+    }
     ack(result);
   });
 

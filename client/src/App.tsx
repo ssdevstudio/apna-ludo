@@ -1,6 +1,6 @@
-import { FormEvent, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { FormEvent, useEffect, useMemo, useReducer, useRef, useState, useCallback } from "react";
 import type { Socket } from "socket.io-client";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Link, Route, Routes, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import type {
   ClientToServerEvents, ServerToClientEvents, RoomSnapshot, ChatMessage,
@@ -842,6 +842,7 @@ export default function App() {
   useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if(e.key.toLowerCase()==="r" && !["INPUT","TEXTAREA","SELECT"].includes((e.target as HTMLElement)?.tagName))document.querySelector<HTMLButtonElement>(".roll-button:not(:disabled)")?.click();};window.addEventListener("keydown",onKey);return ()=>window.removeEventListener("keydown",onKey);},[]);
   return <ErrorBoundary><Routes><Route path="/" element={<Landing/>}/><Route path="/room/:code" element={<Room/>}/><Route path="*" element={<Landing/>}/></Routes></ErrorBoundary>;
 }
+
 
 
 

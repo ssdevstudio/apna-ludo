@@ -17,7 +17,7 @@ export type PlayerGameStatus = "active" | "won" | "forfeited";
 
 export interface TokenState {
   id: string;
-  /** -1: yard, 0..51: common track, 52..56: home lane, 57: home. */
+  /** -1: yard, 0..50: common track, 51..55: home lane, 56: home (FINISH_PROGRESS). */
   progress: number;
 }
 
@@ -142,6 +142,7 @@ export function canMoveToken(
   playerId: string,
   tokenId: string,
   dice: number,
+  blockades?: Set<number>,
 ): boolean {
   if (!Number.isInteger(dice) || dice < 1 || dice > 6) return false;
   const player = state.players.find((candidate) => candidate.id === playerId);
@@ -156,11 +157,11 @@ export function canMoveToken(
   const finalDestination = diceDestination;
   if (finalDestination > FINISH_PROGRESS) return false;
 
-  const blockades = blockadeSquares(state);
+  const resolvedBlockades = blockades ?? blockadeSquares(state);
   const firstStep = token.progress === -1 ? 0 : token.progress + 1;
   for (let progress = firstStep; progress <= finalDestination; progress += 1) {
     const square = globalSquare(player.color, progress);
-    if (square === null || !blockades.has(square)) continue;
+    if (square === null || !resolvedBlockades.has(square)) continue;
 
     // A token may not pass or land on any blockade (2+ tokens), including its own.
     return false;
@@ -184,13 +185,18 @@ export function legalTokenIds(state: GameState, playerId: string, dice: number):
   const player = state.players.find((candidate) => candidate.id === playerId);
   if (!player) return [];
 
-  let candidates = player.tokens
-    .filter((token) => canMoveToken(state, playerId, token.id, dice))
+  const blockades = blockadeSquares(state);
+
+  if (dice === 6) {
+    const yardTokens = player.tokens
+      .filter((token) => token.progress === -1 && canMoveToken(state, playerId, token.id, dice, blockades))
+      .map((token) => token.id);
+    if (yardTokens.length > 0) return yardTokens;
+  }
+
+  return player.tokens
+    .filter((token) => canMoveToken(state, playerId, token.id, dice, blockades))
     .map((token) => token.id);
-
-  // Player can choose to either bring a token out or move an existing token on a 6.
-
-  return candidates;
 }
 
 function finishTurn(state: GameState, playerId: string, extraTurn: boolean): GameState {
@@ -270,7 +276,19 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   const tokenIndex = player.tokens.findIndex((token) => token.id === tokenId);
   const previousProgress = player.tokens[tokenIndex]!.progress;
   const diceDestination = previousProgress === -1 ? 0 : previousProgress + state.dice;
-  const finalDestination = diceDestination;
+
+  let finalDestination = diceDestination;
+  let starJumped = false;
+
+  const destSquare = globalSquare(player.color, finalDestination);
+  if (destSquare !== null &&
+    STAR_SQUARE_SET.has(destSquare) &&
+    destSquare !== START_OFFSETS[player.color] &&
+    finalDestination + STAR_JUMP <= FINISH_PROGRESS
+  ) {
+    finalDestination += STAR_JUMP;
+    starJumped = true;
+  }
 
   const movedToken: TokenState = { ...player.tokens[tokenIndex]!, progress: finalDestination };
   const players = state.players.map((candidate) => ({
@@ -307,7 +325,7 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
     players,
     winners,
     revision: state.revision + 1,
-    lastAction: { type: "moved", playerId, tokenId, capturedTokenIds, starJumped: false },
+    lastAction: { type: "moved", playerId, tokenId, capturedTokenIds, starJumped },
   };
 
   const extraTurn = !finished && (state.dice === 6 || capturedTokenIds.length > 0 || finalDestination === FINISH_PROGRESS);
