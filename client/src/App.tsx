@@ -648,6 +648,7 @@ function Room() {
   const [lastRolls,setLastRolls]=useState<Record<string,number>>({});
   const chatEnd=useRef<HTMLDivElement>(null);
   const revisionRef=useRef(0);
+  useEffect(()=>{if(snapshot)revisionRef.current=snapshot.revision;},[snapshot]);
   const cmdSeq=useRef(0);
   const moveTokenRef=useRef<(tokenId:string)=>void>(()=>{});
 
