@@ -537,8 +537,8 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
     {game.players.map(p => {
       if (game.currentPlayerId !== p.id) return null;
       const blinkStyle: React.CSSProperties = {
-        position: 'absolute', width: '40%', height: '40%', zIndex: 1, pointerEvents: 'none', borderRadius: '10px',
-        animation: 'yardBlink 1s infinite alternate',
+        position: 'absolute', width: '40%', height: '40%', zIndex: 10, pointerEvents: 'none', borderRadius: '10px',
+        animation: 'yardBlinkNew 1s infinite',
       };
       if (p.color === 'green') { blinkStyle.top = '0'; blinkStyle.left = '0'; }
       else if (p.color === 'yellow') { blinkStyle.top = '0'; blinkStyle.right = '0'; }
