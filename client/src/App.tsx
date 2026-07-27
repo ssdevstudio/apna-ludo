@@ -381,7 +381,8 @@ function PlayerCorner({
   canRoll,
   canMove,
   onRoll,
-  avatar
+  avatar,
+  reactions
 }: {
   player?: GamePlayer | RoomPlayerSnapshot;
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -392,6 +393,7 @@ function PlayerCorner({
   canMove: boolean;
   onRoll: () => void;
   avatar: string;
+  reactions?: {id:string, emoji:string}[];
 }) {
   if (!player) {
     return <div className={`player-corner corner-${position} empty`}></div>;
@@ -402,7 +404,10 @@ function PlayerCorner({
 
   return (
     <div className={`player-corner corner-${position} corner-${player.color} ${isActive ? "active" : ""}`}>
-      <div className="corner-profile">
+      <div className="corner-profile" style={{position: "relative"}}>
+        {reactions?.map(r => (
+          <div key={r.id} className="floating-emoji" style={{position:"absolute", top:"-20px", left:"50%", transform:"translateX(-50%)", fontSize:"2rem", zIndex:50, animation:"floatUp 3s ease-out forwards"}}>{r.emoji}</div>
+        ))}
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
         <b>{player.name}</b>
       </div>
@@ -639,6 +644,14 @@ function Room() {
   const [reconnectToken,setReconnectToken]=useState<string|null>(()=>sessionStorage.getItem(`apna-token-${code}`));
   const [copied,setCopied]=useState(false);
   const [chatOpen,setChatOpen]=useState(false);
+  const chatOpenRef=useRef(false);
+  const [unreadCount,setUnreadCount]=useState(0);
+  useEffect(()=>{
+    chatOpenRef.current=chatOpen;
+    if(chatOpen)setUnreadCount(0);
+  },[chatOpen]);
+  const [reactionPickerOpen,setReactionPickerOpen]=useState(false);
+  const [reactions,setReactions]=useState<{id:string, emoji:string, playerId:string}[]>([]);
   const [settingsOpen,setSettingsOpen]=useState(false);
   const [message,setMessage]=useState("");
   const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
@@ -705,7 +718,17 @@ function Room() {
       if(snap.game?.currentPlayerId===playerId&&snap.game?.dice===null)playSound("turn");
       if(snap.game?.movableTokenIds?.length===1&&snap.game.currentPlayerId===playerId){setTimeout(()=>{moveTokenRef.current(snap.game!.movableTokenIds[0]!);},300);}
     });
-    s.on("chat:message",(msg:ChatMessage)=>{setChatMsgs(p=>{const next=[...p,msg];return next.length>120?next.slice(-120):next;});});
+    s.on("chat:message",(msg:ChatMessage)=>{
+      setChatMsgs(p=>{const next=[...p,msg];return next.length>120?next.slice(-120):next;});
+      setUnreadCount(prev => chatOpenRef.current ? 0 : prev + 1);
+    });
+    s.on("room:reaction", (payload) => {
+      const id = crypto.randomUUID();
+      setReactions(prev => [...prev, { id, emoji: payload.emoji, playerId: payload.playerId }]);
+      setTimeout(() => {
+        setReactions(prev => prev.filter(r => r.id !== id));
+      }, 3000);
+    });
     return ()=>{s.close();};
   },[]); // eslint-disable-line
 
@@ -718,6 +741,12 @@ function Room() {
   const moveToken=(tokenId:string)=>{if(!socket||!canMove)return;cmdSeq.current+=1;setTokenAnimation(tokenId);socket.emit("game:move",{tokenId,expectedRevision:revisionRef.current},()=>{setTokenAnimation(null);});};
   moveTokenRef.current=moveToken;
   const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
+  
+  const sendReaction = (emoji: string) => {
+    setReactionPickerOpen(false);
+    if (!socket) return;
+    socket.emit("room:react", { emoji }, () => {});
+  };
   const leaveRoom=()=>{if(socket)socket.emit("room:leave",{},()=>{});sessionStorage.removeItem(`apna-token-${snapshot?.code??code}`);navigate("/");};
   const rematchRoom=()=>{if(socket)socket.emit("room:rematch",{expectedRevision:revisionRef.current},()=>{});};
 
@@ -747,6 +776,7 @@ function Room() {
       canMove={canMove && isMe}
       onRoll={rollDice}
       avatar={isMe ? myAvatar : ""}
+      reactions={reactions.filter((r: any) => r.playerId === p?.id)}
     />
   };
 
@@ -771,7 +801,13 @@ function Room() {
     <header className="room-header"><Logo compact/>
       <div className="room-code"><span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code??code).toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button></div>
       <div className="header-actions">
-        <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {allChatMessages.length>0&&<span className="badge">{allChatMessages.length}</span>}</button>
+        <div className="reaction-wrapper" style={{position:"relative"}}>
+          <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
+          {reactionPickerOpen && <div className="reaction-picker" style={{position:"absolute", right:0, top:"100%", background:"white", border:"1px solid #ddd", borderRadius:"8px", padding:"4px", display:"flex", gap:"4px", zIndex:100, boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>
+            {["👍","😂","😡","😭","😮","🎲"].map(e=><button key={e} onClick={()=>sendReaction(e)} style={{background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", padding:"4px"}}>{e}</button>)}
+          </div>}
+        </div>
+        <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>
         <button className="icon-btn" onClick={()=>setSettingsOpen(true)}>⚙️</button>
       </div>
     </header>

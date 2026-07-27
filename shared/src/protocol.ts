@@ -41,6 +41,11 @@ export const chatCommandSchema = z.object({
   commandId: commandIdSchema.optional(),
 }).strict();
 
+export const roomReactSchema = z.object({
+  emoji: z.string().min(1).max(10),
+  commandId: commandIdSchema.optional(),
+}).strict();
+
 export const tokenStateSchema = z.object({
   id: z.string(),
   progress: z.number().int().min(-1).max(57),
@@ -164,6 +169,7 @@ export interface ClientToServerEvents {
   "game:roll": (payload: z.input<typeof roomCommandSchema>, ack: (result: CommandResult) => void) => void;
   "game:move": (payload: z.input<typeof moveTokenSchema>, ack: (result: CommandResult) => void) => void;
   "chat:send": (payload: z.input<typeof chatCommandSchema>, ack: (result: CommandResult) => void) => void;
+  "room:react": (payload: z.input<typeof roomReactSchema>, ack: (result: CommandResult) => void) => void;
   "room:rematch": (payload: z.input<typeof roomCommandSchema>, ack: (result: CommandResult) => void) => void;
   "room:leave": (payload: z.input<typeof roomCommandSchema>, ack: (result: CommandResult) => void) => void;
 }
@@ -171,6 +177,7 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
   "room:snapshot": (snapshot: RoomSnapshot) => void;
   "chat:message": (message: ChatMessage) => void;
+  "room:reaction": (payload: { emoji: string; playerId: string }) => void;
   "server:error": (error: { code: ErrorCode; message: string }) => void;
 }
 

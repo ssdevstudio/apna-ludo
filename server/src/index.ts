@@ -10,6 +10,7 @@ import {
   roomCommandSchema,
   moveTokenSchema,
   chatCommandSchema,
+  roomReactSchema,
   commandMetaSchema,
   type ClientToServerEvents,
   type ServerToClientEvents,
@@ -32,6 +33,7 @@ import {
   handleLeave,
   getRoomData,
   getRoom,
+  broadcastReaction,
 } from "./room-manager.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -315,6 +317,27 @@ io.on("connection", (socket) => {
     }
     const result = withIdempotency(parsed.data.commandId, () =>
       addChatMessage(io, socket.id, parsed.data.text, parsed.data.commandId),
+    );
+    ack(result);
+  });
+
+  socket.on("room:react", (payload, ack) => {
+    const parsed = roomReactSchema.safeParse(payload);
+    if (!parsed.success) {
+      ack({ ok: false, code: "INVALID_PAYLOAD", message: parsed.error.message });
+      return;
+    }
+    if (!checkRateLimit(socket.data, "chat")) {
+      ack({ ok: false, code: "RATE_LIMITED", message: "Too many reactions" });
+      return;
+    }
+    const roomCode = socket.data.roomCode;
+    if (!roomCode) {
+      ack({ ok: false, code: "NOT_IN_ROOM", message: "Not in room" });
+      return;
+    }
+    const result = withIdempotency(parsed.data.commandId, () =>
+      broadcastReaction(io, roomCode, socket.id, parsed.data.emoji)
     );
     ack(result);
   });

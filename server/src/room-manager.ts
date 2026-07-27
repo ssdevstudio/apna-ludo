@@ -716,3 +716,12 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
     }
   }, delay);
 }
+
+export function broadcastReaction(io: TypedServer, code: string, socketId: string, emoji: string): CommandResult {
+  const room = rooms.get(code);
+  if (!room) return { ok: false, code: "ROOM_NOT_FOUND", message: "Room not found" };
+  const player = getPlayerInRoom(room, socketId);
+  if (!player || !room.players.has(player.id)) return { ok: false, code: "NOT_IN_ROOM", message: "Not in room" };
+  io.to(code).emit("room:reaction", { emoji, playerId: player.id });
+  return { ok: true };
+}

@@ -225,3 +225,13 @@ footer{padding:24px 20px;max-width:1200px;margin:auto;border-top:1px solid var(-
 .color-btn.green { background: #3B9C70; }
 .color-btn.yellow { background: #E7B93F; }
 .color-btn.blue { background: #3783BA; }
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+}
+
+.floating-emoji {
+  pointer-events: none;
+}
