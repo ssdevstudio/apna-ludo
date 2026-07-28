@@ -5,6 +5,7 @@
   gap: 15px 10px;
   width: min(100%, 580px);
   margin: 0 auto;
+  padding: 30px 0;
 }
 .board-center {
   grid-column: 1 / -1;
