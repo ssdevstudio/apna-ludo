@@ -678,7 +678,13 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
 
     // Smarter bot: pick the best token to move. Use the UPDATED player after applyRoll.
     const updatedCp = r.game.players.find((p: GamePlayer) => p.id === cp.id);
-    if (!updatedCp || !r.game.dice) return;
+    if (!updatedCp) return;
+    
+    // If dice is null, it means applyRoll already advanced the turn (e.g. no legal moves)
+    if (!r.game.dice) {
+      scheduleBotTurn(io, r);
+      return;
+    }
     const movableIds = r.game.dice ? legalTokenIds(r.game, updatedCp.id, r.game.dice) : [];
     if (movableIds.length > 0) {
       const diceValue = r.game.dice;
