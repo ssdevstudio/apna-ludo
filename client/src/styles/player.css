@@ -5,68 +5,81 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 6px 14px;
-  border-radius: 8px;
-  background: #fffdf7;
-  border: 2px solid transparent;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  min-width: 130px;
-  opacity: 0.5;
+  padding: 6px 12px 6px 8px;
+  border-radius: 40px;
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  border: 3px solid transparent;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,1);
+  min-width: 140px;
+  opacity: 0.6;
   transition: all 0.3s ease;
   position: relative;
 }
 .player-corner.active {
   opacity: 1;
   transform: scale(1.05);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,1);
   z-index: 10;
 }
 .player-corner.empty { visibility: hidden; }
 
-.corner-red { border-color: var(--red); background: linear-gradient(to right, rgba(219,68,55,0.1), transparent); }
-.corner-blue { border-color: var(--blue); background: linear-gradient(to right, rgba(66,133,244,0.1), transparent); }
-.corner-green { border-color: var(--green); background: linear-gradient(to right, rgba(15,157,88,0.1), transparent); }
-.corner-yellow { border-color: var(--yellow); background: linear-gradient(to right, rgba(244,180,0,0.1), transparent); }
+.corner-red { border-color: var(--red); background: linear-gradient(145deg, #ffffff, #ffebee); }
+.corner-blue { border-color: var(--blue); background: linear-gradient(145deg, #ffffff, #e8f0fe); }
+.corner-green { border-color: var(--green); background: linear-gradient(145deg, #ffffff, #e6f4ea); }
+.corner-yellow { border-color: var(--yellow); background: linear-gradient(145deg, #ffffff, #fef7e0); }
 
-.corner-top-left { justify-self: start; grid-column: 1; grid-row: 1; }
-.corner-top-right { justify-self: end; grid-column: 2; grid-row: 1; flex-direction: row-reverse; }
-.corner-bottom-left { justify-self: start; grid-column: 1; grid-row: 3; }
-.corner-bottom-right { justify-self: end; grid-column: 2; grid-row: 3; flex-direction: row-reverse; }
+.corner-top-left { justify-self: start; grid-column: 1; grid-row: 1; padding-right: 40px; }
+.corner-top-right { justify-self: end; grid-column: 2; grid-row: 1; flex-direction: row-reverse; padding-left: 40px; }
+.corner-bottom-left { justify-self: start; grid-column: 1; grid-row: 3; padding-right: 40px; }
+.corner-bottom-right { justify-self: end; grid-column: 2; grid-row: 3; flex-direction: row-reverse; padding-left: 40px; }
 
-.corner-top-right.corner-yellow { background: linear-gradient(to left, rgba(244,180,0,0.1), transparent); }
-.corner-top-right.corner-blue { background: linear-gradient(to left, rgba(66,133,244,0.1), transparent); }
-.corner-bottom-right.corner-blue { background: linear-gradient(to left, rgba(66,133,244,0.1), transparent); }
-.corner-bottom-right.corner-yellow { background: linear-gradient(to left, rgba(244,180,0,0.1), transparent); }
+.corner-profile { display: flex; flex-direction: column; align-items: center; gap: 2px; z-index: 2; }
+.corner-profile b { font-size: 12px; white-space: nowrap; max-width: 60px; overflow: hidden; text-overflow: ellipsis; color: #333; font-weight: 700; }
+.corner-dice { 
+  position: absolute; 
+  top: 50%; 
+  transform: translateY(-50%); 
+  display: flex; 
+  align-items: center; 
+  z-index: 15; 
+}
+.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -20px; }
+.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -20px; }
 
-.corner-profile { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.corner-profile b { font-size: 11px; white-space: nowrap; max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
-.corner-dice { position: relative; display: flex; align-items: center; }
-.corner-roll-btn { background: transparent; border: none; padding: 0; cursor: pointer; transition: transform 0.2s; outline: none; }
-.corner-roll-btn:not(:disabled):hover { transform: scale(1.1) translateY(-2px); }
+.corner-roll-btn { 
+  background: #fff; 
+  border: 3px solid #ddd; 
+  border-radius: 12px; 
+  padding: 4px; 
+  cursor: pointer; 
+  transition: transform 0.2s, box-shadow 0.2s; 
+  outline: none; 
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+.corner-roll-btn:not(:disabled):hover { transform: scale(1.1) translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
 .corner-roll-btn:disabled { cursor: default; }
 
 /* PlayerTurnIndicator Component */
 .turn-indicator-wrapper {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
+  inset: 0;
   pointer-events: none;
+  z-index: 1;
 }
-.turn-left { right: -50px; }
-.turn-right { left: -50px; }
 
 .turn-glow-ring {
   position: absolute;
-  width: 45px;
-  height: 45px;
+  top: 50%;
+  margin-top: -22px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   animation: ringPulse 1.2s infinite cubic-bezier(0.2, 0, 0.8, 1);
   box-shadow: 0 0 15px currentColor;
 }
+.turn-right .turn-glow-ring { left: 18px; }
+.turn-left .turn-glow-ring { right: 18px; }
+
 .ring-red { color: var(--red); }
 .ring-blue { color: var(--blue); }
 .ring-green { color: var(--green); }
@@ -78,6 +91,9 @@
 }
 
 .turn-arrow {
+  position: absolute;
+  top: 50%;
+  margin-top: -16px;
   color: #ffcc00;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) drop-shadow(0 0 8px rgba(255, 204, 0, 0.6));
   animation: arrowFloat 0.5s infinite alternate ease-in-out;
@@ -85,16 +101,16 @@
   align-items: center;
   justify-content: center;
 }
-.arrow-left { animation-name: floatLeft; }
-.arrow-right { animation-name: floatRight; }
+.turn-right .turn-arrow { right: -5px; animation-name: floatRight; }
+.turn-left .turn-arrow { left: -5px; animation-name: floatLeft; }
 
 @keyframes floatLeft {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-10px); }
+  100% { transform: translateX(-8px); }
 }
 @keyframes floatRight {
   0% { transform: translateX(0); }
-  100% { transform: translateX(10px); }
+  100% { transform: translateX(8px); }
 }
 
 .turn-highlight-border {

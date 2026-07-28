@@ -39,7 +39,15 @@ export function PlayerCorner({
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
         <b>{player.name}</b>
       </div>
-      <div className="corner-dice">
+      
+      {isActive && (canRoll || canMove) && (
+        <PlayerTurnIndicator 
+          color={player.color as PlayerColor} 
+          direction={position.includes('left') ? 'right' : 'left'} 
+        />
+      )}
+
+      <div className={`corner-dice ${isActive && (canRoll || canMove) ? 'dice-active' : ''}`}>
         <button 
           className="corner-roll-btn" 
           onClick={onRoll} 
@@ -47,12 +55,6 @@ export function PlayerCorner({
         >
           <Die value={diceValue ?? 1} rolling={isRolling} />
         </button>
-        {isActive && (canRoll || canMove) && (
-          <PlayerTurnIndicator 
-            color={player.color as PlayerColor} 
-            direction={player.color === 'red' || player.color === 'green' ? 'left' : 'right'} 
-          />
-        )}
       </div>
     </div>
   );

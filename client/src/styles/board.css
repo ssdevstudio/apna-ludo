@@ -22,7 +22,7 @@
 .game-pawn-wrapper{position:absolute;top:50%;left:50%;transform:translate(-50%,-80%);transform-origin:bottom center;z-index:15;width:clamp(20px,2.8vw,36px);height:clamp(26px,3.6vw,46px);border:0;background:transparent;padding:0;margin:0;pointer-events:auto;box-sizing:border-box}
 .game-pawn-inner{display:block;width:100%;height:100%;transition:all .3s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
 .game-pawn-inner::before,.game-pawn-inner::after{display:none}
-.game-pawn-inner img{width:100%;height:100%;object-fit:contain;pointer-events:none}
+.game-pawn-inner img{width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.6)) drop-shadow(0 8px 10px rgba(0,0,0,0.3)) brightness(1.15) contrast(1.05);}
 .game-pawn-wrapper.legal-token{cursor:pointer}
 .game-pawn-wrapper.legal-token .game-pawn-inner{animation:glow 1s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,255,100,.8)) drop-shadow(0 2px 3px rgba(0,0,0,.45))}
 .game-pawn-wrapper.legal-token:hover .game-pawn-inner{transform:translateY(-3px) scale(1.2)}
@@ -32,8 +32,9 @@
 .yard-blink-overlay { transition: all 0.2s ease-in-out; }
 
 @keyframes yardBlink {
-  from { box-shadow: inset 0 0 0px 4px rgba(255,255,255,0.0), 0 0 10px rgba(255,255,255,0.0); background-color: rgba(255,255,255,0.0); }
-  to { box-shadow: inset 0 0 0px 4px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5); background-color: rgba(255,255,255,0.3); }
+  0% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0); }
+  50% { box-shadow: inset 0 0 0 5px rgba(255,255,255,0.9), 0 0 15px rgba(255,255,255,0.6); }
+  100% { box-shadow: inset 0 0 0 0 rgba(255,255,255,0); }
 }
 
 @keyframes yardBlinkNew {
