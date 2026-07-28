@@ -20,13 +20,29 @@
 
 .home-yard{position:absolute;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px;z-index:3}.yard-red{left:0;bottom:0;width:40%;height:40%}.yard-green{left:0;top:0;width:40%;height:40%}.yard-yellow{right:0;top:0;width:40%;height:40%}.yard-blue{right:0;bottom:0;width:40%;height:40%}.yard-token{width:100%;max-width:40px;height:auto;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));place-self:center}
 
-.game-pawn-wrapper{position:absolute;top:50%;left:50%;transform:translate(-50%,-80%);transform-origin:50% 80%;z-index:15;width:clamp(20px,2.8vw,36px);height:clamp(26px,3.6vw,46px);border:0;background:transparent;padding:0;margin:0;pointer-events:auto;box-sizing:border-box}
+.game-pawn-wrapper{position:absolute;top:50%;left:50%;transform:translate(-50%,-90%);transform-origin:50% 90%;z-index:15;width:clamp(20px,2.8vw,36px);height:clamp(26px,3.6vw,46px);border:0;background:transparent;padding:0;margin:0;pointer-events:auto;box-sizing:border-box}
 .game-pawn-inner{display:block;width:100%;height:100%;transition:all .3s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
 .game-pawn-inner::before,.game-pawn-inner::after{display:none}
 .game-pawn-inner img{width:100%;height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.6)) drop-shadow(0 8px 10px rgba(0,0,0,0.3)) brightness(1.15) contrast(1.05);}
 .game-pawn-wrapper.legal-token{cursor:pointer}
-.game-pawn-wrapper.legal-token .game-pawn-inner{animation:glow 1s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,255,100,.8)) drop-shadow(0 2px 3px rgba(0,0,0,.45))}
-.game-pawn-wrapper.legal-token:hover .game-pawn-inner{transform:translateY(-3px) scale(1.2)}
+.game-pawn-wrapper.legal-token .game-pawn-inner{animation:pawnHop 0.5s infinite alternate ease-in-out;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.5))}
+.game-pawn-wrapper.legal-token::before {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  margin-bottom: -22px;
+  border-radius: 50%;
+  border: 3px dashed #222;
+  box-shadow: 0 0 0 2px var(--token-color, red), inset 0 0 0 2px var(--token-color, red);
+  z-index: -1;
+  animation: spinRing 3s linear infinite;
+  pointer-events: none;
+}
+.game-pawn-wrapper.legal-token:hover .game-pawn-inner{transform:translateY(-3px) scale(1.15)}
 .game-pawn-wrapper.legal-token:focus-visible .game-pawn-inner{outline:3px solid #f0bd3f;outline-offset:3px}
 .game-pawn-wrapper .game-pawn-inner.pawn--animate{animation:hop 0.15s ease}
 
@@ -46,9 +62,13 @@
 
 @keyframes footprintFade{from{opacity:0.8;transform:translate(-50%,-50%) scale(0.8)}to{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
 
-@keyframes glow {
-  from { transform: translateY(0); filter: drop-shadow(0 0 6px rgba(255,255,100,0.4)) drop-shadow(0 2px 3px rgba(0,0,0,0.45)); }
-  to { transform: translateY(-3px); filter: drop-shadow(0 0 12px rgba(255,255,100,0.8)) drop-shadow(0 5px 6px rgba(0,0,0,0.3)); }
+@keyframes pawnHop {
+  0% { transform: translateY(0); filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+  100% { transform: translateY(-4px); filter: drop-shadow(0 6px 5px rgba(0,0,0,0.3)); }
+}
+@keyframes spinRing {
+  0% { transform: rotateX(72deg) rotateZ(0deg); }
+  100% { transform: rotateX(72deg) rotateZ(360deg); }
 }
 @keyframes hop {
   0% { transform: translateY(0) }
