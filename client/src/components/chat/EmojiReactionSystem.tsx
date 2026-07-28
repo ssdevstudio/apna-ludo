@@ -5,7 +5,7 @@ export function EmojiReactionSystem({
 }) {
   return (
     <>
-      <div className="floating-reactions" style={{position:'fixed', inset:0, pointerEvents:'none', zIndex:999, overflow:'hidden'}}>
+      <div className="floating-reactions" style={{position:'absolute', inset:0, pointerEvents:'none', zIndex:999, overflow:'hidden'}}>
         {reactions.map(r => (
           <div key={r.id} style={{
             position:'absolute', left:'50%', top:'50%', fontSize:'48px',

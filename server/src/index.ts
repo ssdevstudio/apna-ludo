@@ -331,8 +331,13 @@ io.on("connection", (socket) => {
       ack({ ok: false, code: "RATE_LIMITED", message: "Too many reactions" });
       return;
     }
+    const roomCode = socket.data.roomCode;
+    if (!roomCode) {
+      ack({ ok: false, code: "NOT_IN_ROOM", message: "Not in room" });
+      return;
+    }
     const result = withIdempotency(parsed.data.commandId, () =>
-      broadcastReaction(io, socket.id, parsed.data.emoji)
+      broadcastReaction(io, roomCode, socket.id, parsed.data.emoji)
     );
     ack(result);
   });

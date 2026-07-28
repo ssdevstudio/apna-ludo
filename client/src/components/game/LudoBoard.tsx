@@ -15,7 +15,6 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
   const visualProgressRef = useRef<Record<string, number>>({});
   const [, setForceRender] = useState(0);
   const [footprints, setFootprints] = useState<{id:string;color:PlayerColor;top:string;left:string}[]>([]);
-  const [capturedTokens, setCapturedTokens] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const tokensToAnimate:{id:string;color:PlayerColor;start:number;end:number}[] = [];
@@ -32,9 +31,6 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
         tokensToAnimate.push({id: t.id, color: p.color, start: current, end: t.progress});
       } else if (current !== t.progress) {
         visualProgressRef.current[t.id] = t.progress;
-        if (t.progress === -1 && current !== -1) {
-          setCapturedTokens(prev => ({...prev, [t.id]: Date.now()}));
-        }
         instantChange = true;
       }
     }));
@@ -57,7 +53,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
           const c = cellIdx % 15;
           const top = `${(r + 0.5) * (100 / 15)}%`;
           const left = `${(c + 0.5) * (100 / 15)}%`;
-          setFootprints(prev => [...prev.slice(-8), { id: Math.random().toString(), color: t.color, top, left }]);
+          setFootprints(prev => [...prev.slice(-4), { id: Math.random().toString(), color: t.color, top, left }]);
 
           setForceRender(x => x + 1);
           playSound("move");
@@ -124,10 +120,10 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       <div key={f.id} className="footprint-anim" style={{
         position: 'absolute', top: f.top, left: f.left,
         transform: 'translate(-50%, -50%)', zIndex: 6,
-        width: '12px', height: '12px', pointerEvents: 'none',
-        backgroundColor: 'white', borderRadius: '50%', opacity: 0.8,
-        boxShadow: `0 0 6px 2px var(--${f.color}), inset 0 0 2px var(--${f.color})`,
-        animation: 'footprintFade 1.2s ease-out forwards'
+        width: '24px', height: '24px', pointerEvents: 'none',
+        backgroundColor: 'white', borderRadius: '50%', opacity: 0.6,
+        boxShadow: `0 0 4px var(--${f.color}), inset 0 0 4px var(--${f.color})`,
+        animation: 'footprintFade 0.6s ease-out forwards'
       }} />
     ))}
 
@@ -174,15 +170,12 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
     const innerClass = `game-pawn-inner pawn-color-${t.color} ${isLegalToken ? "legal-token premium-pulse" : ""} ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""}`;
     
-    const isCaptured = capturedTokens[t.id] && (Date.now() - capturedTokens[t.id] < 600);
-    const transition = isCaptured ? 'top 0.6s cubic-bezier(0.5, 0, 0.5, 1), left 0.6s cubic-bezier(0.5, 0, 0.5, 1), transform 0.6s cubic-bezier(0.5, 0, 0.5, 1)' : 'top 0.25s linear, left 0.25s linear, transform 0.25s linear';
-
     const style: React.CSSProperties = {
       position: 'absolute',
       top,
       left,
       transform,
-      transition,
+      transition: 'top 0.25s linear, left 0.25s linear, transform 0.25s linear',
       zIndex: isYard ? 5 : 10,
       width: 'clamp(20px,2.8vw,36px)',
       height: 'clamp(26px,3.6vw,46px)'
@@ -192,7 +185,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       return (
         <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
           <span className={innerClass}>
-            <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }} className={isCaptured ? "token-capture-spin" : ""}>
+            <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
               <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
             </div>
           </span>
@@ -202,7 +195,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     return (
       <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token`}>
         <div className={innerClass}>
-          <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }} className={isCaptured ? "token-capture-spin" : ""}>
+          <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
             <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
           </div>
         </div>

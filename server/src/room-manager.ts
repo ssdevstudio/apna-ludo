@@ -717,9 +717,7 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
   }, delay);
 }
 
-export function broadcastReaction(io: TypedServer, socketId: string, emoji: string): CommandResult {
-  const code = socketToRoom.get(socketId);
-  if (!code) return { ok: false, code: "NOT_IN_ROOM", message: "Not in room" };
+export function broadcastReaction(io: TypedServer, code: string, socketId: string, emoji: string): CommandResult {
   const room = rooms.get(code);
   if (!room) return { ok: false, code: "ROOM_NOT_FOUND", message: "Room not found" };
   const player = getPlayerInRoom(room, socketId);

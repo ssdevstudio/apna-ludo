@@ -45,11 +45,7 @@ export function PlayerCorner({
         >
           <Die value={diceValue ?? 1} rolling={isRolling} />
         </button>
-        {isActive && canRoll && (
-          <div className="turn-indicator">
-            {position.includes('right') ? '👉' : '👈'}
-          </div>
-        )}
+        {isActive && canRoll && <div className="turn-indicator">←</div>}
       </div>
     </div>
   );
