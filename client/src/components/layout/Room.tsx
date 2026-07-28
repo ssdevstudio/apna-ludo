@@ -177,12 +177,17 @@ export function Room() {
   
   const sendReaction = (emoji: string) => {
     setSentEmoji(emoji);
-    setTimeout(() => {
-      setReactionPickerOpen(false);
-      setSentEmoji(null);
-    }, 400);
+    setTimeout(() => setSentEmoji(null), 1000);
+    setReactionPickerOpen(false);
     if (!socket) return;
-    socket.emit("room:react", { emoji }, () => {});
+    socket.emit("room:react", { emoji }, (ack: any) => {
+      if (ack && !ack.ok) {
+        console.error("Reaction failed:", ack);
+        if (ack.code !== "RATE_LIMITED") {
+          alert("Could not send emoji: " + ack.message);
+        }
+      }
+    });
   };
   const leaveRoom=()=>{if(socket)socket.emit("room:leave",{},()=>{});sessionStorage.removeItem(`apna-token-${snapshot?.code??code}`);navigate("/");};
   const rematchRoom=()=>{if(socket)socket.emit("room:rematch",{expectedRevision:revisionRef.current},()=>{});};
