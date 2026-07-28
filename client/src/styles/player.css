@@ -40,7 +40,7 @@
 
 .corner-profile { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .corner-profile b { font-size: 11px; white-space: nowrap; max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
-.corner-dice { position: relative; display: flex; align-items: center; }
+.corner-dice { display: flex; align-items: center; }
 .corner-roll-btn { background: transparent; border: none; padding: 0; cursor: pointer; transition: transform 0.2s; outline: none; }
 .corner-roll-btn:not(:disabled):hover { transform: scale(1.1) translateY(-2px); }
 .corner-roll-btn:disabled { cursor: default; }
@@ -54,15 +54,15 @@
   text-shadow: 0 0 8px rgba(255,255,255,1), 0 0 4px rgba(0,0,0,0.5);
 }
 .corner-bottom-left .turn-indicator, .corner-top-left .turn-indicator {
-  right: -50px;
+  right: -40px;
   animation: pointLeft 0.5s infinite alternate ease-in-out;
 }
 .corner-bottom-right .turn-indicator, .corner-top-right .turn-indicator {
-  left: -50px;
+  left: -40px;
   animation: pointRight 0.5s infinite alternate ease-in-out;
 }
-@keyframes pointLeft { from { transform: translateX(0); } to { transform: translateX(-15px); } }
-@keyframes pointRight { from { transform: translateX(0); } to { transform: translateX(15px); } }
+@keyframes pointLeft { from { transform: translateX(0); } to { transform: translateX(-12px); } }
+@keyframes pointRight { from { transform: translateX(0); } to { transform: translateX(12px); } }
 
 .turn-highlight-border {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5) !important;

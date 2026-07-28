@@ -41,20 +41,36 @@ export function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"en
     osc.connect(gain); gain.connect(ctx.destination); gain.gain.setValueAtTime(.12, n);
     gain.gain.exponentialRampToValueAtTime(.001, n+.22);
     if (type==="dice") {
-      gain.gain.setValueAtTime(.08,n);
-      for(let i=0;i<4;i++){
+      gain.gain.setValueAtTime(.0, n);
+      for(let i=0;i<8;i++){
         const o2=ctx.createOscillator(),g2=ctx.createGain();
         o2.connect(g2);g2.connect(ctx.destination);
-        o2.type="triangle";o2.frequency.value=200+Math.random()*600;
-        g2.gain.setValueAtTime(.06,n+i*.04);
-        g2.gain.exponentialRampToValueAtTime(.001,n+i*.04+.03);
-        o2.start(n+i*.04);o2.stop(n+i*.04+.04);
+        o2.type="square";o2.frequency.value=400+Math.random()*400;
+        g2.gain.setValueAtTime(.08,n+i*.06);
+        g2.gain.exponentialRampToValueAtTime(.001,n+i*.06+.05);
+        o2.start(n+i*.06);o2.stop(n+i*.06+.06);
       }
-      osc.frequency.setValueAtTime(300,n);osc.frequency.exponentialRampToValueAtTime(1200,n+.15);
-      osc.start(n);osc.stop(n+.18);
+      return;
+    }
+    else if (type==="land") {
+      osc.type="square";
+      osc.frequency.setValueAtTime(200,n);
+      osc.frequency.exponentialRampToValueAtTime(50,n+.05);
+      gain.gain.setValueAtTime(.2, n);
+      gain.gain.exponentialRampToValueAtTime(.001, n+.06);
+      osc.start(n); osc.stop(n+.07);
     }
     else if (type==="move") { osc.frequency.setValueAtTime(500,n); osc.frequency.exponentialRampToValueAtTime(800,n+.08); osc.start(n); osc.stop(n+.1); }
-    else if (type==="capture") { osc.type="sawtooth"; osc.frequency.setValueAtTime(400,n); osc.frequency.exponentialRampToValueAtTime(150,n+.25); osc.start(n); osc.stop(n+.3); }
+    else if (type==="capture") { 
+      osc.type="square"; osc.frequency.setValueAtTime(800,n); osc.frequency.exponentialRampToValueAtTime(100,n+.3); 
+      gain.gain.setValueAtTime(.2, n); gain.gain.exponentialRampToValueAtTime(.001, n+.3);
+      osc.start(n); osc.stop(n+.3);
+      const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.type="sawtooth"; o2.frequency.setValueAtTime(400,n); o2.frequency.exponentialRampToValueAtTime(50,n+.25);
+      g2.gain.setValueAtTime(.15,n); g2.gain.exponentialRampToValueAtTime(.001,n+.3);
+      o2.start(n); o2.stop(n+.3);
+    }
     else if (type==="turn") { osc.frequency.value=660; gain.gain.setValueAtTime(.1,n); gain.gain.exponentialRampToValueAtTime(.001,n+.1); osc.start(n); osc.stop(n+.1); }
     else { osc.frequency.value=800; osc.start(n); osc.stop(n+.05); }
   } catch {}
