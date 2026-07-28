@@ -22,7 +22,31 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 .settings-panel{background:var(--paper);padding:40px;width:min(100%,360px);position:relative;box-shadow:12px 12px 0 var(--mint)}.settings-panel h2{font-size:32px;margin:6px 0 24px}.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}.toggle{width:42px;height:22px;border-radius:11px;border:0;background:#ccc;position:relative;transition:background .2s;cursor:pointer}.toggle--on{background:var(--teal)}.toggle-knob{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}.toggle--on .toggle-knob{left:22px}.setting-code{font-family:'DM Mono';font-size:11px;color:var(--teal);cursor:pointer;font-weight:700}.setting-note{text-align:center;font-size:10px;color:#4a5c58;margin-top:16px}.lang-btn{display:flex;gap:4px;border:1px solid var(--line);background:var(--paper);padding:5px 7px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px}.lang-btn span{padding:2px 6px;border-radius:4px}.lang-btn .lang-active{background:var(--deep);color:#fff}
 
-.room-page{height:100vh;overflow:hidden;background:#0d5c46 url(/wood-pattern.png) center center;background-size:cover;}
+.room-page {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: radial-gradient(circle at 50% 30%, #15795d 0%, #0d5c46 35%, #052b21 80%, #02120e 100%);
+}
+.room-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+.room-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 150%);
+  pointer-events: none;
+  z-index: 1;
+}
 .room-header{height:60px;background:transparent;display:flex;align-items:center;padding:0 16px;position:relative;z-index:5}
 .room-code{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px}
 .room-code>span{font:600 10px 'Fredoka',sans-serif;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.5);}
@@ -31,7 +55,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .room-code small{font-size:8px;background:var(--yellow);color:#000;border-radius:10px;padding:3px 6px;margin-left:5px;letter-spacing:.05em}
 .header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
 
-.game-layout{height:calc(100vh - 60px);display:grid;grid-template-columns:240px minmax(440px,1fr) 260px}
+.game-layout{height:calc(100vh - 60px);display:grid;grid-template-columns:240px minmax(440px,1fr) 260px;position:relative;z-index:2}
 .table-area{min-width:0;padding:4px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto;background:transparent;}
 .game-controls{width:min(100%,580px);display:flex;align-items:center;justify-content:space-between;margin-top:10px;min-height:56px;gap:8px}
 .lobby-note,.move-hint{display:flex;align-items:center;gap:8px}.lobby-note>span{font-size:22px;color:var(--teal)}.lobby-note>div,.move-hint{flex-direction:column;align-items:flex-start;gap:2px}.lobby-note b,.move-hint b{font-size:11px}.lobby-note small,.move-hint small{font-size:9px;color:#3d5450}.start-button{min-width:150px}
