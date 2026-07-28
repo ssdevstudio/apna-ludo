@@ -2,6 +2,11 @@
 
 This document catalogs every animation required for the premium Ludo experience. It dictates the duration, easing curve, triggers, and associated sounds/particles for every interaction.
 
+## Animation Philosophy
+
+- **No animation should ever block gameplay.**
+- **Animations enhance gameplay, never delay gameplay.**
+
 ---
 
 ## 1. Dice Animations

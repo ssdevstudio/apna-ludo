@@ -48,7 +48,7 @@ App
               └── Rankings & Rematch Controls
 ```
 
-*Recommendation*: Break `App.tsx` into discrete files reflecting this exact tree in Phase 1.
+*Recommendation*: Break `App.tsx` into discrete files reflecting this exact tree in Phase 1B.
 
 ## 3. State Ownership
 
@@ -86,7 +86,20 @@ Real-time communication is managed via Socket.IO, defined in `shared/src/protoco
   - `room:reaction`: Broadcasts emoji reactions.
   - `server:error`: Delivers error alerts.
 
-## 6. Asset Inventory
+## 6. Audio Engine & Philosophy
+
+Currently, audio is implemented using a raw, inline Web Audio API implementation inside `App.tsx` (`playSound` function).
+
+**Audio Philosophy**:
+- Only one primary SFX plays at once.
+- Ambient sounds may overlap.
+- No clipping.
+- No distortion.
+- No delay.
+
+*Recommendation for Audio Phase*: An `AudioEngine` singleton should be created to manage HTML5 Audio/Web Audio nodes with channels, volume sliders, and asset preloading.
+
+## 7. Asset Inventory & Rules
 
 Current assets are minimal and lack structure:
 
@@ -97,6 +110,13 @@ public/
   └── board/ (ludo-board.svg)
 ```
 
+**Asset Rules**:
+- Assets must be `SVG` or `2x PNG`.
+- Maximum size `256 KB`.
+- No blurry assets.
+- No stretched images.
+- No watermark.
+
 *Missing Assets Needed for Premium Feel*:
 - `assets/dice/` (3D or premium sprites if not CSS)
 - `assets/emoji/` (High-res animated SVGs)
@@ -104,15 +124,15 @@ public/
 - `assets/particles/` (Capture/Win effects)
 - `assets/fonts/` (Premium typography like Inter or Poppins)
 
-## 7. CSS Map
+## 8. CSS Map
 
 Current styling is monolithic:
 - `client/src/index.css`: Global resets, font imports (`DM Mono`, `Yeseva One`), base variables.
 - `client/src/styles.css`: 100% of all component styles (Layout, Board, Chat, Modals, Animations).
 
-*Recommendation*: Needs splitting into CSS modules or styled-components per UI Component Tree node.
+*Recommendation*: Needs splitting into CSS modules or styled-components per UI Component Tree node during Phase 1C.
 
-## 8. Animation Inventory
+## 9. Animation Inventory
 
 | Animation Name | Duration | Trigger | Used By |
 | --- | --- | --- | --- |
@@ -128,15 +148,25 @@ Current styling is monolithic:
 | `popupOpen` | 0.2s | Emoji Click | `.emoji-grid-popup` |
 | `fall` (Confetti)| 3s (infinite) | Game Over | `.confetti` |
 
-## 9. Performance Baseline
+## 10. Performance Baseline & Budget
 
 *(Estimations based on current Vite + React build)*
+
+**Performance Budget**:
+- Target FPS: 60
+- Minimum FPS: 55
+- Input latency: < 80ms
+- Dice animation: < 900ms
+- Token movement: < 1200ms
+- Emoji popup: < 200ms
+
+**Current Baseline**:
 - **FPS**: Variable (45-60 FPS during heavy CSS transforms).
 - **JS Bundle**: ~112kB (Gzipped) - Extremely lean, but lacks animation libraries.
 - **CSS Size**: ~7.4kB (Gzipped).
 - **Rerenders**: Heavy. `App.tsx` rerenders entirely on every Socket ping and state change.
 
-## 10. Current UX Problems (Pre-Phase 1)
+## 11. Current UX Problems (Pre-Phase 1)
 
 | Feature | Rating | Reason |
 | --- | --- | --- |
@@ -148,7 +178,7 @@ Current styling is monolithic:
 | **Sounds** | ⭐☆☆☆☆ | Web Audio synthesis sounds like an 8-bit game, not a premium mobile app. |
 | **Animation** | ⭐⭐☆☆☆ | CSS keyframes are jittery and lack proper easing curves and timing control. |
 
-## 11. Risk Register
+## 12. Risk Register
 
 **HIGH RISK (DO NOT MODIFY UNLESS REQUIRED)**
 - **Board Coordinate Rewrite**: Breakage means tokens move to wrong squares.
@@ -156,7 +186,7 @@ Current styling is monolithic:
 - **Dice Logic (Server)**: Affects game fairness.
 
 **MEDIUM RISK**
-- **CSS Refactor (Phase 1)**: Splitting `styles.css` might break `z-index` stacking contexts.
+- **CSS Refactor (Phase 1C)**: Splitting `styles.css` might break `z-index` stacking contexts.
 - **Animation Engine (Phase 2)**: Intercepting token moves requires careful synchronization with Server State.
 
 **LOW RISK**
@@ -164,17 +194,22 @@ Current styling is monolithic:
 - **Audio Engine**: Independent subsystem.
 - **Hover/Cursor Polish**: Pure CSS visual layer.
 
-## 12. Implementation Strategy & Phase Mapping
+## 13. Implementation Strategy & Phase Mapping
+
+*Mandatory Rule: After completing each phase, a `PHASE_X_REPORT.md` must be generated detailing files changed, tests passed, performance metrics, and risks.*
 
 | Module | Status | Risk | Phase |
 | --- | --- | --- | --- |
+| **UI Folders** | Create layout | Low | 1A |
+| **UI Components**| Split App.tsx | Med | 1B |
+| **UI Styling** | Split CSS | Med | 1C |
+| **Animation** | Rewrite | Medium| 2 |
+| **Audio** | Rewrite | Low | 3 |
 | **Dice** | Improve | Low | 4 |
 | **Board** | Improve | Low | 8 |
-| **Socket** | Stable | High | Never |
-| **Audio** | Rewrite | Low | 3 |
 | **Emoji** | Rewrite | Low | 9 |
 | **Chat** | Improve | Low | 11 |
-| **Animation** | Rewrite | Medium | 2 |
+| **Socket** | Stable | High | Never |
 
 ---
-**Status**: Ready for pre-requisite planning documents (`UI_COMPONENT_TREE.md`, `DESIGN_SYSTEM.md`, `ANIMATION_SPEC.md`).
+**Status**: Ready for Phase 1A (Folder Restructure).

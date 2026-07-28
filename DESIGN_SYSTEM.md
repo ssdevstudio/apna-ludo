@@ -2,6 +2,17 @@
 
 This document defines the strict visual guidelines for Phase 1. All CSS must use these exact variables. No hardcoded hex values or pixel spacing in components.
 
+## Visual Direction Target
+- Premium
+- Friendly
+- Modern
+- Toy-like
+- Bright
+- Clean
+- Not realistic
+- Not cartoon
+- Semi-3D
+
 ## 1. Color Palette
 
 ```css
