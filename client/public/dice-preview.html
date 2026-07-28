@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dice Artwork Exploration</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap');
+    body {
+      background: #f0ede6;
+      font-family: 'Fredoka', sans-serif;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      align-items: center;
+    }
+    h1 {
+      color: #3d5450;
+      margin-bottom: 0;
+    }
+    p {
+      color: #778480;
+      margin-top: 0;
+    }
+    .preview-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      justify-content: center;
+    }
+    .concept-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 250px;
+    }
+    .concept-card h3 {
+      margin: 0;
+      color: #333;
+    }
+    
+    /* Mock Player Card Layout */
+    .mock-player-corner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 12px 6px 8px;
+      border-radius: 40px;
+      background: linear-gradient(145deg, #ffffff, #ffebee); /* Red corner */
+      border: 3px solid #dc3545;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,1);
+      position: relative;
+      width: 140px;
+      height: 60px;
+      box-sizing: border-box;
+    }
+    .mock-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #dc3545, #b02a37);
+      border: 2px solid white;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .mock-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    /* Turn Indicator Arrow */
+    .mock-arrow {
+      position: absolute;
+      right: -5px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ffcc00;
+      font-size: 16px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    }
+    
+    /* The Dice Button Box */
+    .mock-dice-container {
+      position: absolute;
+      right: -60px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      padding: 4px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* The 48-52px Dice Asset */
+    .mock-dice-img {
+      width: 48px;
+      height: 48px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div>
+    <h1>Dice Artwork Concepts</h1>
+    <p>Target size: 48px. Review the visual hierarchy.</p>
+  </div>
+
+  <div class="preview-grid">
+    
+    <!-- Concept A -->
+    <div class="concept-card">
+      <h3>Concept A<br><small>Classic Ludo</small></h3>
+      <div class="mock-player-corner">
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sumit</div>
+        <div class="mock-arrow">▶</div>
+        <div class="mock-dice-container">
+          <img src="/assets/dice/concept-a.svg" class="mock-dice-img" alt="Concept A" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Concept B -->
+    <div class="concept-card">
+      <h3>Concept B<br><small>Glossy Plastic</small></h3>
+      <div class="mock-player-corner">
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sumit</div>
+        <div class="mock-arrow">▶</div>
+        <div class="mock-dice-container">
+          <img src="/assets/dice/concept-b.svg" class="mock-dice-img" alt="Concept B" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Concept C -->
+    <div class="concept-card">
+      <h3>Concept C<br><small>Soft Toy</small></h3>
+      <div class="mock-player-corner">
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sumit</div>
+        <div class="mock-arrow">▶</div>
+        <div class="mock-dice-container">
+          <img src="/assets/dice/concept-c.svg" class="mock-dice-img" alt="Concept C" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Concept D -->
+    <div class="concept-card">
+      <h3>Concept D<br><small>Minimal Premium</small></h3>
+      <div class="mock-player-corner">
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sumit</div>
+        <div class="mock-arrow">▶</div>
+        <div class="mock-dice-container">
+          <img src="/assets/dice/concept-d.svg" class="mock-dice-img" alt="Concept D" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Concept E -->
+    <div class="concept-card">
+      <h3>Concept E<br><small>Realistic</small></h3>
+      <div class="mock-player-corner">
+        <div class="mock-avatar">S</div>
+        <div class="mock-name">Sumit</div>
+        <div class="mock-arrow">▶</div>
+        <div class="mock-dice-container">
+          <img src="/assets/dice/concept-e.svg" class="mock-dice-img" alt="Concept E" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept E: Realistic (Bone Color, Noise, Shadows) -->
+  <defs>
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.1 0" />
+      <feComposite operator="in" in2="SourceGraphic" result="monoNoise"/>
+      <feBlend mode="multiply" in="SourceGraphic" in2="monoNoise"/>
+    </filter>
+    <linearGradient id="bone-grad" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fdfbf7"/>
+      <stop offset="100%" stop-color="#e8e1d5"/>
+    </linearGradient>
+    <radialGradient id="pip-depth" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(36 36) scale(16)">
+      <stop offset="0%" stop-color="#111" />
+      <stop offset="100%" stop-color="#333" />
+    </radialGradient>
+  </defs>
+  
+  <rect x="2" y="6" width="124" height="120" rx="20" fill="#c4bcae" />
+  <rect x="2" y="2" width="124" height="120" rx="20" fill="url(#bone-grad)" filter="url(#noise)" />
+  
+  <g fill="url(#pip-depth)">
+    <circle cx="36" cy="36" r="14" />
+    <circle cx="36" cy="64" r="14" />
+    <circle cx="36" cy="92" r="14" />
+    <circle cx="92" cy="36" r="14" />
+    <circle cx="92" cy="64" r="14" />
+    <circle cx="92" cy="92" r="14" />
+  </g>
+</svg>

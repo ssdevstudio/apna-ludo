@@ -1,0 +1,12 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept D: Minimal Premium (Sharp, Flat, Elegant) -->
+  <rect x="2" y="2" width="124" height="124" rx="12" fill="#ffffff" stroke="#e0e0e0" stroke-width="4" />
+  <g fill="#222222">
+    <circle cx="36" cy="36" r="10" />
+    <circle cx="36" cy="64" r="10" />
+    <circle cx="36" cy="92" r="10" />
+    <circle cx="92" cy="36" r="10" />
+    <circle cx="92" cy="64" r="10" />
+    <circle cx="92" cy="92" r="10" />
+  </g>
+</svg>

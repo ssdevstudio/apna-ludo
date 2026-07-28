@@ -1,0 +1,13 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept C: Soft Toy (Rounded, Matte, Muted) -->
+  <rect x="4" y="8" width="120" height="116" rx="40" fill="#e0e0e0" />
+  <rect x="4" y="4" width="120" height="116" rx="40" fill="#fdfaf6" />
+  <g fill="#5a5a5a">
+    <circle cx="40" cy="40" r="12" />
+    <circle cx="40" cy="64" r="12" />
+    <circle cx="40" cy="88" r="12" />
+    <circle cx="88" cy="40" r="12" />
+    <circle cx="88" cy="64" r="12" />
+    <circle cx="88" cy="88" r="12" />
+  </g>
+</svg>

@@ -1,0 +1,40 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept B: Glossy Plastic (Highlights, Bevels, Gradient) -->
+  <rect x="4" y="8" width="120" height="116" rx="28" fill="#a0a0a0" />
+  <rect x="4" y="4" width="120" height="116" rx="28" fill="url(#gloss-bg)" />
+  <rect x="8" y="8" width="112" height="108" rx="24" fill="url(#gloss-inner)" />
+  
+  <g fill="#1a1a1a">
+    <circle cx="36" cy="36" r="14" />
+    <circle cx="36" cy="64" r="14" />
+    <circle cx="36" cy="92" r="14" />
+    <circle cx="92" cy="36" r="14" />
+    <circle cx="92" cy="64" r="14" />
+    <circle cx="92" cy="92" r="14" />
+  </g>
+  
+  <g fill="url(#pip-shadow)" opacity="0.8">
+    <circle cx="36" cy="36" r="14" />
+    <circle cx="36" cy="64" r="14" />
+    <circle cx="36" cy="92" r="14" />
+    <circle cx="92" cy="36" r="14" />
+    <circle cx="92" cy="64" r="14" />
+    <circle cx="92" cy="92" r="14" />
+  </g>
+  
+  <defs>
+    <linearGradient id="gloss-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#dddddd"/>
+    </linearGradient>
+    <linearGradient id="gloss-inner" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#fdfdfd"/>
+      <stop offset="100%" stop-color="#e8e8e8"/>
+    </linearGradient>
+    <radialGradient id="pip-shadow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(36 36) scale(14)">
+      <stop offset="60%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.8"/>
+    </radialGradient>
+  </defs>
+</svg>
