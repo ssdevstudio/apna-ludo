@@ -765,7 +765,7 @@ function Room() {
       setUnreadCount(prev => chatOpenRef.current ? 0 : prev + 1);
     });
     s.on("room:reaction", (payload) => {
-      const id = crypto.randomUUID();
+      const id = Math.random().toString(36).substring(2);
       setReactions(prev => [...prev, { id, emoji: payload.emoji, playerId: payload.playerId }]);
       setTimeout(() => {
         setReactions(prev => prev.filter(r => r.id !== id));
