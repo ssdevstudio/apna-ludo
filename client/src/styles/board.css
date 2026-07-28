@@ -29,16 +29,41 @@
 .game-pawn-wrapper.legal-token::before {
   content: "";
   position: absolute;
-  bottom: 10%;
+  bottom: 12%;
   left: 50%;
-  width: 85%;
+  width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  border: 2px dashed rgba(0,0,0,0.75);
-  box-shadow: 0 0 0 1.5px var(--token-color, red), inset 0 0 0 1.5px var(--token-color, red);
+  border: 3px solid var(--token-color, red);
+  box-shadow: 0 0 8px var(--token-color, red), inset 0 0 8px var(--token-color, red);
   z-index: -1;
-  animation: spinRing 4s linear infinite;
   pointer-events: none;
+  animation: pulseRingPremium 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.game-pawn-wrapper.legal-token::after {
+  content: "";
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--token-color, red);
+  filter: blur(6px);
+  z-index: -2;
+  pointer-events: none;
+  animation: pulseGlowPremium 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseRingPremium {
+  0% { transform: translateX(-50%) rotateX(60deg) scale(0.6); opacity: 1; border-width: 4px; }
+  100% { transform: translateX(-50%) rotateX(60deg) scale(1.5); opacity: 0; border-width: 1px; }
+}
+
+@keyframes pulseGlowPremium {
+  0% { transform: translateX(-50%) rotateX(60deg) scale(0.8); opacity: 0.3; }
+  100% { transform: translateX(-50%) rotateX(60deg) scale(1.1); opacity: 0.6; }
 }
 .game-pawn-wrapper.legal-token:hover .game-pawn-inner{transform:translateY(-3px) scale(1.15)}
 .game-pawn-wrapper.legal-token:focus-visible .game-pawn-inner{outline:3px solid #f0bd3f;outline-offset:3px}
