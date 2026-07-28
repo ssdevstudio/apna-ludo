@@ -58,7 +58,62 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .game-layout{height:calc(100vh - 60px);display:grid;grid-template-columns:240px minmax(440px,1fr) 260px;position:relative;z-index:2}
 .table-area{min-width:0;padding:4px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto;background:transparent;}
 .game-controls{width:min(100%,580px);display:flex;align-items:center;justify-content:space-between;margin-top:10px;min-height:56px;gap:8px}
-.lobby-note,.move-hint{display:flex;align-items:center;gap:8px}.lobby-note>span{font-size:22px;color:var(--teal)}.lobby-note>div,.move-hint{flex-direction:column;align-items:flex-start;gap:2px}.lobby-note b,.move-hint b{font-size:11px}.lobby-note small,.move-hint small{font-size:9px;color:#3d5450}.start-button{min-width:150px}
+.lobby-note, .move-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 12px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+}
+.lobby-note>span {
+  font-size: 28px;
+  color: var(--yellow);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.lobby-note>div, .move-hint {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+.lobby-note b, .move-hint b {
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.lobby-note small, .move-hint small {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+@keyframes startPulse {
+  0% { box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 0 rgba(245, 223, 161, 0.6); }
+  70% { box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 12px rgba(245, 223, 161, 0); }
+  100% { box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 0 rgba(245, 223, 161, 0); }
+}
+.start-button {
+  min-width: 160px;
+  padding: 14px 20px;
+  font-size: 15px !important;
+  background: var(--yellow) !important;
+  color: #1a0e08 !important;
+  animation: startPulse 2s infinite;
+  border: 2px solid #fff;
+  border-radius: 30px;
+}
+.start-button:hover:not(:disabled) {
+  background: #fbe692 !important;
+  transform: translateY(-2px) scale(1.05);
+}
+.start-button:disabled {
+  animation: none;
+  background: rgba(255,255,255,0.1) !important;
+  color: rgba(255,255,255,0.4) !important;
+  border-color: rgba(255,255,255,0.2);
+  box-shadow: none !important;
+}
 
 .reconnect-banner{position:fixed;z-index:20;top:60px;left:0;right:0;background:#fff0bb;padding:8px;text-align:center;font-size:11px;font-weight:700}.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--ink);border-top-color:transparent;border-radius:50%;margin-right:7px;vertical-align:middle;animation:spin .8s linear infinite}
 
