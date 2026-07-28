@@ -159,31 +159,40 @@ export function createRoomWithComputer(
   io: TypedServer,
   name: string,
   hostSocketId: string,
+  preferredColor: PlayerColor = "red",
+  maxPlayers: number = 2
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   // Create room first
-  const createResult = createRoom(io, name, 2, hostSocketId);
+  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor);
   if (!createResult.ok) return createResult;
   const room = rooms.get(createResult.room.code)!;
 
-  // Add computer player
-  const botId = `bot-${crypto.randomUUID().slice(0, 8)}`;
-  const botPlayer: RoomPlayerData = {
-    id: botId,
-    name: "Bot",
-    color: "green",
-    ready: true,
-    connected: true,
-    isHost: false,
-    reconnectToken: "",
-    socketId: null,
-    isBot: true,
-    boundTokens: new Map(),
-  };
-  room.players.set(botId, botPlayer);
-  room.playerOrder.push(botId);
+  const usedColors = new Set<PlayerColor>();
+  usedColors.add(preferredColor);
+  const availableColors = PLAYER_COLORS.filter(c => !usedColors.has(c));
+
+  // Add computer players
+  for (let i = 0; i < maxPlayers - 1; i++) {
+    const botId = `bot-${crypto.randomUUID().slice(0, 8)}`;
+    const botColor = availableColors[i]!;
+    const botPlayer: RoomPlayerData = {
+      id: botId,
+      name: `Bot ${i + 1}`,
+      color: botColor,
+      ready: true,
+      connected: true,
+      isHost: false,
+      reconnectToken: "",
+      socketId: null,
+      isBot: true,
+      boundTokens: new Map(),
+    };
+    room.players.set(botId, botPlayer);
+    room.playerOrder.push(botId);
+  }
   room.revision += 1;
 
-  // Auto-start game since we have 2 players, both ready
+  // Auto-start game since everyone is ready
   const gamePlayers = room.playerOrder
     .map((id) => room.players.get(id)!)
     .filter((p) => p.connected || p.isBot)

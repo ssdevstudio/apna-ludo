@@ -45,7 +45,7 @@ export function Landing() {
     if (!name.trim()) return setError("Enter your name first.");
     sessionStorage.setItem("apna-player",name.trim());sessionStorage.setItem("apna-avatar",avatar);
     try {
-      const r=await fetch("/api/room",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor})});
+      const r=await fetch("/api/room",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers})});
       const d=await r.json();
       if (d.ok) { sessionStorage.setItem(`apna-token-${d.room.code}`,d.reconnectToken);sessionStorage.setItem(`apna-playerid-${d.room.code}`,d.playerId);navigate(`/room/${d.room.code}`); }
       else setError("Failed.");

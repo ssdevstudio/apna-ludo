@@ -100,7 +100,7 @@ app.post("/api/room", (req, res) => {
   }
   const isVsBot = vsComputerRaw === true;
   if (isVsBot) {
-    const result = createRoomWithComputer(io, name, "");
+    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {
