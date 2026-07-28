@@ -102,14 +102,14 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.85) rotate(calc(-${boardRotation}deg + ${ang}deg))` };
     }
     if (count === 3) {
-      const offsets = [[-8, 0], [0, 0], [8, 0]];
-      const angles = [-20, 0, 20];
+      const offsets = [[-6, -2], [6, -2], [0, 2]];
+      const angles = [-22, 22, 0];
       const [ox, oy] = offsets[index] ?? [0, 0];
       const ang = angles[index] ?? 0;
       return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.75) rotate(calc(-${boardRotation}deg + ${ang}deg))` };
     }
-    const offsets = [[-10, 3], [-3, 3], [3, 3], [10, 3]];
-    const angles = [-25, -8, 8, 25];
+    const offsets = [[-8, -3], [8, -3], [-4, 3], [4, 3]];
+    const angles = [-28, 28, -10, 10];
     const [ox, oy] = offsets[index % 4] ?? [0, 0];
     const ang = angles[index % 4] ?? 0;
     return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.65) rotate(calc(-${boardRotation}deg + ${ang}deg))` };
