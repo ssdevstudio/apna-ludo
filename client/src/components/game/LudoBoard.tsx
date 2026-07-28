@@ -96,12 +96,12 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     const baseRotation = `rotate(-${boardRotation}deg)`;
     if (count === 1) return { transform: `translate(-50%, -50%) ${baseRotation}` };
     if (count === 2) {
-      const offsets = [[-25, 0], [25, 0]];
+      const offsets = [[-20, -10], [20, 10]];
       const [ox, oy] = offsets[index] ?? [0, 0];
       return { transform: `translate(calc(-50% + ${ox}%), calc(-50% + ${oy}%)) scale(0.8) ${baseRotation}` };
     }
     if (count === 3) {
-      const offsets = [[-35, 0], [0, 0], [35, 0]];
+      const offsets = [[-25, -15], [25, -15], [0, 15]];
       const [ox, oy] = offsets[index] ?? [0, 0];
       return { transform: `translate(calc(-50% + ${ox}%), calc(-50% + ${oy}%)) scale(0.75) ${baseRotation}` };
     }
@@ -170,13 +170,20 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
     const innerClass = `game-pawn-inner pawn-color-${t.color} ${isLegalToken ? "legal-token premium-pulse" : ""} ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""}`;
     
+    let zIndex = isYard ? 5 : 10;
+    if (!isYard) {
+      const tokensHere = allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0));
+      const stackIdx = tokensHere.findIndex(x => x.id === t.id);
+      zIndex = 10 + stackIdx;
+    }
+
     const style: React.CSSProperties = {
       position: 'absolute',
       top,
       left,
       transform,
       transition: 'top 0.25s linear, left 0.25s linear, transform 0.25s linear',
-      zIndex: isYard ? 5 : 10,
+      zIndex,
       width: 'clamp(20px,2.8vw,36px)',
       height: 'clamp(26px,3.6vw,46px)'
     };
@@ -185,7 +192,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       return (
         <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
           <span className={innerClass}>
-            <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
+            <div style={{ transform: 'translateY(-50%)', width: '100%', height: '100%' }}>
               <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
             </div>
           </span>
@@ -195,7 +202,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     return (
       <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token`}>
         <div className={innerClass}>
-          <div style={{ transform: 'translateY(-35%)', width: '100%', height: '100%' }}>
+          <div style={{ transform: 'translateY(-50%)', width: '100%', height: '100%' }}>
             <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
           </div>
         </div>

@@ -20,29 +20,29 @@
 
 .floating-emoji { pointer-events: none; }
 @keyframes floatUp {
-  0% { opacity: 1; transform: translate(-50%, 0) scale(0.5); }
-  20% { opacity: 1; transform: translate(-50%, -20px) scale(1.2); }
-  100% { opacity: 0; transform: translate(-50%, -60px) scale(1); }
+  0% { opacity: 1; transform: translate(-50%, 0) scale(0.6); }
+  15% { opacity: 1; transform: translate(-50%, -30px) scale(1.3); }
+  100% { opacity: 0; transform: translate(-50%, -120px) scale(0.9); }
 }
 
 .screen-emoji-animation {
   position: fixed;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 8rem;
+  font-size: 6rem;
   z-index: 9999;
   pointer-events: none;
   animation: emojiPopNew 2.5s ease-out forwards !important;
-  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.6));
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
 }
 
 @keyframes emojiPopNew {
-  0% { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; }
-  15% { transform: translate(-50%, -50%) scale(2.5) rotate(10deg); opacity: 1; }
-  30% { transform: translate(-50%, -50%) scale(2) rotate(-5deg); opacity: 1; }
-  80% { transform: translate(-50%, -50%) scale(2) rotate(0deg); opacity: 1; }
-  100% { transform: translate(-50%, -100%) scale(3); opacity: 0; }
+  0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(2) rotate(8deg); opacity: 1; }
+  30% { transform: translate(-50%, -50%) scale(1.8) rotate(-3deg); opacity: 1; }
+  70% { transform: translate(-50%, -50%) scale(1.8) rotate(0deg); opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(2.5); opacity: 0; }
 }
 
 .emoji-grid-popup {
@@ -50,24 +50,32 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255,255,255,0.95);
-  border-radius: 12px;
-  padding: 8px;
+  background: rgba(255,255,255,0.97);
+  border-radius: 16px;
+  padding: 10px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  gap: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.1);
   z-index: 100;
   transform-origin: bottom center;
-  animation: popupOpen 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: popupOpen 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  border: 2px solid rgba(255,255,255,0.8);
+  backdrop-filter: blur(8px);
 }
 @keyframes popupOpen {
   0% { transform: translateX(-50%) scale(0); opacity: 0; }
   100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
-.emoji-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 4px; transition: transform 0.1s; }
-.emoji-btn:hover { transform: scale(1.2); }
+.emoji-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 4px; transition: transform 0.15s, background 0.15s; border-radius: 8px; }
+.emoji-btn:hover { transform: scale(1.25); background: rgba(0,0,0,0.06); }
+.emoji-btn--sent { transform: scale(1.4); background: rgba(7,59,58,0.15); animation: emojiSentPop 0.3s ease-out; }
+@keyframes emojiSentPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1.4); }
+}
 
 @media(max-width:1050px){
   .chat-panel{position:fixed;right:0;top:60px;bottom:0;width:280px;z-index:10;transform:translateX(105%);box-shadow:-8px 0 25px rgba(7,59,58,.12);transition:transform .25s}.chat-panel--open{transform:none}.chat-heading button{display:block}

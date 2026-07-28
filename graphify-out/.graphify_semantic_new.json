@@ -1,0 +1,490 @@
+{
+  "nodes": [
+    {
+      "id": "client_index_html",
+      "label": "Apna Ludo Main Entry Point",
+      "file_type": "code",
+      "source_file": "client/index.html"
+    },
+    {
+      "id": "dice_preview_html",
+      "label": "Dice Artwork Preview Page",
+      "file_type": "code",
+      "source_file": "client/public/dice-preview.html"
+    },
+    {
+      "id": "board_png",
+      "label": "Ludo Board Game Layout",
+      "file_type": "image",
+      "source_file": "client/public/board.png"
+    },
+    {
+      "id": "concept_a_svg",
+      "label": "Classic Ludo Dice Concept",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/concept-a.svg"
+    },
+    {
+      "id": "concept_b_svg",
+      "label": "Glossy Plastic Dice Concept",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/concept-b.svg"
+    },
+    {
+      "id": "concept_c_svg",
+      "label": "Soft Toy Dice Concept",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/concept-c.svg"
+    },
+    {
+      "id": "concept_d_svg",
+      "label": "Minimal Premium Dice Concept",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/concept-d.svg"
+    },
+    {
+      "id": "concept_e_svg",
+      "label": "Realistic Dice Concept",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/concept-e.svg"
+    },
+    {
+      "id": "dice-1_svg",
+      "label": "Dice Face 1 (Single Pip)",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/dice-1.svg"
+    },
+    {
+      "id": "dice-2_svg",
+      "label": "Dice Face 2 (Two Pips)",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/dice-2.svg"
+    },
+    {
+      "id": "dice-3_svg",
+      "label": "Dice Face 3 (Three Pips)",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/dice-3.svg"
+    },
+    {
+      "id": "dice-4_svg",
+      "label": "Dice Face 4 (Four Pips)",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/dice-4.svg"
+    },
+    {
+      "id": "dice-5_svg",
+      "label": "Dice Face 5 (Five Pips)",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/dice-5.svg"
+    },
+    {
+      "id": "dice-6_svg",
+      "label": "Dice Face 6 (Six Pips)",
+      "file_type": "image",
+      "source_file": "client/public/assets/dice/dice-6.svg"
+    }
+  ],
+  "edges": [
+    {
+      "source": "dice_preview_html",
+      "target": "concept_a_svg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/public/dice-preview.html",
+      "weight": 1.0
+    },
+    {
+      "source": "dice_preview_html",
+      "target": "concept_b_svg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/public/dice-preview.html",
+      "weight": 1.0
+    },
+    {
+      "source": "dice_preview_html",
+      "target": "concept_c_svg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/public/dice-preview.html",
+      "weight": 1.0
+    },
+    {
+      "source": "dice_preview_html",
+      "target": "concept_d_svg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/public/dice-preview.html",
+      "weight": 1.0
+    },
+    {
+      "source": "dice_preview_html",
+      "target": "concept_e_svg",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/public/dice-preview.html",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_a_svg",
+      "target": "concept_b_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/concept-a.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_a_svg",
+      "target": "concept_c_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "client/public/assets/dice/concept-a.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_a_svg",
+      "target": "concept_d_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "client/public/assets/dice/concept-a.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_a_svg",
+      "target": "concept_e_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "client/public/assets/dice/concept-a.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_b_svg",
+      "target": "concept_c_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "client/public/assets/dice/concept-b.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_b_svg",
+      "target": "concept_d_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "client/public/assets/dice/concept-b.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_b_svg",
+      "target": "concept_e_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "client/public/assets/dice/concept-b.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_c_svg",
+      "target": "concept_d_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "client/public/assets/dice/concept-c.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_c_svg",
+      "target": "concept_e_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "client/public/assets/dice/concept-c.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_d_svg",
+      "target": "concept_e_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "client/public/assets/dice/concept-d.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_a_svg",
+      "target": "board_png",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "client/public/assets/dice/concept-a.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_b_svg",
+      "target": "board_png",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "client/public/assets/dice/concept-b.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_c_svg",
+      "target": "board_png",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "client/public/assets/dice/concept-c.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_d_svg",
+      "target": "board_png",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "client/public/assets/dice/concept-d.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "concept_e_svg",
+      "target": "board_png",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "client/public/assets/dice/concept-e.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "client_index_html",
+      "target": "board_png",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "client/index.html",
+      "weight": 1.0
+    },
+    {
+      "source": "client_index_html",
+      "target": "dice_preview_html",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "client/index.html",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-1_svg",
+      "target": "dice-2_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-1.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-1_svg",
+      "target": "dice-3_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-1.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-1_svg",
+      "target": "dice-4_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-1.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-1_svg",
+      "target": "dice-5_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-1.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-1_svg",
+      "target": "dice-6_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-1.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-2_svg",
+      "target": "dice-3_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-2.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-2_svg",
+      "target": "dice-4_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-2.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-2_svg",
+      "target": "dice-5_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-2.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-2_svg",
+      "target": "dice-6_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-2.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-3_svg",
+      "target": "dice-4_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-3.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-3_svg",
+      "target": "dice-5_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-3.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-3_svg",
+      "target": "dice-6_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-3.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-4_svg",
+      "target": "dice-5_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-4.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-4_svg",
+      "target": "dice-6_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-4.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "dice-5_svg",
+      "target": "dice-6_svg",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/assets/dice/dice-5.svg",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "dice_design_alternatives",
+      "label": "Dice Design Concept Alternatives for Ludo Game",
+      "nodes": [
+        "concept_a_svg",
+        "concept_b_svg",
+        "concept_c_svg",
+        "concept_d_svg",
+        "concept_e_svg"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "client/public/dice-preview.html"
+    },
+    {
+      "id": "ludo_game_assets",
+      "label": "Ludo Game Visual Assets Collection",
+      "nodes": [
+        "board_png",
+        "concept_a_svg",
+        "concept_b_svg",
+        "concept_c_svg",
+        "concept_d_svg",
+        "concept_e_svg"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/board.png"
+    },
+    {
+      "id": "dice_preview_system",
+      "label": "Dice Preview and Selection System",
+      "nodes": [
+        "dice_preview_html",
+        "concept_a_svg",
+        "concept_b_svg",
+        "concept_c_svg",
+        "concept_d_svg",
+        "concept_e_svg"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "client/public/dice-preview.html"
+    },
+    {
+      "id": "ludo_dice_asset_set",
+      "label": "Ludo Dice Face Asset Set (1-6)",
+      "nodes": [
+        "dice-1_svg",
+        "dice-2_svg",
+        "dice-3_svg",
+        "dice-4_svg",
+        "dice-5_svg",
+        "dice-6_svg"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "client/public/assets/dice/"
+    }
+  ],
+  "input_tokens": 1250,
+  "output_tokens": 1024
+}

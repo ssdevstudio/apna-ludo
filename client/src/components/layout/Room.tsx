@@ -44,6 +44,7 @@ export function Room() {
   },[chatOpen]);
   const [reactionPickerOpen,setReactionPickerOpen]=useState(false);
   const [reactions,setReactions]=useState<{id:string, emoji:string, playerId:string}[]>([]);
+  const [sentEmoji,setSentEmoji]=useState<string|null>(null);
   const [settingsOpen,setSettingsOpen]=useState(false);
   const [message,setMessage]=useState("");
   const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
@@ -153,7 +154,11 @@ export function Room() {
   const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
   
   const sendReaction = (emoji: string) => {
-    setReactionPickerOpen(false);
+    setSentEmoji(emoji);
+    setTimeout(() => {
+      setReactionPickerOpen(false);
+      setSentEmoji(null);
+    }, 400);
     if (!socket) return;
     socket.emit("room:react", { emoji }, () => {});
   };
@@ -210,7 +215,7 @@ export function Room() {
         <div className="reaction-wrapper" style={{position:"relative"}}>
           <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
           {reactionPickerOpen && <div className="emoji-grid-popup">
-              {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className="emoji-btn">{e}</button>)}
+              {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className={`emoji-btn ${sentEmoji===e?"emoji-btn--sent":""}`}>{e}</button>)}
             </div>}
         </div>
         <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>

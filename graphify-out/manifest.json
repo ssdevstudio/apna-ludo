@@ -1,0 +1,187 @@
+{
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\package.json": {
+    "mtime": 1785071666.374135,
+    "ast_hash": "19356130f3089038f5f9e0d74a26ce3e",
+    "semantic_hash": "19356130f3089038f5f9e0d74a26ce3e"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\App.tsx": {
+    "mtime": 1785229825.8257315,
+    "ast_hash": "29847f1a72c5b53443cdda0c7018a7b4",
+    "semantic_hash": "29847f1a72c5b53443cdda0c7018a7b4"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\chat\\ChatSidebar.tsx": {
+    "mtime": 1785229844.4021263,
+    "ast_hash": "7a7fa924c6b7fec4422b42ba6a91ba09",
+    "semantic_hash": "7a7fa924c6b7fec4422b42ba6a91ba09"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\chat\\EmojiReactionSystem.tsx": {
+    "mtime": 1785231111.931224,
+    "ast_hash": "9510245627556a225ed9ae7596e8fc4c",
+    "semantic_hash": "9510245627556a225ed9ae7596e8fc4c"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\game\\Dice.tsx": {
+    "mtime": 1785235520.192629,
+    "ast_hash": "f66e78ceb6f436bb695d7e77ad5be11a",
+    "semantic_hash": "f66e78ceb6f436bb695d7e77ad5be11a"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\game\\LudoBoard.tsx": {
+    "mtime": 1785231217.7044451,
+    "ast_hash": "38b86a41b3e19c7554e3a632c4e7d842",
+    "semantic_hash": "38b86a41b3e19c7554e3a632c4e7d842"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\game\\PlayerCard.tsx": {
+    "mtime": 1785237139.5232425,
+    "ast_hash": "612e99938ad06e96589c18dada47db24",
+    "semantic_hash": "612e99938ad06e96589c18dada47db24"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\game\\PlayerTurnIndicator.tsx": {
+    "mtime": 1785231724.9769254,
+    "ast_hash": "190ce1dda00cd39c3d7809349562bbcb",
+    "semantic_hash": "190ce1dda00cd39c3d7809349562bbcb"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\layout\\ErrorBoundary.tsx": {
+    "mtime": 1785229825.4092207,
+    "ast_hash": "f09df3e4a83ebcf281159954955a8079",
+    "semantic_hash": "f09df3e4a83ebcf281159954955a8079"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\layout\\Landing.tsx": {
+    "mtime": 1785229702.6683557,
+    "ast_hash": "1daca3f67a6a7063f5bb7b371ecce449",
+    "semantic_hash": "1daca3f67a6a7063f5bb7b371ecce449"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\layout\\Room.tsx": {
+    "mtime": 1785233646.8943145,
+    "ast_hash": "14431ca702aafa832d25080a9cb19817",
+    "semantic_hash": "14431ca702aafa832d25080a9cb19817"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\modals\\SettingsPanel.tsx": {
+    "mtime": 1785229671.831432,
+    "ast_hash": "f77f2d43166b910da775a40d81addb56",
+    "semantic_hash": "f77f2d43166b910da775a40d81addb56"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\modals\\VictoryModal.tsx": {
+    "mtime": 1785237157.77957,
+    "ast_hash": "3176f1a3c805e520f8123fa703b7f163",
+    "semantic_hash": "3176f1a3c805e520f8123fa703b7f163"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\ui\\Logo.tsx": {
+    "mtime": 1785229680.3504093,
+    "ast_hash": "27716293acb1ae6ea274615bed0a1feb",
+    "semantic_hash": "27716293acb1ae6ea274615bed0a1feb"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\components\\ui\\MiniBoard.tsx": {
+    "mtime": 1785229680.483209,
+    "ast_hash": "0fe11b23e387f2401027418d07379f6d",
+    "semantic_hash": "0fe11b23e387f2401027418d07379f6d"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\hooks\\useTimer.ts": {
+    "mtime": 1785229775.5440845,
+    "ast_hash": "64f50c80716b2243e709c8d19a4a9560",
+    "semantic_hash": "64f50c80716b2243e709c8d19a4a9560"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\main.tsx": {
+    "mtime": 1785237729.2169285,
+    "ast_hash": "ff3b64ad53e1857664e6c5c1103aef7f",
+    "semantic_hash": "ff3b64ad53e1857664e6c5c1103aef7f"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\utils\\audio.ts": {
+    "mtime": 1785231111.9362235,
+    "ast_hash": "b8fd7ca5341e6f05b2a8471047a2ea43",
+    "semantic_hash": "b8fd7ca5341e6f05b2a8471047a2ea43"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\utils\\constants.ts": {
+    "mtime": 1785229662.9197257,
+    "ast_hash": "d7eede7555ddfd6f5585882adaa759d1",
+    "semantic_hash": "d7eede7555ddfd6f5585882adaa759d1"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\utils\\i18n.ts": {
+    "mtime": 1785229653.9965997,
+    "ast_hash": "aec27ca79b11e6a416277d8cf0ceca46",
+    "semantic_hash": "aec27ca79b11e6a416277d8cf0ceca46"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\src\\vite-env.d.ts": {
+    "mtime": 1785070057.0092328,
+    "ast_hash": "0352474ba2918efe13895edbc3780d94",
+    "semantic_hash": "0352474ba2918efe13895edbc3780d94"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\tsconfig.json": {
+    "mtime": 1785160840.978922,
+    "ast_hash": "f42b52384eff9f7adb05d9993de1b59e",
+    "semantic_hash": "f42b52384eff9f7adb05d9993de1b59e"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\vite.config.ts": {
+    "mtime": 1784658326.4544587,
+    "ast_hash": "23881be58d3c9d5ce639face5f49b8c9",
+    "semantic_hash": "23881be58d3c9d5ce639face5f49b8c9"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\index.html": {
+    "mtime": 1785233695.7056317,
+    "ast_hash": "58768b3ef539652477697cc33bf95a63",
+    "semantic_hash": "58768b3ef539652477697cc33bf95a63"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\dice-preview.html": {
+    "mtime": 1785236481.7029488,
+    "ast_hash": "5ed5df1e8b555a0d176c5edadf58b1be",
+    "semantic_hash": "5ed5df1e8b555a0d176c5edadf58b1be"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\concept-a.svg": {
+    "mtime": 1785236423.3964376,
+    "ast_hash": "cc5294443ed378bfcb9fba4c4b66d416",
+    "semantic_hash": "cc5294443ed378bfcb9fba4c4b66d416"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\concept-b.svg": {
+    "mtime": 1785236434.3857584,
+    "ast_hash": "5ae7b76ca4ab49df4ba218430d965e37",
+    "semantic_hash": "5ae7b76ca4ab49df4ba218430d965e37"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\concept-c.svg": {
+    "mtime": 1785236444.8890502,
+    "ast_hash": "92d77bee3d113a5c5322e916832e148b",
+    "semantic_hash": "92d77bee3d113a5c5322e916832e148b"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\concept-d.svg": {
+    "mtime": 1785236452.741407,
+    "ast_hash": "632a0f6a5695ed4beeac16b91b119b0c",
+    "semantic_hash": "632a0f6a5695ed4beeac16b91b119b0c"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\concept-e.svg": {
+    "mtime": 1785236462.5025527,
+    "ast_hash": "139eefcbc199e6352f47e6b1513f249b",
+    "semantic_hash": "139eefcbc199e6352f47e6b1513f249b"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\dice-1.svg": {
+    "mtime": 1785235464.0639455,
+    "ast_hash": "429108ec48c739cbaeb3f8fab6f78c14",
+    "semantic_hash": "429108ec48c739cbaeb3f8fab6f78c14"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\dice-2.svg": {
+    "mtime": 1785235472.9109898,
+    "ast_hash": "1b5bfc42d97079f062631cc1aac55fa7",
+    "semantic_hash": "1b5bfc42d97079f062631cc1aac55fa7"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\dice-3.svg": {
+    "mtime": 1785235482.4869685,
+    "ast_hash": "bcd7c789b5f2b6285b1b57c1cbc093fc",
+    "semantic_hash": "bcd7c789b5f2b6285b1b57c1cbc093fc"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\dice-4.svg": {
+    "mtime": 1785235491.1200848,
+    "ast_hash": "7d0264c5b86df2a882cc57fb6c330e0a",
+    "semantic_hash": "7d0264c5b86df2a882cc57fb6c330e0a"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\dice-5.svg": {
+    "mtime": 1785235499.9773078,
+    "ast_hash": "6f2d7928b8faed21564dc739a58d924e",
+    "semantic_hash": "6f2d7928b8faed21564dc739a58d924e"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\assets\\dice\\dice-6.svg": {
+    "mtime": 1785235509.2368925,
+    "ast_hash": "40c9bb2abe441fffa8a399df9ae91c6b",
+    "semantic_hash": "40c9bb2abe441fffa8a399df9ae91c6b"
+  },
+  "C:\\Users\\Sumit Kumar\\Desktop\\Apps\\Claude Code\\Test\\Game\\Apana Ludo\\client\\public\\board.png": {
+    "mtime": 1784660534.101719,
+    "ast_hash": "32fdf8047600727c6ac00262eed24107",
+    "semantic_hash": "32fdf8047600727c6ac00262eed24107"
+  }
+}
