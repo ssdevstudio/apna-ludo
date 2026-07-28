@@ -1,44 +1,87 @@
-.die{width:44px;height:44px;background:transparent;perspective:800px;flex:none;position:relative;z-index:10;}
-.die-inner{width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275)}
-.die-face{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:linear-gradient(135deg,#ffffff 0%,#f0f0f0 100%);border-radius:10px;padding:5px;box-shadow:inset 0 4px 6px rgba(255,255,255,1), inset 0 -4px 6px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.4);backface-visibility:hidden;border:1px solid #dcdcdc;}
-.die-face i{border-radius:50%;width:8px;height:8px;place-self:center}
-.die-face i.dot{background:var(--deep);box-shadow:inset 0 2px 4px rgba(0,0,0,0.8),0 1px 1px rgba(255,255,255,1)}
-.die-face--1{transform:rotateY(0deg) translateZ(22px)}
-.die-face--2{transform:rotateX(-90deg) translateZ(22px)}
-.die-face--3{transform:rotateY(90deg) translateZ(22px)}
-.die-face--4{transform:rotateY(-90deg) translateZ(22px)}
-.die-face--5{transform:rotateX(90deg) translateZ(22px)}
-.die-face--6{transform:rotateX(180deg) translateZ(22px)}
-.die-shadow{position:absolute;bottom:-8px;left:50%;width:36px;height:12px;background:rgba(0,0,0,0.3);border-radius:50%;filter:blur(4px);transform:translateX(-50%);z-index:-1;transition:all 0.3s;}
-
-.die { animation: diceFloat 2s ease-in-out infinite; }
-@keyframes diceFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+.die {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  position: relative;
+  z-index: 10;
+  border-radius: 8px;
 }
 
-.die--rolling { animation: diceRollJump 0.6s cubic-bezier(0.3, 0.8, 0.5, 1) forwards !important; }
-.die--rolling .die-inner { animation: diceTumble 0.6s linear forwards !important; }
-.die--rolling .die-shadow { animation: diceShadowJump 0.6s cubic-bezier(0.3, 0.8, 0.5, 1) forwards !important; }
-
-@keyframes diceRollJump {
-  0% { transform: translateY(0) scale(1); }
-  40% { transform: translateY(-80px) scale(1); }
-  80% { transform: translateY(0) scale(1.1, 0.9); }
-  90% { transform: translateY(-15px) scale(0.95, 1.05); }
-  100% { transform: translateY(0) scale(1); }
+.die-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7f7f7 30%, #e6e6e6 100%);
+  border-radius: 8px;
+  padding: 5px;
+  border: 1px solid #c0c0c0;
+  box-shadow: 
+    inset 2px 2px 4px rgba(255, 255, 255, 1), 
+    inset -2px -2px 4px rgba(0, 0, 0, 0.15),
+    0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-@keyframes diceTumble {
-  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-  50% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
-  100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(0deg); }
+.die-face i {
+  border-radius: 50%;
+  width: 8px;
+  height: 8px;
+  place-self: center;
+}
+
+.die-face i.dot {
+  background: var(--deep);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.7), 
+    0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.die-shadow {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 32px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  filter: blur(3px);
+  transform: translateX(-50%);
+  z-index: -1;
+  transition: all 0.2s;
+}
+
+.die--rolling {
+  animation: diceFastRoll 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+.die--rolling .die-face {
+  animation: diceMotionBlur 0.3s linear forwards !important;
+}
+
+.die--rolling .die-shadow {
+  animation: diceShadowJump 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+@keyframes diceFastRoll {
+  0% { transform: translateY(0) scale(1) rotateZ(0deg); }
+  40% { transform: translateY(-16px) scale(1.08) rotateZ(15deg); }
+  85% { transform: translateY(0) scale(1.1, 0.9) rotateZ(0deg); }
+  95% { transform: translateY(-3px) scale(0.98, 1.02) rotateZ(0deg); }
+  100% { transform: translateY(0) scale(1) rotateZ(0deg); }
+}
+
+@keyframes diceMotionBlur {
+  0% { filter: blur(0px); }
+  40% { filter: blur(1px); }
+  80% { filter: blur(0px); }
+  100% { filter: blur(0px); }
 }
 
 @keyframes diceShadowJump {
   0% { transform: translateX(-50%) scale(1); opacity: 0.5; }
-  40% { transform: translateX(-50%) scale(0.5); opacity: 0.1; }
-  80% { transform: translateX(-50%) scale(1.1); opacity: 0.6; }
+  40% { transform: translateX(-50%) scale(0.7); opacity: 0.15; }
+  85% { transform: translateX(-50%) scale(1.1); opacity: 0.6; }
   100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
 }
 
