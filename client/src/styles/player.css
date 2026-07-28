@@ -47,18 +47,21 @@
 
 .turn-indicator {
   position: absolute;
+  top: 50%;
+  margin-top: -12px;
   font-size: 32px;
   font-weight: bold;
   color: #ff9800;
-  z-index: 20;
+  z-index: 10;
+  pointer-events: none;
   text-shadow: 0 0 8px rgba(255,255,255,1), 0 0 4px rgba(0,0,0,0.5);
 }
 .corner-bottom-left .turn-indicator, .corner-top-left .turn-indicator {
-  right: -50px;
+  right: -55px;
   animation: pointLeft 0.5s infinite alternate ease-in-out;
 }
 .corner-bottom-right .turn-indicator, .corner-top-right .turn-indicator {
-  left: -50px;
+  left: -55px;
   animation: pointRight 0.5s infinite alternate ease-in-out;
 }
 @keyframes pointLeft { from { transform: translateX(0); } to { transform: translateX(-15px); } }

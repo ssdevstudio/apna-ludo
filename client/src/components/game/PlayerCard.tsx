@@ -3,6 +3,28 @@ import { Die } from "./Dice";
 import { tr } from "../../utils/i18n";
 import { COLOR_HEX } from "../../utils/constants";
 
+const GoldenArrow = ({ direction = "left" }: { direction?: "left" | "right" }) => (
+  <svg width="40" height="24" viewBox="0 0 40 24" style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))" }}>
+    <defs>
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#fff7b0" />
+        <stop offset="50%" stopColor="#ffd700" />
+        <stop offset="100%" stopColor="#d4af37" />
+      </linearGradient>
+      <linearGradient id="goldBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#fff" />
+        <stop offset="100%" stopColor="#b8860b" />
+      </linearGradient>
+    </defs>
+    <path 
+      d={direction === "left" ? "M 5 12 L 20 2 L 20 8 L 40 8 L 40 16 L 20 16 L 20 22 Z" : "M 35 12 L 20 2 L 20 8 L 0 8 L 0 16 L 20 16 L 20 22 Z"} 
+      fill="url(#goldGrad)" 
+      stroke="url(#goldBorder)" 
+      strokeWidth="1.5"
+    />
+  </svg>
+);
+
 export function PlayerCorner({
   player,
   position,
@@ -45,7 +67,9 @@ export function PlayerCorner({
         >
           <Die value={diceValue ?? 1} rolling={isRolling} />
         </button>
-        {isActive && canRoll && <div className="turn-indicator">←</div>}
+        {isActive && (canRoll || canMove) && <div className="turn-indicator" aria-hidden="true">
+        <GoldenArrow direction={player.color === 'red' || player.color === 'green' ? 'left' : 'right'} />
+      </div>}
       </div>
     </div>
   );
