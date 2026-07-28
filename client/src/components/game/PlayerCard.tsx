@@ -14,7 +14,8 @@ export function PlayerCorner({
   canRoll,
   canMove,
   onRoll,
-  avatar
+  avatar,
+  skipMsg
 }: {
   player?: GamePlayer | RoomPlayerSnapshot;
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -25,6 +26,7 @@ export function PlayerCorner({
   canMove: boolean;
   onRoll: () => void;
   avatar: string;
+  skipMsg?: string;
 }) {
   if (!player) {
     return <div className={`player-corner corner-${position} empty`}></div>;
@@ -47,7 +49,7 @@ export function PlayerCorner({
         />
       )}
 
-      <div className={`corner-dice ${isActive && (canRoll || canMove) ? 'dice-active' : ''}`}>
+      <div className={`corner-dice ${isActive && (canRoll || canMove || isRolling) ? 'dice-active' : ''}`}>
         <button 
           className="corner-roll-btn" 
           onClick={onRoll} 
@@ -55,6 +57,7 @@ export function PlayerCorner({
         >
           <Die value={diceValue ?? 1} rolling={isRolling} />
         </button>
+        {skipMsg && <div className="skip-toast">{skipMsg}</div>}
       </div>
     </div>
   );

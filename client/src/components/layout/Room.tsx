@@ -48,6 +48,7 @@ export function Room() {
   const [settingsOpen,setSettingsOpen]=useState(false);
   const [message,setMessage]=useState("");
   const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
+  const [skipMsg, setSkipMsg] = useState<{playerId: string, msg: string} | null>(null);
   const [rolling,setRolling]=useState(false);
   const [tokenAnimation,setTokenAnimation]=useState<string|null>(null);
     const [boardShake,setBoardShake]=useState(false);
@@ -107,6 +108,12 @@ export function Room() {
         setLastRolls(prev => ({...prev, [snap.game!.currentPlayerId]: snap.game!.dice!}));
       }
       if(snap.game?.lastAction?.type==="moved"){setTokenAnimation(snap.game.lastAction.tokenId??null);setTimeout(()=>setTokenAnimation(null),600);if(snap.game.lastAction.capturedTokenIds?.length){playSound("capture");setBoardShake(true);setTimeout(()=>setBoardShake(false),300);}}
+      if(snap.game?.lastAction?.type==="turn-skipped" && snap.game.lastAction.dice === 6) {
+        setLocalDice(6);
+        setLastRolls(prev => ({...prev, [snap.game!.lastAction!.playerId!]: 6}));
+        setSkipMsg({playerId: snap.game.lastAction.playerId!, msg: "3 Sixes! Turn Missed"});
+        setTimeout(() => setSkipMsg(null), 3000);
+      }
       if(snap.game?.phase==="finished"&&snap.game?.winners.includes(playerId??""))setTimeout(()=>playSound("win"),200);
       if(snap.game?.currentPlayerId===playerId&&snap.game?.dice===null)playSound("turn");
       if(snap.game?.movableTokenIds?.length===1&&snap.game.currentPlayerId===playerId){setTimeout(()=>{moveTokenRef.current(snap.game!.movableTokenIds[0]!);},300);}
@@ -180,6 +187,7 @@ export function Room() {
     const p = snapshot?.game ? snapshot.game.players.find(p=>p.color===color) : snapshot?.players.find(p=>p.color===color);
     const isActive = snapshot?.phase === "playing" && snapshot?.game?.currentPlayerId === p?.id;
     const isMe = p?.id === playerId;
+    const visualActivePlayerId = rolling ? playerId : snapshot?.game?.currentPlayerId;
     
     let displayDice = 1;
     if (isActive && localDice) displayDice = localDice;
@@ -189,13 +197,14 @@ export function Room() {
       key={color}
       player={p}
       position={pos}
-      isActive={isActive}
+      isActive={visualActivePlayerId === p?.id && snapshot?.game?.phase === "playing"}
       diceValue={displayDice}
-      isRolling={isActive && rolling}
+      isRolling={visualActivePlayerId === p?.id && rolling}
       canRoll={canRoll && isMe}
       canMove={canMove && isMe}
       onRoll={rollDice}
       avatar={isMe ? myAvatar : ""}
+      skipMsg={skipMsg?.playerId === p?.id ? skipMsg?.msg : undefined}
     />
   };
 

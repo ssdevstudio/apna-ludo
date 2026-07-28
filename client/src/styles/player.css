@@ -71,6 +71,9 @@
 .corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -62px; }
 .corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -62px; }
 
+.skip-toast { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: #d32f2f; color: white; font: 700 12px 'Yeseva One'; padding: 6px 10px; border-radius: 8px; white-space: nowrap; pointer-events: none; animation: popToast 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
+@keyframes popToast { 0% { transform: translate(-50%, 10px) scale(0.5); opacity: 0; } 100% { transform: translate(-50%, 0) scale(1); opacity: 1; } }
+
 .corner-roll-btn { 
   background: #fff; 
   border: 2px solid #ddd; 
