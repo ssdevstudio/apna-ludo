@@ -231,10 +231,15 @@ export function Room() {
   const brColor = shifted[2];
   const blColor = shifted[3];
   const boardRotation = shift * 90;
+  const isBotGame = snapshot?.players.some(p => p.id.startsWith("bot-") || (p as any).isBot);
 
   return <main className="room-page">
     <header className="room-header"><Logo compact/>
-      <div className="room-code"><span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code??code).toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button></div>
+      <div className="room-code">
+        {!isBotGame ? <>
+          <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code??code).toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
+        </> : <span>SINGLE PLAYER</span>}
+      </div>
       <div className="header-actions">
         <div className="reaction-wrapper" style={{position:"relative"}}>
           <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
@@ -251,7 +256,7 @@ export function Room() {
       <aside className="players-panel">
         <div className="panel-heading"><span>PLAYERS</span><b>{snapshot?.players.length}/4</b></div>
         {snapshot?.players.map(p=><PlayerSeat key={p.id} player={p} active={snapshot?.game?.currentPlayerId===p.id} avatar={p.id===playerId?myAvatar:undefined}/>)}
-        {(snapshot?.players.length??0)<4&&<button className="invite-button" onClick={copyInvite}>+ Invite Player</button>}
+        {(snapshot?.players.length??0)<4 && !isBotGame && <button className="invite-button" onClick={copyInvite}>+ Invite Player</button>}
         {snapshot?.game&&<div className="game-stats">
           <div className="panel-heading" style={{marginTop:10}}><span>STATUS</span></div>
           {snapshot.game.players.map((p,i)=>
