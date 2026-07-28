@@ -47,7 +47,8 @@
 
 .emoji-grid-popup {
   position: absolute;
-  bottom: 100%;
+  top: 100%;
+  margin-top: 10px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255,255,255,0.97);

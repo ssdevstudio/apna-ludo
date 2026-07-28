@@ -195,6 +195,7 @@ io.on("connection", (socket) => {
       createRoom(io, parsed.data.name, parsed.data.maxPlayers, socket.id, parsed.data.color),
     );
     if (result.ok) {
+      socket.data.roomCode = result.room.code;
       socket.join(result.room.code);
     }
     ack(result);
@@ -214,6 +215,7 @@ io.on("connection", (socket) => {
       createRoomWithComputer(io, parsed.data.name, socket.id),
     );
     if (result.ok) {
+      socket.data.roomCode = result.room.code;
       socket.join(result.room.code);
     }
     ack(result);
