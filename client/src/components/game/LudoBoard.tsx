@@ -85,7 +85,7 @@ function tokenCellIndex(color:PlayerColor,progress:number,tokenIdx=0):number|nul
   return progressToCellIndex(color,progress);
 }
 
-export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotation=0}:{game:GameState;myPlayerId:string|null;legalTokens:string[];onMove:(id:string)=>void;tokenAnimation:string|null;boardRotation?:number}){
+export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotation=0,activeTokenId,onCapture}:{game:GameState;myPlayerId:string|null;legalTokens:string[];onMove:(id:string)=>void;tokenAnimation:string|null;boardRotation?:number;activeTokenId?: string | null; onCapture?: () => void;}){
   const me=game.players.find(p=>p.id===myPlayerId);
   const visualProgressRef = useRef<Record<string, number>>({});
   const [, setForceRender] = useState(0);
@@ -93,6 +93,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
 
   useEffect(() => {
     const tokensToAnimate:{id:string;color:PlayerColor;start:number;end:number}[] = [];
+    const tokensToCapture:{id:string;color:PlayerColor}[] = [];
     let instantChange = false;
 
     game.players.forEach(p => p.tokens.forEach(t => {
@@ -104,15 +105,16 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
 
       if (current !== t.progress && current !== -1 && t.progress !== -1 && t.progress > current) {
         tokensToAnimate.push({id: t.id, color: p.color, start: current, end: t.progress});
+      } else if (current !== -1 && t.progress === -1) {
+        tokensToCapture.push({id: t.id, color: p.color});
       } else if (current !== t.progress) {
         visualProgressRef.current[t.id] = t.progress;
         instantChange = true;
       }
     }));
 
-    if (instantChange && tokensToAnimate.length === 0) {
+    if (instantChange && tokensToAnimate.length === 0 && tokensToCapture.length === 0) {
       setForceRender(x => x + 1);
-      if (instantChange) playSound("capture");
     }
 
     if (tokensToAnimate.length > 0) {
@@ -134,9 +136,22 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
           playSound("move");
         } else {
           clearInterval(interval);
+          if (tokensToCapture.length > 0) {
+            tokensToCapture.forEach(cap => {
+              visualProgressRef.current[cap.id] = -1;
+            });
+            if (onCapture) onCapture();
+            setForceRender(x => x + 1);
+          }
         }
       }, 150);
       return () => clearInterval(interval);
+    } else if (tokensToCapture.length > 0) {
+      tokensToCapture.forEach(cap => {
+        visualProgressRef.current[cap.id] = -1;
+      });
+      if (onCapture) onCapture();
+      setForceRender(x => x + 1);
     }
   }, [game]);
 

@@ -107,7 +107,10 @@ export function Room() {
         setLocalDice(snap.game.dice);
         setLastRolls(prev => ({...prev, [snap.game!.currentPlayerId]: snap.game!.dice!}));
       }
-      if(snap.game?.lastAction?.type==="moved"){setTokenAnimation(snap.game.lastAction.tokenId??null);setTimeout(()=>setTokenAnimation(null),600);if(snap.game.lastAction.capturedTokenIds?.length){playSound("capture");setBoardShake(true);setTimeout(()=>setBoardShake(false),300);}}
+      if(snap.game?.lastAction?.type==="moved"){
+        setTokenAnimation(snap.game.lastAction.tokenId??null);
+        setTimeout(()=>setTokenAnimation(null),600);
+      }
       if(snap.game?.lastAction?.type==="turn-skipped" && snap.game.lastAction.dice === 6) {
         setLocalDice(6);
         setLastRolls(prev => ({...prev, [snap.game!.lastAction!.playerId!]: 6}));
@@ -163,6 +166,13 @@ export function Room() {
 };
   const moveToken=(tokenId:string)=>{if(!socket||!canMove)return;cmdSeq.current+=1;setTokenAnimation(tokenId);socket.emit("game:move",{tokenId,expectedRevision:revisionRef.current},()=>{setTokenAnimation(null);});};
   moveTokenRef.current=moveToken;
+
+  const handleCapture = useCallback(() => {
+    playSound("capture");
+    setBoardShake(true);
+    setTimeout(() => setBoardShake(false), 300);
+  }, []);
+
   const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
   
   const sendReaction = (emoji: string) => {
@@ -262,7 +272,16 @@ export function Room() {
           {renderCorner(trColor, 'top-right')}
           
           <div className={`board-center ${boardShake ? "board-shake" : ""}`}>
-            {snapshot?.game ? <LudoBoard game={snapshot.game} myPlayerId={playerId} legalTokens={legalTokens} onMove={moveToken} tokenAnimation={tokenAnimation} boardRotation={boardRotation}/> : <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}><div className="ludo-board" role="grid" aria-label="Empty Ludo board" style={{minHeight:"50vw",maxHeight:"620px"}}><div className="home-yard yard-red">{[0,1,2,3].map(i=><img key={i} src="/token-red.png" alt="red" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-blue">{[0,1,2,3].map(i=><img key={i} src="/token-blue.png" alt="blue" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-green">{[0,1,2,3].map(i=><img key={i} src="/token-green.png" alt="green" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-yellow">{[0,1,2,3].map(i=><img key={i} src="/token-yellow.png" alt="yellow" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><></></div></div>}
+            {snapshot?.game ? <LudoBoard 
+              game={snapshot.game} 
+              myPlayerId={playerId} 
+              legalTokens={legalTokens} 
+              onMove={moveToken} 
+              tokenAnimation={tokenAnimation} 
+              boardRotation={boardRotation}
+              activeTokenId={tokenAnimation}
+              onCapture={handleCapture}
+            /> : <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}><div className="ludo-board" role="grid" aria-label="Empty Ludo board" style={{minHeight:"50vw",maxHeight:"620px"}}><div className="home-yard yard-red">{[0,1,2,3].map(i=><img key={i} src="/token-red.png" alt="red" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-blue">{[0,1,2,3].map(i=><img key={i} src="/token-blue.png" alt="blue" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-green">{[0,1,2,3].map(i=><img key={i} src="/token-green.png" alt="green" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-yellow">{[0,1,2,3].map(i=><img key={i} src="/token-yellow.png" alt="yellow" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><></></div></div>}
           </div>
 
           {renderCorner(blColor, 'bottom-left')}
