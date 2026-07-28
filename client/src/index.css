@@ -1,0 +1,7 @@
+@import "./styles/variables.css";
+@import "./styles/layout.css";
+@import "./styles/landing.css";
+@import "./styles/player.css";
+@import "./styles/board.css";
+@import "./styles/dice.css";
+@import "./styles/chat.css";

@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Yeseva+One&display=swap');
+
+:root {
+  --ink: #102f2e;
+  --deep: #073b3a;
+  --teal: #087f78;
+  --mint: #b8ddd0;
+  --paper: #f4f0e6;
+  --paper2: #ebe4d3;
+  --red: #df4c4b;
+  --blue: #3783ba;
+  --yellow: #e7b93f;
+  --green: #3b9c70;
+  --line: rgba(16,47,46,.18);
+  --border: rgba(0,0,0,0.15);
+  --bg: #f4f0e6;
+  font-family: Manrope,sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+}
