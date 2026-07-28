@@ -93,21 +93,26 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
   };
 
   const getTrackTokenStyle = (index: number, count: number): React.CSSProperties => {
-    const baseRotation = `rotate(-${boardRotation}deg)`;
-    if (count === 1) return { transform: `translate(-50%, -80%) ${baseRotation}` };
+    if (count === 1) return { transform: `translate(-50%, -80%) rotate(-${boardRotation}deg)` };
     if (count === 2) {
-      const offsets = [[-20, -5], [20, 5]];
+      const offsets = [[-4, 0], [4, 0]];
+      const angles = [-15, 15];
       const [ox, oy] = offsets[index] ?? [0, 0];
-      return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.8) ${baseRotation}` };
+      const ang = angles[index] ?? 0;
+      return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.85) rotate(calc(-${boardRotation}deg + ${ang}deg))` };
     }
     if (count === 3) {
-      const offsets = [[-25, -10], [25, -10], [0, 15]];
+      const offsets = [[-8, 0], [0, 0], [8, 0]];
+      const angles = [-20, 0, 20];
       const [ox, oy] = offsets[index] ?? [0, 0];
-      return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.75) ${baseRotation}` };
+      const ang = angles[index] ?? 0;
+      return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.75) rotate(calc(-${boardRotation}deg + ${ang}deg))` };
     }
-    const pos = [{x:-25,y:-15},{x:25,y:-15},{x:-25,y:15},{x:25,y:15}];
-    const p = pos[index % 4]!;
-    return { transform: `translate(calc(-50% + ${p.x}%), calc(-80% + ${p.y}%)) scale(0.65) ${baseRotation}` };
+    const offsets = [[-10, 3], [-3, 3], [3, 3], [10, 3]];
+    const angles = [-25, -8, 8, 25];
+    const [ox, oy] = offsets[index % 4] ?? [0, 0];
+    const ang = angles[index % 4] ?? 0;
+    return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.65) rotate(calc(-${boardRotation}deg + ${ang}deg))` };
   };
 
   const allTokens:{id:string;color:PlayerColor;progress:number;ordinal:number}[]=[];
