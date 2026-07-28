@@ -219,6 +219,23 @@ export function Room() {
     </header>
     <div className="game-layout">
         <EmojiReactionSystem reactions={reactions} />
+      <aside className="players-panel">
+        <div className="panel-heading"><span>PLAYERS</span><b>{snapshot?.players.length}/4</b></div>
+        {snapshot?.players.map(p=><PlayerSeat key={p.id} player={p} active={snapshot?.game?.currentPlayerId===p.id} avatar={p.id===playerId?myAvatar:undefined}/>)}
+        {(snapshot?.players.length??0)<4&&<button className="invite-button" onClick={copyInvite}>+ Invite Player</button>}
+        {snapshot?.game&&<div className="game-stats">
+          <div className="panel-heading" style={{marginTop:10}}><span>STATUS</span></div>
+          {snapshot.game.players.map((p,i)=>
+        <div key={p.id} className={`stat-chip ${p.id===playerId?"stat-chip--me":""}`}>
+          <span className="stat-color" style={{background:COLOR_HEX[p.color]}}/>
+          <span className="stat-name">{p.name} {p.id===playerId?"(You)":""}</span>
+          <span className="stat-info">
+            <span title="Home 🏠">🏠{p.tokens.filter(t=>t.progress===57).length}</span>
+            <span title="Track 🎲">🎲{p.tokens.filter(t=>t.progress>=0&&t.progress<57).length}</span>
+            <span title="Yard 🅿️">🅿️{p.tokens.filter(t=>t.progress===-1).length}</span>
+          </span>
+        </div>)}</div>}
+      </aside>
 
       <section className="table-area">
         <div className="board-container">
