@@ -246,6 +246,7 @@ io.on("connection", (socket) => {
       parsed.data.color,
     );
     if (result.ok) {
+      socket.data.roomCode = roomCode;
       socket.join(roomCode);
     }
     ack(result);
