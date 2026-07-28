@@ -69,7 +69,7 @@ export function PlayerSeat({ player, active, avatar }: { player?:RoomPlayerSnaps
   </div>;
 }
 
-export function renderPlayerRank(p: GamePlayer, i: number, winners: string[], playerId: string | null, avatar: string) {
+export function PlayerRankItem({ p, i, winners, playerId, avatar }: { p: GamePlayer, i: number, winners: string[], playerId: string | null, avatar: string }) {
   const homeCount = p.tokens.filter((t: any)=>t.progress===57).length;
   const isBot = p.id.startsWith("bot-");
   const av = isBot ? "🤖" : avatar;

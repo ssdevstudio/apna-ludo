@@ -1,6 +1,6 @@
 import { RoomSnapshot } from "@apna-ludo/shared";
 import { tr } from "../../utils/i18n";
-import { renderPlayerRank } from "../game/PlayerCard";
+import { PlayerRankItem } from "../game/PlayerCard";
 
 export function VictoryModal({
   snapshot,
@@ -35,7 +35,7 @@ export function VictoryModal({
             const aW=winners.includes(a.id)?0:1;
             const bW=winners.includes(b.id)?0:1;
             return aW-bW;
-          }).map((p,i)=>renderPlayerRank(p,i,winners,playerId,myAvatar))}
+          }).map((p,i)=><PlayerRankItem key={p.id} p={p} i={i} winners={winners} playerId={playerId} avatar={myAvatar} />)}
         </ol>
         <div style={{display:'flex',gap:10,marginTop:20}}>
           <button className="primary-button wide" onClick={onRematch}>Rematch <span>↻</span></button>
