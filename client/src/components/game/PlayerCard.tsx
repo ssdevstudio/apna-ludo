@@ -64,7 +64,7 @@ export function PlayerSeat({ player, active, avatar }: { player?:RoomPlayerSnaps
   if (!player) return <div className="player-seat empty-seat"><span>+</span><div><b>Open seat</b><small>Waiting for player</small></div></div>;
   return <div className={`player-seat seat-${player.color} ${active?"active-seat":""}`}>
     <span className="avatar" style={{background:COLOR_HEX[player.color]}}>{(player as any).isBot?"🤖":avatar??player.name[0]}</span>
-    <div><b>{player.name}{player.isHost&&<sup> HOST</sup>}</b><small>{player.connected?player.ready?tr("ready"):tr("unready"):tr("reconnecting")}</small></div>
+    <div><b><span className="seat-name">{player.name}</span>{player.isHost&&<sup> HOST</sup>}</b><small>{player.connected?player.ready?tr("ready"):tr("unready"):tr("reconnecting")}</small></div>
     {active&&<span className="turn-pip">TURN</span>}
   </div>;
 }

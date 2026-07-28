@@ -8,7 +8,8 @@
 .seat-green .avatar{background:linear-gradient(135deg,var(--green),#146c43)}
 .seat-red .avatar{background:linear-gradient(135deg,var(--red),#b02a37)}
 .player-seat>div{display:flex;flex-direction:column;min-width:0;flex:1;justify-content:center;overflow:hidden;}
-.player-seat b{display:flex;align-items:center;font-size:15px;font-family:'Fredoka',sans-serif;color:#333;text-shadow:0 1px 1px rgba(255,255,255,0.8);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.player-seat b{display:flex;align-items:center;font-size:15px;font-family:'Fredoka',sans-serif;color:#333;text-shadow:0 1px 1px rgba(255,255,255,0.8);line-height:1.2;}
+.seat-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;}
 .player-seat sup{font:700 9px 'Fredoka',sans-serif;background:linear-gradient(180deg,#3d5450,#2a3b38);color:#fff;padding:3px 6px;border-radius:12px;margin-left:6px;box-shadow:0 2px 4px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2);flex-shrink:0;}
 .player-seat small{font-size:11px;color:#555;margin-top:2px;font-weight:700;}
 .turn-pip{font:700 11px 'Fredoka',sans-serif;color:#fff;background:linear-gradient(180deg,var(--teal),#0d5c46);padding:4px 10px;border-radius:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);border:2px solid rgba(255,255,255,0.5);margin-left:auto;flex-shrink:0;}
