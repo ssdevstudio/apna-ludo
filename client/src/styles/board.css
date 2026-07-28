@@ -2,10 +2,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto;
-  gap: 15px 10px;
-  width: min(100%, 580px);
+  gap: 8px 10px;
+  width: min(100%, 520px);
   margin: 0 auto;
-  padding: 30px 0;
+  padding: 12px 0;
 }
 .board-center {
   grid-column: 1 / -1;

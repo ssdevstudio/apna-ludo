@@ -32,7 +32,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
 
 .game-layout{height:calc(100vh - 60px);display:grid;grid-template-columns:210px minmax(440px,1fr) 260px}
-.table-area{min-width:0;padding:12px 16px;display:flex;flex-direction:column;align-items:center;overflow:auto;background:transparent;}
+.table-area{min-width:0;padding:4px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto;background:transparent;}
 .game-controls{width:min(100%,580px);display:flex;align-items:center;justify-content:space-between;margin-top:10px;min-height:56px;gap:8px}
 .lobby-note,.move-hint{display:flex;align-items:center;gap:8px}.lobby-note>span{font-size:22px;color:var(--teal)}.lobby-note>div,.move-hint{flex-direction:column;align-items:flex-start;gap:2px}.lobby-note b,.move-hint b{font-size:11px}.lobby-note small,.move-hint small{font-size:9px;color:#3d5450}.start-button{min-width:150px}
 

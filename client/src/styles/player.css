@@ -28,13 +28,13 @@
 .player-corner {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 6px 12px 6px 8px;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
   border-radius: 40px;
   background: linear-gradient(145deg, #ffffff, #e6e6e6);
   border: 3px solid transparent;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,1);
-  min-width: 140px;
+  min-width: 120px;
   opacity: 0.6;
   transition: all 0.3s ease;
   position: relative;
@@ -52,10 +52,10 @@
 .corner-green { border-color: var(--green); background: linear-gradient(145deg, #ffffff, #e6f4ea); }
 .corner-yellow { border-color: var(--yellow); background: linear-gradient(145deg, #ffffff, #fef7e0); }
 
-.corner-top-left { justify-self: start; grid-column: 1; grid-row: 1; padding-right: 40px; }
-.corner-top-right { justify-self: end; grid-column: 2; grid-row: 1; flex-direction: row-reverse; padding-left: 40px; }
-.corner-bottom-left { justify-self: start; grid-column: 1; grid-row: 3; padding-right: 40px; }
-.corner-bottom-right { justify-self: end; grid-column: 2; grid-row: 3; flex-direction: row-reverse; padding-left: 40px; }
+.corner-top-left { justify-self: start; grid-column: 1; grid-row: 1; padding-right: 32px; }
+.corner-top-right { justify-self: end; grid-column: 2; grid-row: 1; flex-direction: row-reverse; padding-left: 32px; }
+.corner-bottom-left { justify-self: start; grid-column: 1; grid-row: 3; padding-right: 32px; }
+.corner-bottom-right { justify-self: end; grid-column: 2; grid-row: 3; flex-direction: row-reverse; padding-left: 32px; }
 
 .corner-profile { display: flex; flex-direction: column; align-items: center; gap: 2px; z-index: 2; }
 .corner-profile b { font-size: 12px; white-space: nowrap; max-width: 60px; overflow: hidden; text-overflow: ellipsis; color: #333; font-weight: 700; }
@@ -67,8 +67,8 @@
   align-items: center; 
   z-index: 15; 
 }
-.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -68px; }
-.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -68px; }
+.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -62px; }
+.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -62px; }
 
 .corner-roll-btn { 
   background: #fff; 
