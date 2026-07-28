@@ -160,9 +160,7 @@ function finishTurn(state: GameState, playerId: string, extraTurn: boolean): Gam
   const remaining = activePlayers(state);
   if (remaining.length <= 1) {
     const solePlayer = remaining[0];
-    const winners = solePlayer && !state.winners.includes(solePlayer.id)
-      ? [...state.winners, solePlayer.id]
-      : state.winners;
+    const winners = state.winners;
     return {
       ...state,
       phase: "finished",

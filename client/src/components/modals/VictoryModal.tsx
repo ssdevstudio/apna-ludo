@@ -32,9 +32,14 @@ export function VictoryModal({
         <p>All tokens home. Time for another round?</p>
         <ol>
           {snapshot?.game?.players.slice().sort((a,b)=>{
-            const aW=winners.includes(a.id)?0:1;
-            const bW=winners.includes(b.id)?0:1;
-            return aW-bW;
+            const aW = winners.indexOf(a.id);
+            const bW = winners.indexOf(b.id);
+            const aRank = aW !== -1 ? aW : 999;
+            const bRank = bW !== -1 ? bW : 999;
+            if (aRank !== bRank) return aRank - bRank;
+            const aHome = a.tokens.filter(t => t.progress === 57).length;
+            const bHome = b.tokens.filter(t => t.progress === 57).length;
+            return bHome - aHome;
           }).map((p,i)=><PlayerRankItem key={p.id} p={p} i={i} winners={winners} playerId={playerId} avatar={myAvatar} />)}
         </ol>
         <div style={{display:'flex',gap:10,marginTop:20}}>
