@@ -42,16 +42,16 @@ export function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"en
     gain.gain.exponentialRampToValueAtTime(.001, n+.22);
     if (type==="dice") {
       gain.gain.setValueAtTime(.08,n);
-      for(let i=0;i<4;i++){
+      for(let i=0;i<12;i++){
         const o2=ctx.createOscillator(),g2=ctx.createGain();
         o2.connect(g2);g2.connect(ctx.destination);
-        o2.type="triangle";o2.frequency.value=200+Math.random()*600;
-        g2.gain.setValueAtTime(.06,n+i*.04);
-        g2.gain.exponentialRampToValueAtTime(.001,n+i*.04+.03);
-        o2.start(n+i*.04);o2.stop(n+i*.04+.04);
+        o2.type="sine";o2.frequency.value=3500 + Math.random()*1500;
+        g2.gain.setValueAtTime(.03,n+i*.025);
+        g2.gain.exponentialRampToValueAtTime(.001,n+i*.025+.02);
+        o2.start(n+i*.025);o2.stop(n+i*.025+.025);
       }
-      osc.frequency.setValueAtTime(300,n);osc.frequency.exponentialRampToValueAtTime(1200,n+.15);
-      osc.start(n);osc.stop(n+.18);
+      osc.frequency.setValueAtTime(600,n);osc.frequency.exponentialRampToValueAtTime(1000,n+.15);
+      osc.start(n);osc.stop(n+.2);
     }
     else if (type==="move") { osc.frequency.setValueAtTime(500,n); osc.frequency.exponentialRampToValueAtTime(800,n+.08); osc.start(n); osc.stop(n+.1); }
     else if (type==="capture") { osc.type="sawtooth"; osc.frequency.setValueAtTime(400,n); osc.frequency.exponentialRampToValueAtTime(150,n+.25); osc.start(n); osc.stop(n+.3); }
