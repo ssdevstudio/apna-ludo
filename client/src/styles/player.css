@@ -45,27 +45,57 @@
 .corner-roll-btn:not(:disabled):hover { transform: scale(1.1) translateY(-2px); }
 .corner-roll-btn:disabled { cursor: default; }
 
-.turn-indicator {
+/* PlayerTurnIndicator Component */
+.turn-indicator-wrapper {
   position: absolute;
   top: 50%;
-  margin-top: -12px;
-  font-size: 32px;
-  font-weight: bold;
-  color: #ff9800;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10;
   pointer-events: none;
-  text-shadow: 0 0 8px rgba(255,255,255,1), 0 0 4px rgba(0,0,0,0.5);
 }
-.corner-bottom-left .turn-indicator, .corner-top-left .turn-indicator {
-  right: -55px;
-  animation: pointLeft 0.5s infinite alternate ease-in-out;
+.turn-left { right: -50px; }
+.turn-right { left: -50px; }
+
+.turn-glow-ring {
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  animation: ringPulse 1.2s infinite cubic-bezier(0.2, 0, 0.8, 1);
+  box-shadow: 0 0 15px currentColor;
 }
-.corner-bottom-right .turn-indicator, .corner-top-right .turn-indicator {
-  left: -55px;
-  animation: pointRight 0.5s infinite alternate ease-in-out;
+.ring-red { color: var(--red); }
+.ring-blue { color: var(--blue); }
+.ring-green { color: var(--green); }
+.ring-yellow { color: var(--yellow); }
+
+@keyframes ringPulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.4); opacity: 0; }
 }
-@keyframes pointLeft { from { transform: translateX(0); } to { transform: translateX(-15px); } }
-@keyframes pointRight { from { transform: translateX(0); } to { transform: translateX(15px); } }
+
+.turn-arrow {
+  color: #ffcc00;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) drop-shadow(0 0 8px rgba(255, 204, 0, 0.6));
+  animation: arrowFloat 0.5s infinite alternate ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.arrow-left { animation-name: floatLeft; }
+.arrow-right { animation-name: floatRight; }
+
+@keyframes floatLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-10px); }
+}
+@keyframes floatRight {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(10px); }
+}
 
 .turn-highlight-border {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5) !important;
