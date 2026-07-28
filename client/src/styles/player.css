@@ -67,12 +67,12 @@
   align-items: center; 
   z-index: 15; 
 }
-.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -20px; }
-.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -20px; }
+.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -55px; }
+.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -55px; }
 
 .corner-roll-btn { 
   background: #fff; 
-  border: 3px solid #ddd; 
+  border: 2px solid #ddd; 
   border-radius: 12px; 
   padding: 4px; 
   cursor: pointer; 
