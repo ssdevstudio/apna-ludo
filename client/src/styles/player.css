@@ -67,8 +67,8 @@
   align-items: center; 
   z-index: 15; 
 }
-.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -55px; }
-.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -55px; }
+.corner-top-left .corner-dice, .corner-bottom-left .corner-dice { right: -68px; }
+.corner-top-right .corner-dice, .corner-bottom-right .corner-dice { left: -68px; }
 
 .corner-roll-btn { 
   background: #fff; 
