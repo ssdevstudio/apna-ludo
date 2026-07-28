@@ -94,20 +94,20 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
 
   const getTrackTokenStyle = (index: number, count: number): React.CSSProperties => {
     const baseRotation = `rotate(-${boardRotation}deg)`;
-    if (count === 1) return { transform: `translate(-50%, -50%) ${baseRotation}` };
+    if (count === 1) return { transform: `translate(-50%, -80%) ${baseRotation}` };
     if (count === 2) {
-      const offsets = [[-20, -10], [20, 10]];
+      const offsets = [[-20, -5], [20, 5]];
       const [ox, oy] = offsets[index] ?? [0, 0];
-      return { transform: `translate(calc(-50% + ${ox}%), calc(-50% + ${oy}%)) scale(0.8) ${baseRotation}` };
+      return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.8) ${baseRotation}` };
     }
     if (count === 3) {
-      const offsets = [[-25, -15], [25, -15], [0, 15]];
+      const offsets = [[-25, -10], [25, -10], [0, 15]];
       const [ox, oy] = offsets[index] ?? [0, 0];
-      return { transform: `translate(calc(-50% + ${ox}%), calc(-50% + ${oy}%)) scale(0.75) ${baseRotation}` };
+      return { transform: `translate(calc(-50% + ${ox}%), calc(-80% + ${oy}%)) scale(0.75) ${baseRotation}` };
     }
-    const pos = [{x:-25,y:-25},{x:25,y:-25},{x:-25,y:25},{x:25,y:25}];
+    const pos = [{x:-25,y:-15},{x:25,y:-15},{x:-25,y:15},{x:25,y:15}];
     const p = pos[index % 4]!;
-    return { transform: `translate(calc(-50% + ${p.x}%), calc(-50% + ${p.y}%)) scale(0.6) ${baseRotation}` };
+    return { transform: `translate(calc(-50% + ${p.x}%), calc(-80% + ${p.y}%)) scale(0.65) ${baseRotation}` };
   };
 
   const allTokens:{id:string;color:PlayerColor;progress:number;ordinal:number}[]=[];
@@ -153,12 +153,12 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       const pos = YARD_CIRCLE_COORDS[t.color][t.ordinal - 1];
       top = pos?.top;
       left = pos?.left;
-      transform = `translate(-50%, -50%) rotate(-${boardRotation}deg)`;
+      transform = `translate(-50%, -80%) rotate(-${boardRotation}deg)`;
     } else {
       const idx = tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0;
       const r = Math.floor(idx / 15);
       const c = idx % 15;
-      top = `${(r + 0.5) * (100 / 15)}%`;
+      top = `${(r + 0.75) * (100 / 15)}%`;
       left = `${(c + 0.5) * (100 / 15)}%`;
 
       const tokensHere = allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === idx);
@@ -192,7 +192,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       return (
         <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
           <span className={innerClass}>
-            <div style={{ transform: 'translateY(-50%)', width: '100%', height: '100%' }}>
+            <div style={{ width: '100%', height: '100%' }}>
               <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
             </div>
           </span>
@@ -202,7 +202,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     return (
       <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token`}>
         <div className={innerClass}>
-          <div style={{ transform: 'translateY(-50%)', width: '100%', height: '100%' }}>
+          <div style={{ width: '100%', height: '100%' }}>
             <img src={`/token-${t.color}.png`} alt={t.color} draggable={false}/>
           </div>
         </div>
