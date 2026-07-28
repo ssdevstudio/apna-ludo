@@ -1,11 +1,10 @@
 export function Die({ value, rolling }: { value:number; rolling:boolean }) {
-  const dots:Record<number,number[]>={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+  // Ensure we fallback to 1 if value is invalid for some reason
+  const validValue = (value >= 1 && value <= 6) ? value : 1;
   
   return (
-    <span className={`die ${rolling ? 'die--rolling' : ''}`} aria-label={`Dice shows ${value}`}>
-      <span className="die-face">
-        {Array.from({length:9},(_,i)=><i key={i} className={dots[value]?.includes(i)?"dot":""}/>)}
-      </span>
+    <span className={`die ${rolling ? 'die--rolling' : ''}`} aria-label={`Dice shows ${validValue}`}>
+      <img src={`/assets/dice/dice-${validValue}.svg`} className="dice-artwork" alt={`Dice ${validValue}`} draggable="false" />
       <div className="die-shadow"></div>
     </span>
   );
