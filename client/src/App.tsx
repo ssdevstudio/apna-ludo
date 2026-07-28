@@ -20,7 +20,7 @@ let audioCtx: AudioContext | null = null;
 function getCtx() { if (!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
 function loadBool(key: string, def: boolean): boolean { try { const v = localStorage.getItem(key); return v === null ? def : v === "true"; } catch { return def; } }
 const soundEnabled = { current: loadBool("apna-sound", true) };
-function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"enter"|"six"|"star") {
+function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"enter"|"six"|"star"|"land") {
   if (!soundEnabled.current) return;
   try {
     const ctx = getCtx();
@@ -571,14 +571,13 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
       {game.players.map(p => {
       if (game.currentPlayerId !== p.id) return null;
       const blinkStyle: React.CSSProperties = {
-        position: 'absolute', width: '40%', height: '40%', zIndex: 10, pointerEvents: 'none', borderRadius: '10px',
-        animation: 'yardBlinkNew 1s infinite',
+        position: 'absolute', width: '40%', height: '40%', zIndex: 10, pointerEvents: 'none', borderRadius: '12px'
       };
       if (p.color === 'green') { blinkStyle.top = '0'; blinkStyle.left = '0'; }
       else if (p.color === 'yellow') { blinkStyle.top = '0'; blinkStyle.right = '0'; }
       else if (p.color === 'red') { blinkStyle.bottom = '0'; blinkStyle.left = '0'; }
       else if (p.color === 'blue') { blinkStyle.bottom = '0'; blinkStyle.right = '0'; }
-      return <div key={p.id} style={blinkStyle} className={`yard-blink-overlay color-${p.color}`} />;
+      return <div key={p.id} style={blinkStyle} className={`yard-blink-overlay color-${p.color} turn-highlight-border`} />;
     })}
     {Array.from({length:CELL_COUNT},(_,i)=>{
       const ct=cellType(i);
@@ -610,7 +609,7 @@ function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boardRotat
       }
 
       const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
-      const innerClass = `game-pawn-inner pawn-color-${t.color} ${isLegalToken ? "legal-token" : ""} ${tokenAnimation===t.id ? "pawn--animate" : ""}`;
+      const innerClass = `game-pawn-inner pawn-color-${t.color} ${isLegalToken ? "legal-token premium-pulse" : ""} ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""}`;
       
       const style: React.CSSProperties = {
         position: 'absolute',
@@ -699,6 +698,7 @@ function Room() {
   const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
   const [rolling,setRolling]=useState(false);
   const [tokenAnimation,setTokenAnimation]=useState<string|null>(null);
+    const [boardShake,setBoardShake]=useState(false);
   const [localDice,setLocalDice]=useState(6);
   const [lastRolls,setLastRolls]=useState<Record<string,number>>({});
   const chatEnd=useRef<HTMLDivElement>(null);
@@ -755,7 +755,7 @@ function Room() {
         setLocalDice(snap.game.dice);
         setLastRolls(prev => ({...prev, [snap.game!.currentPlayerId]: snap.game!.dice!}));
       }
-      if(snap.game?.lastAction?.type==="moved"){setTokenAnimation(snap.game.lastAction.tokenId??null);setTimeout(()=>setTokenAnimation(null),600);if(snap.game.lastAction.capturedTokenIds?.length)playSound("capture");}
+      if(snap.game?.lastAction?.type==="moved"){setTokenAnimation(snap.game.lastAction.tokenId??null);setTimeout(()=>setTokenAnimation(null),600);if(snap.game.lastAction.capturedTokenIds?.length){playSound("capture");setBoardShake(true);setTimeout(()=>setBoardShake(false),300);}}
       if(snap.game?.phase==="finished"&&snap.game?.winners.includes(playerId??""))setTimeout(()=>playSound("win"),200);
       if(snap.game?.currentPlayerId===playerId&&snap.game?.dice===null)playSound("turn");
       if(snap.game?.movableTokenIds?.length===1&&snap.game.currentPlayerId===playerId){setTimeout(()=>{moveTokenRef.current(snap.game!.movableTokenIds[0]!);},300);}
@@ -779,7 +779,25 @@ function Room() {
   const copyInvite=useCallback(async()=>{try{await navigator.clipboard.writeText(`${window.location.origin}/room/${snapshot?.code??code}`);}catch{}setCopied(true);setTimeout(()=>setCopied(false),1800);},[snapshot,code]);
   const toggleReady=()=>{if(!socket||!snapshot)return;cmdSeq.current+=1;socket.emit("room:ready",{expectedRevision:revisionRef.current},()=>{});};
   const startGame=()=>{if(!socket)return;socket.emit("room:start",{expectedRevision:revisionRef.current},()=>{});};
-  const rollDice=()=>{if(!socket||!canRoll)return;playSound("dice");setRolling(true);cmdSeq.current+=1;socket.emit("game:roll",{expectedRevision:revisionRef.current},()=>{setRolling(false);});};
+  const rollDice=()=>{
+    if(!socket||!canRoll)return;
+    playSound("dice");
+    setRolling(true);
+    cmdSeq.current+=1;
+    const spinInterval = setInterval(() => {
+        setLocalDice(Math.floor(Math.random() * 6) + 1);
+    }, 60);
+    socket.emit("game:roll",{expectedRevision:revisionRef.current},(res: any)=>{
+        clearInterval(spinInterval);
+        setRolling(false);
+        if(res && res.dice) {
+            setLocalDice(res.dice);
+            playSound("land");
+            setBoardShake(true);
+            setTimeout(()=>setBoardShake(false),200);
+        }
+    });
+};
   const moveToken=(tokenId:string)=>{if(!socket||!canMove)return;cmdSeq.current+=1;setTokenAnimation(tokenId);socket.emit("game:move",{tokenId,expectedRevision:revisionRef.current},()=>{setTokenAnimation(null);});};
   moveTokenRef.current=moveToken;
   const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
@@ -844,9 +862,9 @@ function Room() {
       <div className="header-actions">
         <div className="reaction-wrapper" style={{position:"relative"}}>
           <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
-          {reactionPickerOpen && <div className="reaction-picker" style={{position:"absolute", right:0, top:"100%", background:"white", border:"1px solid #ddd", borderRadius:"8px", padding:"4px", display:"flex", gap:"4px", zIndex:100, boxShadow:"0 2px 8px rgba(0,0,0,0.1)"}}>
-            {["👍","😂","😡","😭","😮","🎲"].map(e=><button key={e} onClick={()=>sendReaction(e)} style={{background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", padding:"4px"}}>{e}</button>)}
-          </div>}
+          {reactionPickerOpen && <div className="emoji-grid-popup">
+              {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className="emoji-btn">{e}</button>)}
+            </div>}
         </div>
         <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>
         <button className="icon-btn" onClick={()=>setSettingsOpen(true)}>⚙️</button>
@@ -890,7 +908,7 @@ function Room() {
           {renderCorner(tlColor, 'top-left')}
           {renderCorner(trColor, 'top-right')}
           
-          <div className="board-center">
+          <div className={`board-center ${boardShake ? "board-shake" : ""}`}>
             {snapshot?.game ? <LudoBoard game={snapshot.game} myPlayerId={playerId} legalTokens={legalTokens} onMove={moveToken} tokenAnimation={tokenAnimation} boardRotation={boardRotation}/> : <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}><div className="ludo-board" role="grid" aria-label="Empty Ludo board" style={{minHeight:"50vw",maxHeight:"620px"}}><div className="home-yard yard-red">{[0,1,2,3].map(i=><img key={i} src="/token-red.png" alt="red" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-blue">{[0,1,2,3].map(i=><img key={i} src="/token-blue.png" alt="blue" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-green">{[0,1,2,3].map(i=><img key={i} src="/token-green.png" alt="green" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-yellow">{[0,1,2,3].map(i=><img key={i} src="/token-yellow.png" alt="yellow" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><></></div></div>}
           </div>
 
@@ -912,7 +930,7 @@ function Room() {
       </aside>
     </div>
     {settingsOpen&&<SettingsPanel onClose={()=>setSettingsOpen(false)}/>}
-    {finished&&<div className="modal-backdrop"><div className="game-over" role="dialog" aria-modal="true"><div className="winner-burst" aria-hidden><span>✦</span><b>★</b><span>✦</span></div><p className="section-kicker">{tr("game.over")}</p><h2>{iWon?tr("win.msg"):tr("lose.msg")}</h2>
+    {finished&&<div className="modal-backdrop"><div className="confetti" style={{left:"10%", animationDelay:"0s"}}/><div className="confetti" style={{left:"30%", animationDelay:"0.2s"}}/><div className="confetti" style={{left:"50%", animationDelay:"0.5s"}}/><div className="confetti" style={{left:"70%", animationDelay:"0.1s"}}/><div className="confetti" style={{left:"90%", animationDelay:"0.4s"}}/><div className="game-over" role="dialog" aria-modal="true"><div className="winner-burst" aria-hidden><span>✦</span><b>★</b><span>✦</span></div><p className="section-kicker">{tr("game.over")}</p><h2>{iWon?tr("win.msg"):tr("lose.msg")}</h2>
       <p>All tokens home. Time for another round?</p><ol>{snapshot?.game?.players.slice().sort((a,b)=>{const aW=winners.includes(a.id)?0:1,bW=winners.includes(b.id)?0:1;return aW-bW;}).map((p,i)=>renderPlayerRank(p,i,winners,playerId,myAvatar))}</ol>
       <div style={{display:'flex',gap:10,marginTop:20}}>
         <button className="primary-button wide" onClick={rematchRoom}>Rematch <span>↻</span></button>
