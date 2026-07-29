@@ -47,6 +47,7 @@ export function Room() {
   const [reactions,setReactions]=useState<{id:string, emoji:string, playerId:string}[]>([]);
   const [sentEmoji,setSentEmoji]=useState<string|null>(null);
   const [settingsOpen,setSettingsOpen]=useState(false);
+  const [drawerOpen,setDrawerOpen]=useState(false);
   const [message,setMessage]=useState("");
   const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
   const [skipMsg, setSkipMsg] = useState<{playerId: string, msg: string} | null>(null);
@@ -68,6 +69,15 @@ export function Room() {
   const canMove=legalTokens.length>0;
   const {timeLeft,timerRunning}=useTimer(isMyTurn??false,snapshot);
   const myAvatar=sessionStorage.getItem("apna-avatar")??"😀";
+
+  // Block browser back while in game
+  useEffect(()=>{
+    if(!code)return;
+    const handler=()=>{window.history.pushState(null,"",window.location.href);};
+    window.history.pushState(null,"",window.location.href);
+    window.addEventListener("popstate",handler);
+    return ()=>window.removeEventListener("popstate",handler);
+  },[code]);
 
   useEffect(()=>{
     const s=connect();setSocket(s);
@@ -247,15 +257,19 @@ export function Room() {
         </> : <span>SINGLE PLAYER</span>}
       </div>
       <div className="header-actions">
-        <ThemeToggle />
-        <div className="reaction-wrapper" style={{position:"relative"}}>
-          <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
-          {reactionPickerOpen && <div className="emoji-grid-popup">
-              {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className={`emoji-btn ${sentEmoji===e?"emoji-btn--sent":""}`}>{e}</button>)}
-            </div>}
+        <button className="icon-btn drawer-toggle" onClick={()=>setDrawerOpen(o=>!o)} aria-label="Menu">{drawerOpen?"✕":"☰"}</button>
+        <div className={`drawer-items ${drawerOpen?"drawer--open":""}`}>
+          <ThemeToggle />
+          <div className="reaction-wrapper" style={{position:"relative"}}>
+            <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
+            {reactionPickerOpen && <div className="emoji-grid-popup">
+                {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className={`emoji-btn ${sentEmoji===e?"emoji-btn--sent":""}`}>{e}</button>)}
+              </div>}
+          </div>
+          <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>
+          <button className="icon-btn" onClick={()=>setSettingsOpen(true)}>⚙️</button>
+          <button className="icon-btn exit-btn" onClick={leaveRoom} aria-label="Exit game">🚪</button>
         </div>
-        <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>
-        <button className="icon-btn" onClick={()=>setSettingsOpen(true)}>⚙️</button>
       </div>
     </header>
     <div className="game-layout">
