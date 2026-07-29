@@ -16,9 +16,21 @@
 .turn-pip-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;margin-left:auto;flex-shrink:0}
 .timer-count{font:700 10px 'Fredoka',sans-serif;color:var(--text-secondary);text-align:center}
 .miss-dots-row{display:flex;gap:3px;margin-top:1px;align-items:center}
-.miss-dot{width:8px;height:8px;border-radius:50%;display:inline-block;transition:all 0.2s}
+.corner-dots{display:flex;gap:3px;margin-top:2px;justify-content:center}
+.miss-dot{width:7px;height:7px;border-radius:50%;display:inline-block;transition:all 0.3s}
 .miss-dot--green{background:var(--green);box-shadow:0 0 3px rgba(35,131,82,0.4)}
 .miss-dot--red{background:var(--red);box-shadow:0 0 4px rgba(193,53,53,0.6)}
+.seat-info{display:flex;flex-direction:column;min-width:0;flex:1}
+.seat-top{display:flex;align-items:center;gap:4px}
+.host-badge{font:700 9px 'Fredoka',sans-serif;background:var(--seat-sup-bg);color:#fff;padding:2px 5px;border-radius:8px;flex-shrink:0}
+.seat-dots{display:flex;gap:3px;margin:2px 0}
+/* Snake-style timer bar */
+.snake-bar-wrap{width:100%;height:4px;background:rgba(0,0,0,0.10);border-radius:2px;overflow:hidden;margin-top:2px;flex-shrink:0}
+.player-seat .snake-bar-wrap{width:80px;margin-left:auto;margin-top:auto;margin-bottom:0}
+.corner-profile .snake-bar-wrap{width:100%;max-width:70px;margin:2px auto 0}
+.snake-bar-fill{height:100%;border-radius:2px;transition:width 0.4s linear;position:relative;overflow:hidden}
+.snake-bar-head{position:absolute;right:0;top:-1px;bottom:-1px;width:4px;background:rgba(255,255,255,0.6);border-radius:2px;animation:snakePulse 0.6s infinite alternate}
+@keyframes snakePulse{from{opacity:0.3}to{opacity:1}}
 .empty-seat{border:3px dashed var(--seat-border);color:var(--text-secondary);border-radius:40px;background:rgba(0,0,0,0.08);box-shadow:inset 0 4px 8px rgba(0,0,0,0.1);}
 .empty-seat>span{width:46px;height:46px;border-radius:50%;border:3px dashed var(--seat-border);display:grid;place-items:center;color:var(--text-secondary);}
 .invite-button {

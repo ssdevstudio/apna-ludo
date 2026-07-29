@@ -220,7 +220,8 @@ export function Room() {
     if (isActive && localDice) displayDice = localDice;
     else if (p?.id && lastRolls[p.id]) displayDice = lastRolls[p.id];
 
-    return <PlayerCorner 
+    const gp = p && snapshot?.game?.players.find(gp2 => gp2.id === p.id);
+    return <PlayerCorner
       key={color}
       player={p}
       position={pos}
@@ -232,6 +233,8 @@ export function Room() {
       onRoll={rollDice}
       avatar={isMe ? myAvatar : ""}
       skipMsg={skipMsg?.playerId === p?.id ? skipMsg?.msg : undefined}
+      timeLeft={timerRunning ? timeLeft : undefined}
+      missedCount={gp?.missedTurnCount ?? 0}
     />
   };
 

@@ -5,6 +5,21 @@ import { COLOR_HEX } from "../../utils/constants";
 
 import { PlayerTurnIndicator } from "./PlayerTurnIndicator";
 
+/** Snake-style timer bar — animated depleting bar like Ludo King */
+function SnakeTimerBar({ fraction }: { fraction: number }) {
+  const pct = Math.max(0, Math.min(1, fraction)) * 100;
+  const danger = fraction <= 0.3;
+  const warn = fraction <= 0.6 && fraction > 0.3;
+  const color = danger ? "var(--red)" : warn ? "var(--yellow)" : "var(--green)";
+  return (
+    <div className="snake-bar-wrap" aria-hidden="true">
+      <div className="snake-bar-fill" style={{ width: `${pct}%`, background: color }}>
+        <div className="snake-bar-head" />
+      </div>
+    </div>
+  );
+}
+
 export function PlayerCorner({
   player,
   position,
@@ -15,7 +30,9 @@ export function PlayerCorner({
   canMove,
   onRoll,
   avatar,
-  skipMsg
+  skipMsg,
+  timeLeft,
+  missedCount,
 }: {
   player?: GamePlayer | RoomPlayerSnapshot;
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -27,6 +44,8 @@ export function PlayerCorner({
   onRoll: () => void;
   avatar: string;
   skipMsg?: string;
+  timeLeft?: number;
+  missedCount?: number;
 }) {
   if (!player) {
     return <div className={`player-corner corner-${position} empty`}></div>;
@@ -40,19 +59,29 @@ export function PlayerCorner({
       <div className="corner-profile">
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
         <b>{player.name}</b>
+        {missedCount !== undefined && (
+          <span className="corner-dots">
+            {[0,1,2,3,4].map(i => (
+              <span key={i} className={`miss-dot ${i < missedCount ? "miss-dot--red" : "miss-dot--green"}`} />
+            ))}
+          </span>
+        )}
+        {isActive && timeLeft !== undefined && timeLeft <= 10 && (
+          <SnakeTimerBar fraction={timeLeft / 10} />
+        )}
       </div>
-      
+
       {isActive && (canRoll || canMove) && (
-        <PlayerTurnIndicator 
-          color={player.color as PlayerColor} 
-          direction={position.includes('left') ? 'right' : 'left'} 
+        <PlayerTurnIndicator
+          color={player.color as PlayerColor}
+          direction={position.includes('left') ? 'right' : 'left'}
         />
       )}
 
       <div className={`corner-dice ${isActive && (canRoll || canMove || isRolling) ? 'dice-active' : ''}`}>
-        <button 
-          className="corner-roll-btn" 
-          onClick={onRoll} 
+        <button
+          className="corner-roll-btn"
+          onClick={onRoll}
           disabled={!canRoll && !canMove}
         >
           <Die value={diceValue ?? 1} rolling={isRolling} />
@@ -70,26 +99,27 @@ export function PlayerSeat({
   timeLeft?:number; missedCount?:number;
 }) {
   if (!player) return <div className="player-seat empty-seat"><span>+</span><div><b>Open seat</b><small>Waiting for player</small></div></div>;
-  const dots = [0,1,2,3,4].map(i => {
-    const filled = missedCount !== undefined && i < missedCount;
-    return <span key={i} className={`miss-dot ${filled?"miss-dot--red":"miss-dot--green"}`} />;
-  });
+  const dots = [0,1,2,3,4].map(i => (
+    <span key={i} className={`miss-dot ${missedCount !== undefined && i < missedCount ? "miss-dot--red" : "miss-dot--green"}`} />
+  ));
   return <div className={`player-seat seat-${player.color} ${active?"active-seat":""}`}>
     <span className="avatar" style={{background:COLOR_HEX[player.color]}}>
       {(player as any).isBot?"🤖":avatar??player.name[0]}
-      {active && timeLeft !== undefined && timeLeft <= 10 && (
-        <span className="timer-ring" style={{
-          position:'absolute', inset:-4, borderRadius:'50%', border:`3px solid ${timeLeft <= 3 ? '#e04040' : '#c9942a'}`,
-          opacity: 0.8, background:'transparent', boxShadow:`0 0 8px ${timeLeft <= 3 ? '#e04040' : '#c9942a'}`
-        }} />
-      )}
     </span>
-    <div>
-      <b><span className="seat-name">{player.name}</span>{player.isHost&&<sup> HOST</sup>}</b>
-      <div className="miss-dots-row">{dots}</div>
-      <small>{player.connected?player.ready?tr("ready"):tr("unready"):tr("reconnecting")}</small>
+    <div className="seat-info">
+      <div className="seat-top">
+        <b className="seat-name">{player.name}</b>
+        {player.isHost && <sup className="host-badge"> HOST</sup>}
+      </div>
+      <div className="seat-dots">{dots}</div>
+      <small>{player.connected ? (player.ready ? tr("ready") : tr("unready")) : tr("reconnecting")}</small>
     </div>
-    {active&&<div className="turn-pip-wrap"><span className="turn-pip">TURN</span>{active && timeLeft !== undefined && <span className="timer-count" style={{color: timeLeft <= 3 ? '#e04040' : 'inherit'}}>{timeLeft}s</span>}</div>}
+    {active && timeLeft !== undefined && timeLeft <= 10 && (
+      <SnakeTimerBar fraction={timeLeft / 10} />
+    )}
+    {active && <div className="turn-pip-wrap">
+      <span className="turn-pip">TURN</span>
+    </div>}
   </div>;
 }
 
