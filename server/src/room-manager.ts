@@ -82,6 +82,15 @@ function nextColor(usedColors: Set<PlayerColor>): PlayerColor | undefined {
 function emitSnapshot(io: TypedServer, roomCode: string): void {
   const room = rooms.get(roomCode);
   if (!room) return;
+  
+  if (room.game?.phase === "finished" && room.phase !== "finished") {
+    room.phase = "finished";
+    if (room.turnTimer) clearTimeout(room.turnTimer);
+    if (room.botTimer) clearTimeout(room.botTimer);
+    room.turnTimer = undefined;
+    room.botTimer = undefined;
+  }
+  
   const snapshot = buildSnapshot(room);
   io.to(roomCode).emit("room:snapshot", snapshot);
 }
