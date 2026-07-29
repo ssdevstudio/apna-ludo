@@ -517,9 +517,6 @@ export function handleLeave(io: TypedServer, socketId: string, expectedRevision?
 export function handleRematch(io: TypedServer, socketId: string, expectedRevision?: number, commandId?: string): CommandResult {
   const room = getRoomBySocket(socketId);
   if (!room) return { ok: false, code: "NOT_IN_ROOM", message: "Not in a room", commandId };
-  if (checkStaleRevision(room, expectedRevision)) {
-    return { ok: false, code: "STALE_REVISION", message: "Stale revision", commandId, revision: room.revision };
-  }
   
   if (room.phase !== "finished") {
     return { ok: false, code: "NOT_FINISHED", message: "Game is not finished", commandId };
@@ -531,10 +528,16 @@ export function handleRematch(io: TypedServer, socketId: string, expectedRevisio
   room.rematchRequests.add(requester.id);
   room.lastActivity = Date.now();
 
-  const humanPlayers = [...room.players.values()].filter(p => !p.isBot && p.connected);
-  const allAccepted = humanPlayers.length > 0 && humanPlayers.every(p => room.rematchRequests.has(p.id));
+  const allHumanPlayers = [...room.players.values()].filter(p => !p.isBot);
+  const connectedHumanPlayers = allHumanPlayers.filter(p => p.connected);
+  
+  const isSinglePlayer = allHumanPlayers.length === 1;
+  const allAccepted = isSinglePlayer || (connectedHumanPlayers.length > 0 && connectedHumanPlayers.every(p => room.rematchRequests.has(p.id)));
+
+  console.log(`[Rematch] requester: ${requester.id}, humans: ${connectedHumanPlayers.length}, allAccepted: ${allAccepted}`);
 
   if (allAccepted) {
+    console.log(`[Rematch] All accepted, starting game...`);
     clearTimeout(room.botTimer);
     clearTimeout(room.turnTimer);
     room.botTimer = undefined;

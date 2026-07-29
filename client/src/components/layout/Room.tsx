@@ -231,7 +231,7 @@ export function Room() {
     });
   };
   const leaveRoom=()=>{if(socket)socket.emit("room:leave",{},()=>{});sessionStorage.removeItem(`apna-token-${snapshot?.code??code}`);navigate("/");};
-  const rematchRoom=()=>{if(socket)socket.emit("room:rematch",{expectedRevision:revisionRef.current},()=>{});};
+  const rematchRoom=()=>{if(socket)socket.emit("room:rematch",{expectedRevision:revisionRef.current},(res:any)=>{if(!res.ok) alert(res.code + ": " + res.message);});};
 
   const displayPlayers:(RoomPlayerSnapshot|undefined)[]=snapshot?[...snapshot.players,...Array(Math.max(0,4-snapshot.players.length)).fill(undefined)]:[];
   const finished=snapshot?.game?.phase==="finished";
