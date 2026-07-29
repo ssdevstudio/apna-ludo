@@ -59,15 +59,15 @@ export function PlayerCorner({
       <div className="corner-profile">
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
         <b>{player.name}</b>
+        {isActive && timeLeft !== undefined && timeLeft <= 10 && (
+          <span className={`timer-outer-ring ${timeLeft <= 3 ? "timer-danger" : timeLeft <= 6 ? "timer-warn" : ""}`} style={{'--timer-pct': `${(timeLeft/10)*100}%`} as any} />
+        )}
         {missedCount !== undefined && (
           <span className="corner-dots">
             {[0,1,2,3,4].map(i => (
               <span key={i} className={`miss-dot ${i < missedCount ? "miss-dot--red" : "miss-dot--green"}`} />
             ))}
           </span>
-        )}
-        {isActive && timeLeft !== undefined && timeLeft <= 10 && (
-          <SnakeTimerBar fraction={timeLeft / 10} />
         )}
       </div>
 
@@ -105,18 +105,18 @@ export function PlayerSeat({
   return <div className={`player-seat seat-${player.color} ${active?"active-seat":""}`}>
     <span className="avatar" style={{background:COLOR_HEX[player.color]}}>
       {(player as any).isBot?"🤖":avatar??player.name[0]}
+      {active && timeLeft !== undefined && timeLeft <= 10 && (
+        <span className={`timer-outer-ring ${timeLeft <= 3 ? "timer-danger" : timeLeft <= 6 ? "timer-warn" : ""}`} style={{'--timer-pct': `${(timeLeft/10)*100}%`} as any} />
+      )}
     </span>
     <div className="seat-info">
       <div className="seat-top">
         <b className="seat-name">{player.name}</b>
         {player.isHost && <sup className="host-badge"> HOST</sup>}
       </div>
-      <div className="seat-dots">{dots}</div>
       <small>{player.connected ? (player.ready ? tr("ready") : tr("unready")) : tr("reconnecting")}</small>
+      <div className="seat-dots">{dots}</div>
     </div>
-    {active && timeLeft !== undefined && timeLeft <= 10 && (
-      <SnakeTimerBar fraction={timeLeft / 10} />
-    )}
     {active && <div className="turn-pip-wrap">
       <span className="turn-pip">TURN</span>
     </div>}
