@@ -611,6 +611,13 @@ function getPlayerInRoom(room: RoomData, socketId: string): RoomPlayerData | und
 function doLeave(io: TypedServer, socketId: string, room: RoomData): void {
   for (const [, player] of room.players) {
     if (player.socketId === socketId) {
+      if (room.game && room.phase === "playing") {
+        try {
+          room.game = forfeitPlayer(room.game, player.id);
+        } catch {
+          // ignore
+        }
+      }
       room.players.delete(player.id);
       // Clean up reconnect token so memory doesn't leak
       for (const [token, lookup] of reconnectLookup) {
