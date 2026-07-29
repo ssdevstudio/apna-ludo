@@ -16,7 +16,7 @@ export const T: Record<string, {en:string,hi:string}> = {
   "play.again": {en:"Play again",hi:"फिर से खेलें"},
   "back.home": {en:"Back home",hi:"होम जाएं"},
   "ready": {en:"Ready",hi:"तैयार"},
-  "unready": {en:"तैयार नहीं",hi:"तैयार नहीं"},
+  "unready": {en:"Not Ready",hi:"तैयार नहीं"},
   "start.game": {en:"Start game",hi:"खेल शुरू करें"},
   "wait.players": {en:"Waiting for players",hi:"खिलाड़ियों का इंतज़ार"},
   "name.placeholder": {en:"Your name",hi:"आपका नाम"},
