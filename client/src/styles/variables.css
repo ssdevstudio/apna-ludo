@@ -25,32 +25,36 @@
   --seat-bg: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
   --seat-border: #fff;
   --seat-shadow: inset 0 -6px 12px rgba(0,0,0,0.12), 0 6px 14px rgba(0,0,0,0.2);
-  --seat-active-bg: linear-gradient(180deg, #fff9e6 0%, #ffe082 100%);
-  --seat-active-border: #ffc107;
-  --seat-active-shadow: inset 0 -6px 12px rgba(255,152,0,0.35), 0 6px 16px rgba(0,0,0,0.3);
-  --seat-sup-bg: linear-gradient(180deg, #3d5450, #2a3b38);
-  --seat-sup-border: rgba(255,255,255,0.2);
+  --text-secondary: #4a5c58;
+  --line: rgba(0, 0, 0, 0.1);
+  --panel-bg: rgba(255, 255, 255, 0.95);
+  --panel-border: rgba(0, 0, 0, 0.1);
   
-  --board-shell-bg: linear-gradient(145deg, #2d1810, #4a2a1a, #2d1810);
-  --board-shell-border: transparent;
-  --board-shell-shadow: 0 8px 32px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08);
-  --board-border: #1a0e08;
-  --board-shadow: inset 0 0 12px rgba(0,0,0,.2), 0 2px 8px rgba(0,0,0,.3);
+  --chat-form-bg: rgba(255, 255, 255, 0.8);
+  --chat-input-text: var(--ink);
+  --chat-bg: #fff;
+  --chat-msg-bg: #f9f9f9;
+  
+  --seat-border: rgba(0, 0, 0, 0.1);
+  --seat-bg: rgba(255, 255, 255, 0.9);
+  --seat-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  --seat-active-bg: linear-gradient(180deg, #ffffff 0%, #fff9e6 100%);
+  --seat-active-border: var(--yellow);
+  --seat-active-shadow: 0 4px 12px rgba(240, 189, 63, 0.3);
+  --seat-sup-bg: var(--teal);
+  --seat-sup-border: rgba(0, 0, 0, 0.1);
+  
+  --board-shell-bg: #ffffff;
+  --board-shell-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  --board-shell-border: rgba(0, 0, 0, 0.1);
+  
+  --board-border: #d4cfc0;
+  --board-shadow: 0 4px 12px rgba(0,0,0,0.1);
   --board-overlay: none;
+  --board-color: transparent;
   --board-blend: normal;
   --board-filter: none;
-  --board-color: #fffdf7;
 
-  --chat-msg-bg: #fff;
-  --chat-msg-border: transparent;
-  --chat-mine-bg: #d5eee4;
-  --chat-mine-border: transparent;
-  --chat-form-bg: rgba(255,255,255,0.5);
-  --chat-input-bg: #fff;
-  --chat-input-border: rgba(0,0,0,0.1);
-  --chat-input-color: var(--ink);
-  --chat-input-placeholder: rgba(0,0,0,0.5);
-  
   font-family: 'Fredoka', sans-serif;
   color: var(--text-primary);
   background: var(--app-bg);
@@ -58,38 +62,38 @@
 }
 
 [data-theme="dark"] {
-  --app-bg: radial-gradient(circle at 50% 30%, #15795d 0%, #0d5c46 35%, #052b21 80%, #02120e 100%);
-  --app-bg-image: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.6) 150%), linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-  --panel-bg: rgba(5, 43, 33, 0.85);
-  --panel-border: rgba(255, 255, 255, 0.1);
+  --app-bg: radial-gradient(circle at 50% 30%, #0d5c46 0%, #052b21 50%, #02120e 100%);
+  --app-bg-image: none;
   --text-primary: #fff;
   --text-secondary: #a8b8b5;
-  --heading-color: #a8b8b5;
-
-  --seat-bg: linear-gradient(180deg, rgba(10,30,25,0.85) 0%, rgba(5,20,15,0.95) 100%);
+  --line: rgba(255, 255, 255, 0.1);
+  --panel-bg: rgba(5, 43, 33, 0.85);
+  --panel-border: rgba(255, 255, 255, 0.15);
+  
+  --chat-form-bg: rgba(0, 0, 0, 0.25);
+  --chat-input-text: #fff;
+  --chat-bg: rgba(10, 30, 25, 0.85);
+  --chat-msg-bg: rgba(0, 0, 0, 0.2);
+  
   --seat-border: rgba(255, 215, 0, 0.2);
+  --seat-bg: linear-gradient(180deg, rgba(10,30,25,0.85) 0%, rgba(5,20,15,0.95) 100%);
   --seat-shadow: inset 0 -4px 10px rgba(0,0,0,0.5), 0 6px 14px rgba(0,0,0,0.3);
   --seat-active-bg: linear-gradient(180deg, rgba(25,55,40,0.9) 0%, rgba(10,25,15,0.95) 100%);
   --seat-active-border: rgba(255,215,0,0.9);
   --seat-active-shadow: inset 0 -4px 12px rgba(255,215,0,0.2), 0 6px 20px rgba(255,215,0,0.3);
   --seat-sup-bg: linear-gradient(180deg, #d4af37, #aa8015);
   --seat-sup-border: rgba(255,255,255,0.4);
-
+  
   --board-shell-bg: linear-gradient(135deg, #1f0f08, #3b2215 50%, #170b05);
-  --board-shell-border: rgba(255,255,255,0.15);
   --board-shell-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 6px rgba(0,0,0,0.8);
+  --board-shell-border: rgba(255, 255, 255, 0.15);
+  
   --board-border: #0f0704;
   --board-shadow: inset 0 0 24px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.5);
   --board-overlay: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.3) 100%);
+  --board-color: #e8dcc4;
   --board-blend: multiply, normal;
   --board-filter: contrast(1.15) saturate(1.1) brightness(0.95);
-  --board-color: #e8dcc4;
-
-  --chat-msg-bg: rgba(255,255,255,0.1);
-  --chat-msg-border: rgba(255,255,255,0.05);
-  --chat-mine-bg: rgba(26, 126, 92, 0.4);
-  --chat-mine-border: rgba(26, 126, 92, 0.6);
-  --chat-form-bg: rgba(0,0,0,0.25);
   --chat-input-bg: rgba(255,255,255,0.05);
   --chat-input-border: rgba(255,255,255,0.1);
   --chat-input-color: #fff;

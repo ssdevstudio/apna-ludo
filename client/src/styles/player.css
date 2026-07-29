@@ -17,9 +17,9 @@
 .empty-seat>span{width:46px;height:46px;border-radius:50%;border:3px dashed rgba(255,255,255,0.5);display:grid;place-items:center;color:#fff;}
 .invite-button {
   width: 100%;
-  border: 2px dashed rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  border: 2px dashed var(--seat-border);
+  background: var(--seat-bg);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 700;
   font-family: 'Fredoka', sans-serif;
