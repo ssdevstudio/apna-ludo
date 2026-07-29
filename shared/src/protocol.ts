@@ -79,6 +79,8 @@ export const gameStateSchema: z.ZodType<GameState> = z.object({
   consecutiveSixes: z.number().int().min(0).max(3),
   winners: z.array(z.string()),
   lastAction: lastActionSchema.nullable(),
+  startTime: z.number().optional(),
+  tieBreakerActive: z.boolean().optional(),
 }).strict();
 
 export interface RoomPlayerSnapshot {

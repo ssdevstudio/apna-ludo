@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Fragment } from "react";
 import { GameState, PlayerColor, CELL_COUNT, STAR_CELLS, SAFE_CELLS, cellType, YARD_POSITIONS, progressToCellIndex } from "@apna-ludo/shared";
 import { playSound } from "../../utils/audio";
 
@@ -180,13 +180,37 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       <div key={f.id} className="footprint-anim" style={{ position: 'absolute', top: f.top, left: f.left, transform: 'translate(-50%, -50%)', zIndex: 6, width: '24px', height: '24px', pointerEvents: 'none', backgroundColor: 'white', borderRadius: '50%', opacity: 0.6, boxShadow: `0 0 4px var(--${f.color}), inset 0 0 4px var(--${f.color})`, animation: 'footprintFade 0.6s ease-out forwards' }} />
     ))}
     {game.players.map(p => {
-      if (game.currentPlayerId !== p.id) return null;
-      const blinkStyle: React.CSSProperties = { position: 'absolute', width: '40%', height: '40%', zIndex: 10, pointerEvents: 'none', borderRadius: '12px' };
-      if (p.color === 'green') { blinkStyle.top = '0'; blinkStyle.left = '0'; }
-      else if (p.color === 'yellow') { blinkStyle.top = '0'; blinkStyle.right = '0'; }
-      else if (p.color === 'red') { blinkStyle.bottom = '0'; blinkStyle.left = '0'; }
-      else if (p.color === 'blue') { blinkStyle.bottom = '0'; blinkStyle.right = '0'; }
-      return <div key={p.id} style={blinkStyle} className={`yard-blink-overlay color-${p.color} turn-highlight-border`} />;
+      const isCurrent = game.currentPlayerId === p.id;
+      const isOut = p.status === "forfeited" || p.status === "timed_out";
+      if (!isCurrent && !isOut) return null;
+
+      const style: React.CSSProperties = { position: 'absolute', width: '40%', height: '40%', zIndex: isOut ? 20 : 10, pointerEvents: 'none', borderRadius: '12px' };
+      if (p.color === 'green') { style.top = '0'; style.left = '0'; }
+      else if (p.color === 'yellow') { style.top = '0'; style.right = '0'; }
+      else if (p.color === 'red') { style.bottom = '0'; style.left = '0'; }
+      else if (p.color === 'blue') { style.bottom = '0'; style.right = '0'; }
+
+      return (
+        <Fragment key={p.id}>
+          {isCurrent && !isOut && <div style={style} className={`yard-blink-overlay color-${p.color} turn-highlight-border`} />}
+          {isOut && (
+            <div style={{ ...style, backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{
+                color: 'var(--red)',
+                fontSize: 'clamp(20px, 4vw, 36px)',
+                fontWeight: 900,
+                letterSpacing: '4px',
+                textShadow: '0 2px 4px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)',
+                transform: `rotate(-${boardRotation}deg)`,
+                fontFamily: '"Fredoka", sans-serif',
+                WebkitTextStroke: '1px white'
+              }}>
+                OUT
+              </span>
+            </div>
+          )}
+        </Fragment>
+      );
     })}
     {Array.from({length:CELL_COUNT},(_,i)=>{
       const ct=cellType(i);

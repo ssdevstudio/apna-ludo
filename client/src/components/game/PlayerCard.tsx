@@ -59,17 +59,23 @@ export function PlayerCorner({
       <div className="corner-profile">
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
         <b>{player.name}</b>
-        {isActive && timeLeft !== undefined && timeLeft <= 10 && (
-          <span className={`timer-outer-ring ${timeLeft <= 3 ? "timer-danger" : timeLeft <= 6 ? "timer-warn" : ""}`} style={{'--timer-pct': `${(timeLeft/10)*100}%`} as any} />
-        )}
-        {missedCount !== undefined && (
+      </div>
+
+      {missedCount !== undefined && (
+        <div className="corner-dots-wrap">
           <span className="corner-dots">
             {[0,1,2,3,4].map(i => (
               <span key={i} className={`miss-dot ${i < missedCount ? "miss-dot--red" : "miss-dot--green"}`} />
             ))}
           </span>
-        )}
-      </div>
+        </div>
+      )}
+
+      {isActive && timeLeft !== undefined && timeLeft <= 10 && (
+        <svg className={`corner-timer-svg ${timeLeft <= 3 ? "timer-danger" : timeLeft <= 6 ? "timer-warn" : ""}`} preserveAspectRatio="none">
+          <rect x="0" y="0" width="100%" height="100%" rx="40" pathLength="100" style={{'--timer-pct': (1 - (timeLeft/10)) * 100} as any} />
+        </svg>
+      )}
 
       {isActive && (canRoll || canMove) && (
         <PlayerTurnIndicator

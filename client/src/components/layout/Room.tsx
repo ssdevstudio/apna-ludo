@@ -63,6 +63,30 @@ export function Room() {
   const cmdSeq=useRef(0);
   const moveTokenRef=useRef<(tokenId:string)=>void>(()=>{});
 
+  const [globalTimeLeft, setGlobalTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (snapshot?.game?.phase !== "playing" || !snapshot?.game?.startTime) {
+      setGlobalTimeLeft(null);
+      return;
+    }
+    const updateTimer = () => {
+      const elapsed = Date.now() - snapshot.game!.startTime!;
+      const remaining = Math.max(0, 45 * 60 * 1000 - elapsed);
+      setGlobalTimeLeft(remaining);
+    };
+    const interval = setInterval(updateTimer, 1000);
+    updateTimer();
+    return () => clearInterval(interval);
+  }, [snapshot?.game?.startTime, snapshot?.game?.phase]);
+
+  const formatGlobalTime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
   const me=snapshot?.players.find(p=>p.id===playerId)??null;
   const isMyTurn=snapshot?.game?.currentPlayerId===playerId;
   const legalTokens=(isMyTurn&&snapshot?.game?.movableTokenIds)?snapshot.game.movableTokenIds:[];
@@ -259,6 +283,18 @@ export function Room() {
         {!isBotGame ? <>
           <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code??code).toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
         </> : <span>SINGLE PLAYER</span>}
+        {globalTimeLeft !== null && (
+          <span className="global-timer" style={{ 
+            marginLeft: 20, 
+            padding: '4px 12px',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+            borderRadius: '20px',
+            fontWeight: "bold", 
+            color: globalTimeLeft < 60000 ? "var(--red)" : "inherit" 
+          }}>
+            🕒 {formatGlobalTime(globalTimeLeft)}
+          </span>
+        )}
       </div>
       <div className="header-actions">
         <button className="icon-btn drawer-toggle" onClick={()=>setDrawerOpen(o=>!o)} aria-label="Menu">{drawerOpen?"✕":"☰"}</button>

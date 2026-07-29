@@ -48,6 +48,8 @@ export interface GameState {
   consecutiveSixes: number;
   winners: string[];
   lastAction: LastAction | null;
+  startTime?: number;
+  tieBreakerActive?: boolean;
 }
 
 export class RuleError extends Error {
@@ -98,6 +100,8 @@ export function createGame(
     consecutiveSixes: 0,
     winners: [],
     lastAction: null,
+    startTime: Date.now(),
+    tieBreakerActive: false,
   };
 }
 
@@ -226,24 +230,11 @@ export function applyRoll(state: GameState, playerId: string, dice: number): Gam
   const movableTokenIds = legalTokenIds(next, playerId, dice);
   next = { ...next, dice, movableTokenIds };
   if (movableTokenIds.length === 0) {
-    // Increment missed turn count for auto-forfeit tracking
-    next = {
-      ...next,
-      players: next.players.map(p =>
-        p.id === playerId ? { ...p, missedTurnCount: (p.missedTurnCount ?? 0) + 1 } : p
-      ),
-    };
-    // Auto-forfeit after 5 consecutive missed turns
-    const missingPlayer = next.players.find(p => p.id === playerId);
-    if (missingPlayer && (missingPlayer.missedTurnCount ?? 0) >= 5) {
-      next = forfeitPlayer(next, playerId);
-    } else {
-      next = finishTurn(
-        { ...next, lastAction: { type: "turn-skipped", playerId, dice } },
-        playerId,
-        dice === 6,
-      );
-    }
+    next = finishTurn(
+      { ...next, lastAction: { type: "turn-skipped", playerId, dice } },
+      playerId,
+      dice === 6,
+    );
   }
   return next;
 }
@@ -261,35 +252,64 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   const player = state.players[playerIndex]!;
   const tokenIndex = player.tokens.findIndex((token) => token.id === tokenId);
   const previousProgress = player.tokens[tokenIndex]!.progress;
-  const diceDestination = previousProgress === -1 ? 0 : previousProgress + state.dice;
+  
+  const myTokensOnSquare = previousProgress >= 0 
+    ? player.tokens.filter(t => t.progress === previousProgress).length 
+    : 1;
+  const isBlobMove = myTokensOnSquare >= 2 && state.dice! % 2 === 0;
+  
+  const distance = isBlobMove ? state.dice! / 2 : state.dice!;
+  const diceDestination = previousProgress === -1 ? 0 : previousProgress + distance;
 
   let finalDestination = diceDestination;
 
-  const movedToken: TokenState = { ...player.tokens[tokenIndex]!, progress: finalDestination };
   const players = state.players.map((candidate) => ({
     ...candidate,
     tokens: candidate.tokens.map((token) => ({ ...token })),
   }));
-  players[playerIndex]!.tokens[tokenIndex] = movedToken;
+  
+  if (isBlobMove) {
+    for (let i = 0; i < players[playerIndex]!.tokens.length; i++) {
+      if (players[playerIndex]!.tokens[i]!.progress === previousProgress) {
+        players[playerIndex]!.tokens[i]!.progress = finalDestination;
+      }
+    }
+  } else {
+    players[playerIndex]!.tokens[tokenIndex]!.progress = finalDestination;
+  }
 
   const destinationSquare = globalSquare(player.color, finalDestination);
   const capturedTokenIds: string[] = [];
   if (destinationSquare !== null && !SAFE_SQUARE_SET.has(destinationSquare)) {
     for (const opponent of players) {
       if (opponent.id === playerId) continue;
-      for (const token of opponent.tokens) {
-        if (globalSquare(opponent.color, token.progress) === destinationSquare) {
-          capturedTokenIds.push(token.id);
-          token.progress = -1;
+      
+      const opponentTokensHere = opponent.tokens.filter(t => globalSquare(opponent.color, t.progress) === destinationSquare);
+      
+      if (opponentTokensHere.length === 1 && !isBlobMove) {
+        // Single piece captures single piece
+        capturedTokenIds.push(opponentTokensHere[0]!.id);
+        opponentTokensHere[0]!.progress = -1;
+      } else if (opponentTokensHere.length >= 1 && isBlobMove) {
+        // Blob captures anything (single piece or blob)
+        for (const t of opponentTokensHere) {
+          capturedTokenIds.push(t.id);
+          t.progress = -1;
         }
       }
+      // If single piece lands on blob (opponentTokensHere.length >= 2 && !isBlobMove), they coexist! No capture.
     }
   }
 
   let winners = [...state.winners];
   let finished = false;
   const updatedPlayer = players[playerIndex]!;
-  if (updatedPlayer.tokens.every((token) => token.progress === FINISH_PROGRESS)) {
+  
+  if (state.tieBreakerActive && updatedPlayer.tokens.some((token) => token.progress === FINISH_PROGRESS)) {
+    updatedPlayer.status = "won";
+    winners.push(playerId);
+    finished = true;
+  } else if (updatedPlayer.tokens.every((token) => token.progress === FINISH_PROGRESS)) {
     updatedPlayer.status = "won";
     winners.push(playerId);
     finished = true;
@@ -305,6 +325,31 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
 
   const extraTurn = !finished && (state.dice === 6 || capturedTokenIds.length > 0 || finalDestination === FINISH_PROGRESS);
   next = finishTurn(next, playerId, extraTurn);
+  return next;
+}
+
+export function skipPlayerTurn(state: GameState, playerId: string): GameState {
+  if (state.phase !== "playing") return state;
+  if (state.currentPlayerId !== playerId) return state;
+
+  let next = {
+    ...state,
+    revision: state.revision + 1,
+    players: state.players.map(p =>
+      p.id === playerId ? { ...p, missedTurnCount: (p.missedTurnCount ?? 0) + 1 } : p
+    ),
+  };
+
+  const missingPlayer = next.players.find(p => p.id === playerId);
+  if (missingPlayer && (missingPlayer.missedTurnCount ?? 0) >= 5) {
+    next = forfeitPlayer(next, playerId);
+  } else {
+    next = finishTurn(
+      { ...next, lastAction: { type: "turn-skipped", playerId, dice: state.dice ?? undefined } },
+      playerId,
+      false,
+    );
+  }
   return next;
 }
 

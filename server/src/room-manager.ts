@@ -16,6 +16,7 @@ import {
   forfeitPlayer,
   legalTokenIds,
   globalSquare,
+  skipPlayerTurn,
 } from "@apna-ludo/shared";
 import type {
   ClientToServerEvents,
@@ -38,6 +39,7 @@ export interface RoomData {
   chat: ChatMessage[];
   botTimer?: ReturnType<typeof setTimeout>;
   turnTimer?: ReturnType<typeof setTimeout>;
+  gameTimeout?: ReturnType<typeof setTimeout>;
   lastActivity: number;
 }
 
@@ -333,6 +335,7 @@ export function handleStart(
   room.revision += 1;
   emitSnapshot(io, room.code);
   scheduleTurnTimeout(io, room);
+  scheduleGameTimeout(io, room);
   return { ok: true, commandId };
 }
 
@@ -619,6 +622,50 @@ function rollDice(): number {
   return crypto.randomInt(1, 7);
 }
 
+function scheduleGameTimeout(io: TypedServer, room: RoomData): void {
+  if (room.phase !== "playing" || !room.game || !room.game.startTime) return;
+  if (room.gameTimeout) clearTimeout(room.gameTimeout);
+
+  const elapsed = Date.now() - room.game.startTime;
+  const remaining = 45 * 60 * 1000 - elapsed;
+
+  if (remaining <= 0) {
+    handleGameTimeout(io, room);
+  } else {
+    room.gameTimeout = setTimeout(() => {
+      const r = rooms.get(room.code);
+      if (r) handleGameTimeout(io, r);
+    }, remaining);
+  }
+}
+
+function handleGameTimeout(io: TypedServer, room: RoomData): void {
+  if (room.phase !== "playing" || !room.game) return;
+  
+  const FINISH_PROGRESS = 56;
+  let minUnfinished = 999;
+  for (const p of room.game.players) {
+    if (p.status !== "active") continue;
+    const unfinished = p.tokens.filter(t => t.progress !== FINISH_PROGRESS).length;
+    if (unfinished < minUnfinished) minUnfinished = unfinished;
+  }
+  
+  const playersWithMin = room.game.players.filter(p => p.status === "active" && p.tokens.filter(t => t.progress !== FINISH_PROGRESS).length === minUnfinished);
+  
+  if (playersWithMin.length === 1) {
+    playersWithMin[0]!.status = "won";
+    room.game.winners.push(playersWithMin[0]!.id);
+    room.game.phase = "finished";
+    room.phase = "finished";
+    if (room.turnTimer) clearTimeout(room.turnTimer);
+    if (room.botTimer) clearTimeout(room.botTimer);
+  } else {
+    room.game.tieBreakerActive = true;
+  }
+  room.revision += 1;
+  emitSnapshot(io, room.code);
+}
+
 /** Start a 30-second turn timer. If player doesn't roll, auto-skip. */
 function scheduleTurnTimeout(io: TypedServer, room: RoomData): void {
   if (room.turnTimer) clearTimeout(room.turnTimer);
@@ -632,32 +679,14 @@ function scheduleTurnTimeout(io: TypedServer, room: RoomData): void {
     const cp2 = r.players.get(r.game.currentPlayerId);
     if (!cp2 || cp2.isBot) return;
 
-    // If dice already rolled and there are movable tokens, auto-move the first one
-    if (r.game.dice !== null) {
-      const movable = legalTokenIds(r.game, cp2.id, r.game.dice);
-      if (movable.length > 0) {
-        try {
-          r.game = applyMove(r.game, cp2.id, movable[0]!);
-          r.revision += 1;
-          emitSnapshot(io, r.code);
-          scheduleTurnTimeout(io, r);
-          scheduleBotTurn(io, r);
-        } catch { /* ignore */ }
-        return;
-      }
-    }
-
-    // Auto-skip turn with a forfeited roll effect
-    const dice = rollDice();
+    // Auto-skip turn and lose a life
     try {
-      r.game = applyRoll(r.game, cp2.id, dice);
+      r.game = skipPlayerTurn(r.game, cp2.id);
     } catch {
       return;
     }
     r.revision += 1;
-    if (r.game.dice === null) {
-      scheduleTurnTimeout(io, r);
-    }
+    scheduleTurnTimeout(io, r);
     emitSnapshot(io, r.code);
     scheduleBotTurn(io, r);
   }, TURN_TIMEOUT_MS);
@@ -666,11 +695,12 @@ function scheduleTurnTimeout(io: TypedServer, room: RoomData): void {
 /** If the current player is a bot, auto-roll + move after a short delay */
 export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
   if (room.botTimer) clearTimeout(room.botTimer);
-  if (room.turnTimer) clearTimeout(room.turnTimer);
   if (room.phase !== "playing" || !room.game) return;
 
   const currentPlayer = room.players.get(room.game.currentPlayerId);
   if (!currentPlayer?.isBot) return;
+
+  if (room.turnTimer) clearTimeout(room.turnTimer);
 
   const delay = 600 + crypto.randomInt(400, 1200); // 1-1.8s = "thinking"
   room.botTimer = setTimeout(() => {
@@ -696,6 +726,7 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
     
     // If dice is null, it means applyRoll already advanced the turn (e.g. no legal moves)
     if (!r.game.dice) {
+      scheduleTurnTimeout(io, r);
       scheduleBotTurn(io, r);
       return;
     }
@@ -734,6 +765,7 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
           r2.game = applyMove(r2.game, cp.id, bestId);
           r2.revision += 1;
           emitSnapshot(io, r2.code);
+          scheduleTurnTimeout(io, r2);
           scheduleBotTurn(io, r2);
         } catch {
           // Ignore
