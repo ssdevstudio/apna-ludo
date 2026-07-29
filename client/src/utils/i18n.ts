@@ -28,6 +28,7 @@ export const T: Record<string, {en:string,hi:string}> = {
   "sound": {en:"Sound",hi:"ध्वनि"},
   "settings": {en:"Settings",hi:"सेटिंग्स"},
   "language": {en:"Language",hi:"भाषा"},
+  "dark_mode": {en:"Dark Mode",hi:"डार्क मोड"},
   "copy.code": {en:"Copy",hi:"कॉपी करें"},
   "invite": {en:"Invite players",hi:"खिलाड़ियों को बुलाएं"},
   "connected": {en:"Connected",hi:"जुड़े"},

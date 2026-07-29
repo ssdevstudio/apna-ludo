@@ -6,6 +6,10 @@ import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 
 export default function App() {
   useEffect(()=>{
+    // Initialize theme
+    const savedTheme = localStorage.getItem('apna-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
     const onKey=(e:KeyboardEvent)=>{
       if(e.key.toLowerCase()==="r" && !["INPUT","TEXTAREA","SELECT"].includes((e.target as HTMLElement)?.tagName)) {
         document.querySelector<HTMLButtonElement>(".roll-button:not(:disabled)")?.click();
