@@ -1,3 +1,3 @@
-export * from "./board";
-export * from "./game";
-export * from "./protocol";
+export * from "./board.js";
+export * from "./game.js";
+export * from "./protocol.js";
