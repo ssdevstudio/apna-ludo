@@ -43,7 +43,19 @@ export function VictoryModal({
           }).map((p,i)=><PlayerRankItem key={p.id} p={p} i={i} winners={winners} playerId={playerId} avatar={myAvatar} />)}
         </ol>
         <div style={{display:'flex',gap:10,marginTop:20}}>
-          <button className="primary-button wide" onClick={onRematch}>Rematch <span>↻</span></button>
+          {(() => {
+            const requests = snapshot?.rematchRequests || [];
+            const hasRequested = playerId && requests.includes(playerId);
+            const humanCount = snapshot?.players.filter(p => !p.isBot && p.connected).length || 1;
+            
+            if (hasRequested) {
+              return <button className="primary-button wide" disabled style={{opacity:0.7}}>Waiting ({requests.length}/{humanCount}) <span>⏳</span></button>;
+            } else if (requests.length > 0) {
+              return <button className="primary-button wide" onClick={onRematch} style={{background:'#4caf50'}}>Accept Rematch ({requests.length}/{humanCount}) <span>✓</span></button>;
+            } else {
+              return <button className="primary-button wide" onClick={onRematch}>Rematch <span>↻</span></button>;
+            }
+          })()}
           <button className="text-button wide" onClick={onLeave} style={{background:'rgba(0,0,0,0.05)',padding:'12px',borderRadius:'8px',fontWeight:'bold',color:'#333'}}>Home <span>🏠</span></button>
         </div>
       </div>

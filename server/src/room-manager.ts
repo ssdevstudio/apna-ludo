@@ -40,6 +40,7 @@ export interface RoomData {
   botTimer?: ReturnType<typeof setTimeout>;
   turnTimer?: ReturnType<typeof setTimeout>;
   gameTimeout?: ReturnType<typeof setTimeout>;
+  rematchRequests: Set<string>;
   lastActivity: number;
 }
 
@@ -107,6 +108,7 @@ function buildSnapshot(room: RoomData): RoomSnapshot {
     players,
     game: room.game,
     chat: [...room.chat],
+    rematchRequests: Array.from(room.rematchRequests),
   };
 }
 
@@ -146,6 +148,7 @@ export function createRoom(
     playerOrder: [playerId],
     game: null,
     chat: [],
+    rematchRequests: new Set(),
     lastActivity: Date.now(),
   };
   rooms.set(code, room);
@@ -522,26 +525,40 @@ export function handleRematch(io: TypedServer, socketId: string, expectedRevisio
     return { ok: false, code: "NOT_FINISHED", message: "Game is not finished", commandId };
   }
 
-  // Clear timers before resetting
-  clearTimeout(room.botTimer);
-  clearTimeout(room.turnTimer);
-  room.botTimer = undefined;
-  room.turnTimer = undefined;
+  const requester = getPlayerInRoom(room, socketId);
+  if (!requester) return { ok: false, code: "NOT_IN_ROOM", message: "Player not found", commandId };
 
-  // Reset to lobby
-  room.phase = "lobby";
-  room.game = null;
+  room.rematchRequests.add(requester.id);
   room.lastActivity = Date.now();
-  
-  // Unready all players
-  for (const player of room.players.values()) {
-    if (!player.isBot) {
-      player.ready = false;
-    }
+
+  const humanPlayers = [...room.players.values()].filter(p => !p.isBot && p.connected);
+  const allAccepted = humanPlayers.length > 0 && humanPlayers.every(p => room.rematchRequests.has(p.id));
+
+  if (allAccepted) {
+    clearTimeout(room.botTimer);
+    clearTimeout(room.turnTimer);
+    room.botTimer = undefined;
+    room.turnTimer = undefined;
+    
+    room.rematchRequests.clear();
+    
+    const gamePlayers = room.playerOrder
+      .map((id) => room.players.get(id)!)
+      .filter((p) => p.connected || p.isBot)
+      .map((p) => ({ id: p.id, name: p.name, color: p.color }));
+
+    room.game = createGame(gamePlayers);
+    room.phase = "playing";
+    room.revision += 1;
+    emitSnapshot(io, room.code);
+    scheduleTurnTimeout(io, room);
+    scheduleGameTimeout(io, room);
+  } else {
+    room.revision += 1;
+    emitSnapshot(io, room.code);
+    io.to(room.code).emit("room:rematchRequested", { playerId: requester.id, playerName: requester.name });
   }
 
-  room.revision += 1;
-  emitSnapshot(io, room.code);
   return { ok: true, commandId };
 }
 
@@ -612,6 +629,26 @@ function doLeave(io: TypedServer, socketId: string, room: RoomData): void {
       const remainingCount = [...room.players.values()].filter((p) => p.connected || p.isBot).length;
       if (remainingCount < 2) {
         room.phase = "finished";
+      }
+    } else if (room.phase === "finished" && room.rematchRequests.size > 0) {
+      const humanPlayers = [...room.players.values()].filter(p => !p.isBot && p.connected);
+      const allAccepted = humanPlayers.length > 0 && humanPlayers.every(p => room.rematchRequests.has(p.id));
+      if (allAccepted) {
+        clearTimeout(room.botTimer);
+        clearTimeout(room.turnTimer);
+        room.botTimer = undefined;
+        room.turnTimer = undefined;
+        room.rematchRequests.clear();
+        
+        const gamePlayers = room.playerOrder
+          .map((id) => room.players.get(id)!)
+          .filter((p) => p.connected || p.isBot)
+          .map((p) => ({ id: p.id, name: p.name, color: p.color }));
+
+        room.game = createGame(gamePlayers);
+        room.phase = "playing";
+        scheduleTurnTimeout(io, room);
+        scheduleGameTimeout(io, room);
       }
     }
     emitSnapshot(io, room.code);

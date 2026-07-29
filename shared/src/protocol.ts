@@ -109,6 +109,7 @@ export interface RoomSnapshot {
   players: RoomPlayerSnapshot[];
   game: GameState | null;
   chat: ChatMessage[];
+  rematchRequests?: string[];
 }
 
 export const roomPlayerSnapshotSchema = z.object({
@@ -137,6 +138,7 @@ export const roomSnapshotSchema: z.ZodType<RoomSnapshot> = z.object({
   players: z.array(roomPlayerSnapshotSchema).min(1).max(4),
   game: gameStateSchema.nullable(),
   chat: z.array(chatMessageSchema).max(100),
+  rematchRequests: z.array(z.string()).optional(),
 }).strict();
 
 export type ErrorCode =
@@ -181,6 +183,7 @@ export interface ServerToClientEvents {
   "room:snapshot": (snapshot: RoomSnapshot) => void;
   "chat:message": (message: ChatMessage) => void;
   "room:reaction": (payload: { emoji: string; playerId: string }) => void;
+  "room:rematchRequested": (payload: { playerId: string; playerName: string }) => void;
   "server:error": (error: { code: ErrorCode; message: string }) => void;
 }
 

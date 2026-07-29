@@ -168,6 +168,11 @@ export function Room() {
         setReactions(prev => prev.filter(r => r.id !== id));
       }, 3000);
     });
+    s.on("room:rematchRequested", (payload) => {
+      if (payload.playerId !== playerId) {
+        playSound("turn");
+      }
+    });
     return ()=>{s.close();};
   },[]); // eslint-disable-line
 
