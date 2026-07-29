@@ -55,8 +55,9 @@ export const gamePlayerSchema = z.object({
   id: z.string(),
   name: z.string(),
   color: z.enum(PLAYER_COLORS),
-  status: z.enum(["active", "won", "forfeited"]),
+  status: z.enum(["active", "won", "forfeited", "timed_out"]),
   tokens: z.array(tokenStateSchema).length(4),
+  missedTurnCount: z.number().int().min(0).max(5).default(0),
 }).strict();
 
 export const lastActionSchema = z.object({

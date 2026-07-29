@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { RoomSnapshot } from "@apna-ludo/shared";
 
 export function useTimer(isMyTurn:boolean,snapshot:RoomSnapshot|null):{timeLeft:number;timerRunning:boolean}{
-  const [timeLeft,setTimeLeft]=useState(30);
+  const [timeLeft,setTimeLeft]=useState(10);
   const activeRef=useRef(isMyTurn);
   activeRef.current=isMyTurn;
   const currentPlayerId=snapshot?.game?.currentPlayerId;
   const phase=snapshot?.game?.phase;
   useEffect(()=>{
-    if(!snapshot?.game||phase!=="playing"){setTimeLeft(30);return;}
-    if(isMyTurn){setTimeLeft(30);}
+    if(!snapshot?.game||phase!=="playing"){setTimeLeft(10);return;}
+    if(isMyTurn){setTimeLeft(10);}
     const id=setInterval(()=>{setTimeLeft(t=>{if(t<=1){if(activeRef.current)return 0;return 0;}return t-1;});},1000);
     return ()=>clearInterval(id);
   },[isMyTurn,currentPlayerId,phase]);

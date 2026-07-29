@@ -147,6 +147,7 @@ export function Landing() {
         <article><span>1</span><h3>Make a room</h3><p>Pick your name. Your private table is ready in one tap.</p></article>
         <article><span>2</span><h3>Call your people</h3><p>Send the room code to friends or family. No accounts needed.</p></article>
         <article><span>3</span><h3>Roll &amp; rule</h3><p>Take your color, roll the dice, and bring every token home.</p></article>
+        <article><span>4</span><h3>Life Lines</h3><p>Each player gets 5 life dots. Skip a turn — one dot turns red. All 5 gone? You're out. Last player standing wins.</p></article>
       </div>
     </section>
     <section className="why" id="why">

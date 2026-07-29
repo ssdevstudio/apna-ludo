@@ -12,7 +12,7 @@ import {
 export { PLAYER_COLORS, type PlayerColor, TRACK_LENGTH, HOME_START, FINISH_PROGRESS, TOKENS_PER_PLAYER } from "./board.js";
 
 export type GamePhase = "playing" | "finished";
-export type PlayerGameStatus = "active" | "won" | "forfeited";
+export type PlayerGameStatus = "active" | "won" | "forfeited" | "timed_out";
 
 export interface TokenState {
   id: string;
@@ -26,6 +26,7 @@ export interface GamePlayer {
   color: PlayerColor;
   status: PlayerGameStatus;
   tokens: TokenState[];
+  missedTurnCount?: number;
 }
 
 export interface LastAction {
@@ -89,6 +90,7 @@ export function createGame(
         id: `${player.id}:${index}`,
         progress: -1,
       })),
+      missedTurnCount: 0,
     })),
     currentPlayerId: players[0]!.id,
     dice: null,
@@ -224,11 +226,24 @@ export function applyRoll(state: GameState, playerId: string, dice: number): Gam
   const movableTokenIds = legalTokenIds(next, playerId, dice);
   next = { ...next, dice, movableTokenIds };
   if (movableTokenIds.length === 0) {
-    next = finishTurn(
-      { ...next, lastAction: { type: "turn-skipped", playerId, dice } },
-      playerId,
-      dice === 6,
-    );
+    // Increment missed turn count for auto-forfeit tracking
+    next = {
+      ...next,
+      players: next.players.map(p =>
+        p.id === playerId ? { ...p, missedTurnCount: (p.missedTurnCount ?? 0) + 1 } : p
+      ),
+    };
+    // Auto-forfeit after 5 consecutive missed turns
+    const missingPlayer = next.players.find(p => p.id === playerId);
+    if (missingPlayer && (missingPlayer.missedTurnCount ?? 0) >= 5) {
+      next = forfeitPlayer(next, playerId);
+    } else {
+      next = finishTurn(
+        { ...next, lastAction: { type: "turn-skipped", playerId, dice } },
+        playerId,
+        dice === 6,
+      );
+    }
   }
   return next;
 }
@@ -299,7 +314,9 @@ export function forfeitPlayer(state: GameState, playerId: string): GameState {
   if (!player || player.status !== "active") return state;
 
   const players = state.players.map((candidate) =>
-    candidate.id === playerId ? { ...candidate, status: "forfeited" as const } : candidate,
+    candidate.id === playerId
+      ? { ...candidate, status: ((player.missedTurnCount ?? 0) >= 5 ? "timed_out" : "forfeited") as PlayerGameStatus }
+      : candidate,
   );
   let next: GameState = {
     ...state,

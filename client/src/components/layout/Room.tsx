@@ -6,6 +6,7 @@ import type {
   ClientToServerEvents, ServerToClientEvents, RoomSnapshot, ChatMessage,
   CommandResult, JoinResult, PlayerColor, RoomPlayerSnapshot
 } from "@apna-ludo/shared";
+import { FINISH_PROGRESS } from "@apna-ludo/shared";
 
 import { playSound } from "../../utils/audio";
 import { tr } from "../../utils/i18n";
@@ -276,7 +277,16 @@ export function Room() {
         <EmojiReactionSystem reactions={reactions} />
       <aside className="players-panel">
         <div className="panel-heading"><span>PLAYERS</span><b>{snapshot?.players.length}/4</b></div>
-        {snapshot?.players.map(p=><PlayerSeat key={p.id} player={p} active={snapshot?.game?.currentPlayerId===p.id} avatar={p.id===playerId?myAvatar:undefined}/>)}
+        {snapshot?.players.map(p=>{
+          const gp = snapshot?.game?.players.find(gp=>gp.id===p.id);
+          return <PlayerSeat
+            key={p.id} player={p}
+            active={snapshot?.game?.currentPlayerId===p.id}
+            avatar={p.id===playerId?myAvatar:undefined}
+            timeLeft={timerRunning ? timeLeft : undefined}
+            missedCount={gp?.missedTurnCount ?? 0}
+          />;
+        })}
         {(snapshot?.players.length??0)<4 && !isBotGame && <button className="invite-button" onClick={copyInvite}>+ Invite Player</button>}
         {snapshot?.game&&<div className="game-stats">
           <div className="panel-heading" style={{marginTop:10}}><span>STATUS</span></div>
@@ -285,8 +295,8 @@ export function Room() {
           <span className="stat-color" style={{background:COLOR_HEX[p.color]}}/>
           <span className="stat-name">{p.name} {p.id===playerId?"(You)":""}</span>
           <span className="stat-info">
-            <span title="Home 🏠">🏠{p.tokens.filter(t=>t.progress===57).length}</span>
-            <span title="Track 🎲">🎲{p.tokens.filter(t=>t.progress>=0&&t.progress<57).length}</span>
+            <span title="Home 🏠">🏠{p.tokens.filter(t=>t.progress===FINISH_PROGRESS).length}</span>
+            <span title="Track 🎲">🎲{p.tokens.filter(t=>t.progress>=0&&t.progress<FINISH_PROGRESS).length}</span>
             <span title="Yard 🅿️">🅿️{p.tokens.filter(t=>t.progress===-1).length}</span>
           </span>
         </div>)}</div>}
