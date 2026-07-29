@@ -131,11 +131,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .game-layout{height:calc(100vh - 54px);display:flex;flex-direction:column}
   .table-area{padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;flex:1;overflow-y:auto;min-height:0}
   .game-controls{margin:8px 0;min-height:52px;flex-wrap:wrap;justify-content:center;width:100%}
-  .lobby-note{padding:8px 12px;gap:8px;border-radius:12px;width:100%;justify-content:center;text-align:center}
-  .lobby-note>span{font-size:22px}
-  .lobby-note>div{align-items:center}
+  .lobby-note{padding:8px 12px;gap:8px;border-radius:12px;width:100%;justify-content:center;text-align:center;flex-direction:column}
+  .lobby-note>span{font-size:22px;display:none}
+  .lobby-note>div{display:flex;flex-direction:column;align-items:center;gap:4px}
   .lobby-note small{max-width:100%}
-  .start-button{min-width:100%;padding:10px}
+  .start-button{width:100%;padding:12px;font-size:14px !important}
   .reconnect-banner{top:54px}
   .settings-panel{padding:30px 20px;width:90%}
   .room-page{min-height:100dvh;height:100dvh}
