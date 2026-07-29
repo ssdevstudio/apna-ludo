@@ -42,7 +42,7 @@
   --seat-sup-bg: var(--deep);
   --seat-sup-border: rgba(255, 255, 255, 0.2);
   
-  --board-shell-bg: #ffffff;
+  --board-shell-bg: rgba(255, 255, 255, 0.5);
   --board-shell-shadow: 0 8px 30px rgba(44,30,22,0.15);
   --board-shell-border: rgba(44, 30, 22, 0.1);
   

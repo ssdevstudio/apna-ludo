@@ -24,6 +24,7 @@ export function ThemeToggle() {
         fontSize: '18px',
         width: '36px',
         height: '36px',
+        flexShrink: 0,
         borderRadius: '50%',
         display: 'flex',
         alignItems: 'center',
@@ -33,7 +34,8 @@ export function ThemeToggle() {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        color: 'var(--text-primary)'
+        color: 'var(--text-primary)',
+        marginRight: '8px'
       }}
     >
       {theme === 'light' ? "🌙" : "☀️"}
