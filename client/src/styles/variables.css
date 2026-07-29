@@ -3,28 +3,28 @@
 
 :root {
   /* Bharat Royal — Light: Warm Ivory & Mahogany */
-  --ink: #2a1a12;
-  --deep: #4a281a;
-  --teal: #0f5e4e;
-  --paper: #f5f0e6;
-  --paper-grad: radial-gradient(circle at 30% 20%, #faf6ee 0%, #efe8da 40%, #e8dfce 100%);
+  --ink: #1a0e08;
+  --deep: #3b1f12;
+  --teal: #094d40;
+  --paper: #f0eadc;
+  --paper-grad: radial-gradient(circle at 30% 20%, #f7f2e6 0%, #ece3d0 40%, #e3d7be 100%);
 
-  --red: #c13535;
-  --blue: #1f6eb0;
-  --yellow: #c9942a;
-  --green: #238352;
+  --red: #b82e2e;
+  --blue: #1a5f9e;
+  --yellow: #c28722;
+  --green: #1e7044;
 
   --app-bg: var(--paper-grad);
   --app-bg-image: repeating-linear-gradient(
     45deg, transparent, transparent 20px, rgba(200,180,150,0.04) 20px, rgba(200,180,150,0.04) 21px
   );
   --text-primary: var(--ink);
-  --text-secondary: #6b5a4f;
-  --line: rgba(42, 26, 18, 0.10);
-  --panel-bg: rgba(253, 250, 244, 0.88);
-  --panel-border: rgba(42, 26, 18, 0.12);
-  --mint: #c4a882;
-  --border: rgba(42, 26, 18, 0.15);
+  --text-secondary: #5a4a3e;
+  --line: rgba(26, 14, 8, 0.10);
+  --panel-bg: rgba(253, 250, 244, 0.90);
+  --panel-border: rgba(26, 14, 8, 0.12);
+  --mint: #b09a7a;
+  --border: rgba(26, 14, 8, 0.15);
   --bg: var(--paper);
 
   --chat-form-bg: rgba(255, 255, 255, 0.55);
@@ -47,16 +47,16 @@
   --seat-sup-bg: var(--deep);
   --seat-sup-border: rgba(255, 255, 255, 0.25);
 
-  --board-shell-bg: linear-gradient(145deg, #d4c5b0 0%, #bfaa8e 50%, #a88f72 100%);
-  --board-shell-shadow: 0 12px 36px rgba(42,26,18,0.20), inset 0 1px 0 rgba(255,255,255,0.15);
+  --board-shell-bg: linear-gradient(145deg, #c9b698 0%, #b09674 50%, #9a7d5b 100%);
+  --board-shell-shadow: 0 12px 36px rgba(26,14,8,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
   --board-shell-border: rgba(255, 255, 255, 0.18);
 
-  --board-border: #b8a78c;
-  --board-shadow: 0 4px 12px rgba(42,26,18,0.12);
-  --board-overlay: linear-gradient(rgba(246, 238, 219, 0.3), rgba(246, 238, 219, 0.3));
-  --board-color: #f4ebda;
+  --board-border: #93806a;
+  --board-shadow: 0 4px 16px rgba(26,14,8,0.18);
+  --board-overlay: linear-gradient(rgba(246, 238, 219, 0.15), rgba(246, 238, 219, 0.15));
+  --board-color: #dfd3bd;
   --board-blend: normal, multiply;
-  --board-filter: contrast(1.05) saturate(1.08);
+  --board-filter: contrast(1.10) saturate(1.15);
 
   --stat-chip-bg: linear-gradient(180deg, #f0ebe2 0%, #e4dbcc 100%);
   --stat-chip-border: #fff;
