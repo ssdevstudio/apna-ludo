@@ -128,5 +128,6 @@
 }
 
 @media(max-width:760px){
-  .board-shell{padding:4px;border-radius:6px}
+  .board-shell{padding:6px;border-radius:8px;width:100%;max-width:440px}
+  .ludo-board{width:100%;height:auto;aspect-ratio:1}
 }

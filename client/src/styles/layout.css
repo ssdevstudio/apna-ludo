@@ -129,17 +129,23 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @media(max-width:760px){
   .room-header{height:54px;padding:0 10px}.room-header .logo>span:last-child{display:none}.room-code{left:38%}
   .game-layout{height:calc(100vh - 54px);display:flex;flex-direction:column}
-  .table-area{padding:8px;display:block;overflow-y:auto}
-  .game-controls{margin:8px 0;min-height:52px}.lobby-note small{max-width:160px}.start-button{min-width:120px;padding:10px}
+  .table-area{padding:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;overflow-y:auto;min-height:0}
+  .game-controls{margin:8px 0;min-height:52px;flex-wrap:wrap;justify-content:center;width:100%}
+  .lobby-note{padding:8px 12px;gap:8px;border-radius:12px;width:100%;justify-content:center;text-align:center}
+  .lobby-note>span{font-size:22px}
+  .lobby-note>div{align-items:center}
+  .lobby-note small{max-width:100%}
+  .start-button{min-width:100%;padding:10px}
   .reconnect-banner{top:54px}
-  .settings-panel{padding:30px 20px}
+  .settings-panel{padding:30px 20px;width:90%}
   .room-page{min-height:100dvh;height:100dvh}
   .game-layout.chat-visible:after{inset:54px min(86vw,320px) 0 0;border-radius:12px 0 0 12px}
 }
 
 @media(max-width:400px){
   .room-code>span{display:none}.room-code{left:44%}
-  .lobby-note b{max-width:100px}
+  .lobby-note b{max-width:100%}
+  .lobby-note small{font-size:9px}
 }
 
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
