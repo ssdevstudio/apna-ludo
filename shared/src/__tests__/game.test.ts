@@ -460,8 +460,8 @@ describe("forfeitPlayer", () => {
 });
 
 describe("Ludo King 6-rule (must bring out token from yard)", () => {
-  it("on rolling 6 with tokens in yard, only yard-exit moves are legal", () => {
-    // One token on track at progress 10, tokens in yard. Roll 6 → must use yard token.
+  it("on rolling 6 with tokens in yard, ALL movable tokens are legal", () => {
+    // One token on track at progress 10, tokens in yard. Roll 6 → can use yard or track token.
     let state = createGame(makePlayers(2));
     state = {
       ...state,
@@ -479,9 +479,8 @@ describe("Ludo King 6-rule (must bring out token from yard)", () => {
       ],
     };
     state = applyRoll(state, "p0", 6);
-    // Only yard tokens should be legal (not p0:0 on track)
-    expect(state.movableTokenIds).toEqual(["p0:1", "p0:2", "p0:3"]);
-    expect(state.movableTokenIds).not.toContain("p0:0");
+    // ALL tokens should be legal
+    expect(state.movableTokenIds.sort()).toEqual(["p0:0", "p0:1", "p0:2", "p0:3"].sort());
   });
 
   it("on rolling 6 with ONLY yard tokens, all yard tokens are legal", () => {

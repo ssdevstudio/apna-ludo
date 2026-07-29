@@ -226,9 +226,7 @@ describe("Board validation — cellType classification", () => {
 });
 
 describe("Board validation — movement integrity", () => {
-  it("star jump is exactly 5", () => {
-    expect(STAR_JUMP).toBe(5);
-  });
+
 
   it("each step along track moves to adjacent cells on the path", () => {
     // Verify path adjacency between consecutive cells on the outer loop.

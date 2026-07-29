@@ -137,19 +137,32 @@ export function canMoveToken(
   const finalDestination = diceDestination;
   if (finalDestination > FINISH_PROGRESS) return false;
 
+  // Blockade check
+  const startProgress = token.progress === -1 ? 0 : token.progress + 1;
+  for (let step = startProgress; step <= finalDestination; step++) {
+    const stepSquare = globalSquare(player.color, step);
+    if (stepSquare !== null) {
+      for (const opponent of state.players) {
+        if (opponent.id === playerId) continue;
+        let tokensOnSquare = 0;
+        for (const oppToken of opponent.tokens) {
+          if (globalSquare(opponent.color, oppToken.progress) === stepSquare) {
+            tokensOnSquare++;
+          }
+        }
+        if (tokensOnSquare >= 2) {
+          return false; // Cannot pass or land on an opponent's blockade
+        }
+      }
+    }
+  }
+
   return true;
 }
 
 export function legalTokenIds(state: GameState, playerId: string, dice: number): string[] {
   const player = state.players.find((candidate) => candidate.id === playerId);
   if (!player) return [];
-
-  if (dice === 6) {
-    const yardTokens = player.tokens
-      .filter((token) => token.progress === -1 && canMoveToken(state, playerId, token.id, dice))
-      .map((token) => token.id);
-    if (yardTokens.length > 0) return yardTokens;
-  }
 
   return player.tokens
     .filter((token) => canMoveToken(state, playerId, token.id, dice))
@@ -160,7 +173,10 @@ function finishTurn(state: GameState, playerId: string, extraTurn: boolean): Gam
   const remaining = activePlayers(state);
   if (remaining.length <= 1) {
     const solePlayer = remaining[0];
-    const winners = state.winners;
+    const winners = solePlayer && !state.winners.includes(solePlayer.id) 
+      ? [...state.winners, solePlayer.id] 
+      : state.winners;
+      
     return {
       ...state,
       phase: "finished",

@@ -4,7 +4,7 @@ body { margin: 0; min-width: 320px; background: var(--paper); }
 button, input { font: inherit; }
 button, a { color: inherit; }
 button { cursor: pointer; }
-button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #f0bd3f; outline-offset: 3px; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #d4a31a; outline-offset: 3px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 .logo{display:flex;align-items:center;gap:11px;text-decoration:none;line-height:.85}.logo>span:last-child{display:flex;flex-direction:column}.logo b{font-size:17px;letter-spacing:.16em}.logo em{font-family:'Yeseva One',serif;font-size:17px;color:var(--teal);font-style:normal}.logo-mark{position:relative;width:34px;height:34px;display:grid;grid-template-columns:1fr 1fr;gap:2px;transform:rotate(45deg)}.logo-mark i{display:block;border-radius:3px}.logo-mark i:nth-child(1){background:var(--red)}.logo-mark i:nth-child(2){background:var(--blue)}.logo-mark i:nth-child(3){background:var(--green)}.logo-mark i:nth-child(4){background:var(--yellow)}.logo--compact{transform:scale(.9);transform-origin:left center}
@@ -12,22 +12,22 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .text-button{border:0;background:transparent;font-weight:700;padding:10px}.text-button span{color:var(--teal)}
 .primary-button{border:0;background:var(--deep);color:#fff;padding:13px 18px;font-size:12px;font-weight:800;display:inline-flex;justify-content:center;align-items:center;gap:18px;transition:transform .15s,background .15s;white-space:nowrap}.primary-button:hover{background:var(--teal);transform:translateY(-2px);box-shadow:0 4px 8px rgba(7,59,58,.2)}.primary-button:active{transform:translateY(0)}.primary-button span{font-size:18px}
 .wide{width:100%}
-.icon-btn{border:2px solid rgba(255,255,255,0.4);background:rgba(0,0,0,0.3);width:40px;height:40px;border-radius:20px;color:#fff;display:grid;place-items:center;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px);box-shadow:0 4px 8px rgba(0,0,0,0.3);position:relative;font-size:18px;}
-.icon-btn:hover{background:rgba(0,0,0,0.5);transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,0.4);}
+
+.icon-btn{border:2px solid var(--panel-border);background:var(--panel-bg);width:40px;height:40px;border-radius:20px;color:var(--text-primary);display:grid;place-items:center;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px);box-shadow:0 4px 8px rgba(0,0,0,0.2);position:relative;font-size:18px;}
+.icon-btn:hover{background:rgba(0,0,0,0.08);transform:translateY(-2px);box-shadow:0 6px 12px rgba(0,0,0,0.3);}
 .icon-btn .badge{position:absolute;right:-4px;top:-4px;background:var(--red);color:#fff;border-radius:10px;padding:2px 5px;font-size:10px;line-height:1;font-weight:bold;}
 
+.modal-backdrop{position:fixed;inset:0;z-index:50;background:rgba(5,30,20,.75);display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px)}
+.close-button{position:absolute;right:18px;top:14px;border:0;background:none;font-size:26px;cursor:pointer;line-height:1;color:var(--text-primary)}
 
-.modal-backdrop{position:fixed;inset:0;z-index:50;background:rgba(7,40,39,.7);display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px)}
-.close-button{position:absolute;right:18px;top:14px;border:0;background:none;font-size:26px;cursor:pointer;line-height:1}
+.settings-panel{background:var(--panel-bg);padding:40px;width:min(100%,360px);position:relative;box-shadow:12px 12px 0 rgba(196,168,130,0.5);backdrop-filter:blur(12px);border-radius:16px;}.settings-panel h2{font-size:32px;margin:6px 0 24px}.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}.toggle{width:42px;height:22px;border-radius:11px;border:0;background:#888;position:relative;transition:background .2s;cursor:pointer}.toggle--on{background:var(--teal)}.toggle-knob{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}.toggle--on .toggle-knob{left:22px}.setting-code{font-family:'DM Mono';font-size:11px;color:var(--teal);cursor:pointer;font-weight:700}.setting-note{text-align:center;font-size:10px;color:var(--text-secondary);margin-top:16px}.lang-btn{display:flex;gap:4px;border:1px solid var(--line);background:var(--panel-bg);padding:5px 7px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px}.lang-btn span{padding:2px 6px;border-radius:4px}.lang-btn .lang-active{background:var(--deep);color:#fff}
 
-.settings-panel{background:var(--paper);padding:40px;width:min(100%,360px);position:relative;box-shadow:12px 12px 0 var(--mint)}.settings-panel h2{font-size:32px;margin:6px 0 24px}.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}.toggle{width:42px;height:22px;border-radius:11px;border:0;background:#ccc;position:relative;transition:background .2s;cursor:pointer}.toggle--on{background:var(--teal)}.toggle-knob{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}.toggle--on .toggle-knob{left:22px}.setting-code{font-family:'DM Mono';font-size:11px;color:var(--teal);cursor:pointer;font-weight:700}.setting-note{text-align:center;font-size:10px;color:#4a5c58;margin-top:16px}.lang-btn{display:flex;gap:4px;border:1px solid var(--line);background:var(--paper);padding:5px 7px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px}.lang-btn span{padding:2px 6px;border-radius:4px}.lang-btn .lang-active{background:var(--deep);color:#fff}
-
-.room-page{height:100vh;background:var(--app-bg);background-image:var(--app-bg-image);background-size:32px 32px;overflow:hidden;position:relative}
+.room-page{height:100vh;background:var(--app-bg);background-image:var(--app-bg-image);background-size:42px 42px;overflow:hidden;position:relative}
 .room-header{height:60px;background:transparent;display:flex;align-items:center;padding:0 16px;position:relative;z-index:5}
 .room-code{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px}
 .room-code strong{font:800 12px 'Fredoka',sans-serif;color:var(--text-primary);letter-spacing:1px}
-.room-code button{border:2px solid rgba(255,255,255,0.4);background:rgba(0,0,0,0.3);border-radius:20px;color:#fff;padding:6px 12px;font:600 14px 'Fredoka',sans-serif;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px);box-shadow:0 4px 8px rgba(0,0,0,0.3);}
-.room-code button:hover{background:rgba(0,0,0,0.5);transform:translateY(-1px);}
+.room-code button{border:2px solid var(--panel-border);background:var(--panel-bg);border-radius:20px;color:var(--text-primary);padding:6px 12px;font:600 14px 'Fredoka',sans-serif;cursor:pointer;transition:all .15s;backdrop-filter:blur(4px);box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+.room-code button:hover{background:rgba(0,0,0,0.06);transform:translateY(-1px);}
 .room-code small{font-size:8px;background:var(--yellow);color:#000;border-radius:10px;padding:3px 6px;margin-left:5px;letter-spacing:.05em}
 .header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
 
@@ -62,7 +62,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   min-height: 56px;
   gap: 8px;
 }
-.lobby-note, .invite-button {
+.lobby-note {
   width: 100%;
   border: 2px dashed var(--panel-border);
   background: var(--panel-bg);
@@ -72,7 +72,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);
 }
 .lobby-note>span {
@@ -95,9 +95,9 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   color: var(--text-secondary);
 }
 @keyframes startPulse {
-  0% { box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 0 rgba(245, 223, 161, 0.6); }
-  70% { box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 12px rgba(245, 223, 161, 0); }
-  100% { box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 0 rgba(245, 223, 161, 0); }
+  0% { box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 0 rgba(201, 148, 42, 0.5); }
+  70% { box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 12px rgba(201, 148, 42, 0); }
+  100% { box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 0 rgba(201, 148, 42, 0); }
 }
 .start-button {
   min-width: 160px;
@@ -106,22 +106,22 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   background: var(--yellow) !important;
   color: #1a0e08 !important;
   animation: startPulse 2s infinite;
-  border: 2px solid #fff;
+  border: 2px solid rgba(255,255,255,0.7);
   border-radius: 30px;
 }
 .start-button:hover:not(:disabled) {
-  background: #fbe692 !important;
+  background: #e8b84a !important;
   transform: translateY(-2px) scale(1.05);
 }
 .start-button:disabled {
   animation: none;
-  background: rgba(255,255,255,0.1) !important;
+  background: rgba(0,0,0,0.15) !important;
   color: rgba(255,255,255,0.4) !important;
   border-color: rgba(255,255,255,0.2);
   box-shadow: none !important;
 }
 
-.reconnect-banner{position:fixed;z-index:20;top:60px;left:0;right:0;background:#fff0bb;padding:8px;text-align:center;font-size:11px;font-weight:700}.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--ink);border-top-color:transparent;border-radius:50%;margin-right:7px;vertical-align:middle;animation:spin .8s linear infinite}
+.reconnect-banner{position:fixed;z-index:20;top:60px;left:0;right:0;background:var(--reconnect-bg);color:var(--reconnect-text);padding:8px;text-align:center;font-size:11px;font-weight:700}.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--text-primary);border-top-color:transparent;border-radius:50%;margin-right:7px;vertical-align:middle;animation:spin .8s linear infinite}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes bounce{50%{transform:translateY(-14px) scale(.95)}}
@@ -129,7 +129,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 @media(max-width:1050px){
   .game-layout{grid-template-columns:200px minmax(420px,1fr)}
-  .game-layout.chat-visible:after{content:"";position:fixed;inset:60px 280px 0 0;background:rgba(7,40,39,.25);z-index:9}
+  .game-layout.chat-visible:after{content:"";position:fixed;inset:60px 280px 0 0;background:rgba(5,30,20,.25);z-index:9}
 }
 
 @media(max-width:760px){

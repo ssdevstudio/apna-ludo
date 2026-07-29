@@ -4,10 +4,10 @@ import { playSound } from "../../utils/audio";
 
 const TokenSvg = ({ color }: { color: string }) => {
   const colorMap = {
-    red: { main: '#F40000', dark: '#8A0000', highlight: '#FF6B6B' },
-    green: { main: '#008B00', dark: '#004A00', highlight: '#33FF33' },
-    yellow: { main: '#FFD700', dark: '#997A00', highlight: '#FFFF66' },
-    blue: { main: '#007BFF', dark: '#004499', highlight: '#66B2FF' },
+    red: { main: '#c13535', dark: '#7a1c1c', highlight: '#e06565' },
+    green: { main: '#238352', dark: '#12452a', highlight: '#48b878' },
+    yellow: { main: '#c9942a', dark: '#7a5a12', highlight: '#e8b84a' },
+    blue: { main: '#1f6eb0', dark: '#0e3d64', highlight: '#4a94d4' },
   };
   const c = colorMap[color as keyof typeof colorMap] || colorMap.red;
 
@@ -75,7 +75,7 @@ const TokenSvg = ({ color }: { color: string }) => {
   );
 };
 
-export const COLOR_HEX: Record<PlayerColor, string> = { red: '#F40000', green: '#008B00', yellow: '#FFD700', blue: '#007BFF' };
+export const COLOR_HEX: Record<PlayerColor, string> = { red: '#c13535', green: '#238352', yellow: '#c9942a', blue: '#1f6eb0' };
 
 const STAR_CELLS_SET=new Set(STAR_CELLS);
 const SAFE_CELLS_SET=new Set(SAFE_CELLS);

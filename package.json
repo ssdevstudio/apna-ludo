@@ -12,7 +12,8 @@
     "build": "npm run build -w shared && npm run build -w client && npm run build -w server",
     "start": "npm run start -w server",
     "test": "vitest run",
-    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client"
+    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w client",
+    "prepare": "husky"
   },
   "dependencies": {
     "@types/node": "^24.0.0",
@@ -20,5 +21,8 @@
     "jimp": "^1.6.1",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }

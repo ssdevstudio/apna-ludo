@@ -2,56 +2,83 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Vintage Light Theme Core Colors */
-  --ink: #2c1e16;
-  --deep: #3b2b22;
-  --teal: #1a4f47;
-  --paper: #f8f3e6;
-  --paper-grad: radial-gradient(circle at center, #fdfbf7 0%, #f4eee0 100%);
-  
-  --red: #c93b3b;
-  --blue: #2a6fb3;
-  --yellow: #d19a28;
-  --green: #2a8a4f;
+  /* Bharat Royal — Light: Warm Ivory & Mahogany */
+  --ink: #2a1a12;
+  --deep: #4a281a;
+  --teal: #0f5e4e;
+  --paper: #f5f0e6;
+  --paper-grad: radial-gradient(circle at 30% 20%, #faf6ee 0%, #efe8da 40%, #e8dfce 100%);
+
+  --red: #c13535;
+  --blue: #1f6eb0;
+  --yellow: #c9942a;
+  --green: #238352;
 
   --app-bg: var(--paper-grad);
-  --app-bg-image: none;
+  --app-bg-image: repeating-linear-gradient(
+    45deg, transparent, transparent 20px, rgba(200,180,150,0.04) 20px, rgba(200,180,150,0.04) 21px
+  );
   --text-primary: var(--ink);
-  --text-secondary: #5a4b41;
-  --line: rgba(44, 30, 22, 0.1);
-  --panel-bg: rgba(253, 251, 247, 0.9);
-  --panel-border: rgba(44, 30, 22, 0.15);
-  
-  --chat-form-bg: rgba(255, 255, 255, 0.6);
+  --text-secondary: #6b5a4f;
+  --line: rgba(42, 26, 18, 0.10);
+  --panel-bg: rgba(253, 250, 244, 0.88);
+  --panel-border: rgba(42, 26, 18, 0.12);
+  --mint: #c4a882;
+  --border: rgba(42, 26, 18, 0.15);
+  --bg: var(--paper);
+
+  --chat-form-bg: rgba(255, 255, 255, 0.55);
   --chat-input-bg: #ffffff;
-  --chat-input-border: rgba(44, 30, 22, 0.2);
+  --chat-input-border: rgba(42, 26, 18, 0.18);
   --chat-input-color: var(--ink);
-  --chat-input-placeholder: rgba(44, 30, 22, 0.5);
-  --chat-bg: rgba(253, 251, 247, 0.95);
+  --chat-input-placeholder: rgba(42, 26, 18, 0.45);
+  --chat-bg: rgba(253, 250, 244, 0.94);
   --chat-msg-bg: #fff;
-  --chat-msg-border: rgba(44, 30, 22, 0.1);
-  --chat-mine-bg: #e6eedb;
+  --chat-msg-border: rgba(42, 26, 18, 0.09);
+  --chat-mine-bg: #e2ebd6;
   --chat-mine-border: #b8c9a9;
-  
-  --seat-border: rgba(44, 30, 22, 0.1);
-  --seat-bg: rgba(255, 255, 255, 0.85);
-  --seat-shadow: 0 4px 10px rgba(44,30,22,0.08);
-  --seat-active-bg: linear-gradient(180deg, #fff9e6 0%, #ffe082 100%);
+
+  --seat-border: rgba(42, 26, 18, 0.12);
+  --seat-bg: rgba(255, 255, 255, 0.82);
+  --seat-shadow: 0 6px 14px rgba(42,26,18,0.10);
+  --seat-active-bg: linear-gradient(180deg, #fdf3d6 0%, #f5d98c 100%);
   --seat-active-border: var(--yellow);
-  --seat-active-shadow: 0 4px 12px rgba(209, 154, 40, 0.3);
+  --seat-active-shadow: 0 6px 18px rgba(201, 148, 42, 0.30);
   --seat-sup-bg: var(--deep);
-  --seat-sup-border: rgba(255, 255, 255, 0.2);
-  
-  --board-shell-bg: rgba(255, 255, 255, 0.5);
-  --board-shell-shadow: 0 8px 30px rgba(44,30,22,0.15);
-  --board-shell-border: rgba(44, 30, 22, 0.1);
-  
-  --board-border: #d6cdbc;
-  --board-shadow: 0 4px 12px rgba(44,30,22,0.1);
-  --board-overlay: linear-gradient(rgba(246, 238, 219, 0), rgba(246, 238, 219, 0));
+  --seat-sup-border: rgba(255, 255, 255, 0.25);
+
+  --board-shell-bg: linear-gradient(145deg, #d4c5b0 0%, #bfaa8e 50%, #a88f72 100%);
+  --board-shell-shadow: 0 12px 36px rgba(42,26,18,0.20), inset 0 1px 0 rgba(255,255,255,0.15);
+  --board-shell-border: rgba(255, 255, 255, 0.18);
+
+  --board-border: #b8a78c;
+  --board-shadow: 0 4px 12px rgba(42,26,18,0.12);
+  --board-overlay: linear-gradient(rgba(246, 238, 219, 0.3), rgba(246, 238, 219, 0.3));
   --board-color: #f4ebda;
   --board-blend: normal, multiply;
-  --board-filter: contrast(1.05) saturate(1.1);
+  --board-filter: contrast(1.05) saturate(1.08);
+
+  --stat-chip-bg: linear-gradient(180deg, #f0ebe2 0%, #e4dbcc 100%);
+  --stat-chip-border: #fff;
+  --stat-chip-me-bg: linear-gradient(180deg, #fdf3d6 0%, #f5d98c 100%);
+  --stat-chip-me-border: var(--yellow);
+
+  --player-corner-bg: linear-gradient(145deg, #ffffff, #f5f0e6);
+  --corner-roll-bg: #fff;
+  --corner-roll-border: #ccbba6;
+
+  --toast-danger-bg: #b03232;
+  --toast-danger-text: #fff;
+
+  --reconnect-bg: #f5e6c4;
+  --reconnect-text: var(--ink);
+
+  --emoji-popup-bg: rgba(255, 255, 255, 0.97);
+  --emoji-popup-border: rgba(255, 255, 255, 0.8);
+
+  --turn-arrow-color: #d4a31a;
+  --highlight-glow: rgba(255, 255, 255, 0.7);
+  --dice-face-bg: #faf6ee;
 
   font-family: 'Fredoka', 'Manrope', sans-serif;
   color: var(--text-primary);
@@ -60,47 +87,74 @@
 }
 
 [data-theme="dark"] {
-  --ink: #fff;
-  --deep: #052b21;
-  --teal: #087f78;
-  --paper: #052b21;
+  --ink: #e8e2d6;
+  --deep: #021a14;
+  --teal: #0f785e;
+  --paper: #071e18;
 
-  --app-bg: radial-gradient(circle at 50% 30%, #0d5c46 0%, #052b21 50%, #02120e 100%);
-  --app-bg-image: none;
-  --text-primary: #ffffff;
-  --text-secondary: #a8b8b5;
-  --line: rgba(255, 255, 255, 0.1);
-  --panel-bg: rgba(5, 43, 33, 0.85);
-  --panel-border: rgba(255, 255, 255, 0.15);
-  
+  --app-bg: radial-gradient(circle at 50% 30%, #0d3d30 0%, #052118 50%, #010c08 100%);
+  --app-bg-image: repeating-linear-gradient(
+    45deg, transparent, transparent 20px, rgba(255,215,150,0.02) 20px, rgba(255,215,150,0.02) 21px
+  );
+  --text-primary: #e8e2d6;
+  --text-secondary: #a8a098;
+  --line: rgba(232, 226, 214, 0.10);
+  --panel-bg: rgba(5, 35, 25, 0.88);
+  --panel-border: rgba(232, 226, 214, 0.12);
+  --mint: #6b8a72;
+  --border: rgba(232, 226, 214, 0.12);
+  --bg: #0a2820;
+
   --chat-form-bg: rgba(0, 0, 0, 0.25);
-  --chat-input-bg: rgba(255,255,255,0.05);
-  --chat-input-border: rgba(255,255,255,0.1);
-  --chat-input-color: #ffffff;
-  --chat-input-placeholder: rgba(255,255,255,0.5);
-  --chat-bg: rgba(5, 30, 22, 0.9);
-  --chat-msg-bg: rgba(255, 255, 255, 0.1);
-  --chat-msg-border: rgba(255, 255, 255, 0.05);
-  --chat-mine-bg: rgba(26, 126, 92, 0.4);
-  --chat-mine-border: rgba(26, 126, 92, 0.6);
-  
-  --seat-border: rgba(255, 215, 0, 0.2);
-  --seat-bg: linear-gradient(180deg, rgba(10,30,25,0.85) 0%, rgba(5,20,15,0.95) 100%);
+  --chat-input-bg: rgba(255,255,255,0.06);
+  --chat-input-border: rgba(232,226,214,0.12);
+  --chat-input-color: #e8e2d6;
+  --chat-input-placeholder: rgba(232,226,214,0.40);
+  --chat-bg: rgba(5, 30, 20, 0.92);
+  --chat-msg-bg: rgba(232, 226, 214, 0.08);
+  --chat-msg-border: rgba(232, 226, 214, 0.04);
+  --chat-mine-bg: rgba(15, 120, 94, 0.35);
+  --chat-mine-border: rgba(15, 120, 94, 0.55);
+
+  --seat-border: rgba(201, 148, 42, 0.25);
+  --seat-bg: linear-gradient(180deg, rgba(8,35,25,0.85) 0%, rgba(3,20,12,0.95) 100%);
   --seat-shadow: inset 0 -4px 10px rgba(0,0,0,0.5), 0 6px 14px rgba(0,0,0,0.3);
-  --seat-active-bg: linear-gradient(180deg, rgba(25,55,40,0.9) 0%, rgba(10,25,15,0.95) 100%);
-  --seat-active-border: rgba(255,215,0,0.9);
-  --seat-active-shadow: inset 0 -4px 12px rgba(255,215,0,0.2), 0 6px 20px rgba(255,215,0,0.3);
-  --seat-sup-bg: linear-gradient(180deg, #d4af37, #aa8015);
-  --seat-sup-border: rgba(255,255,255,0.4);
-  
-  --board-shell-bg: linear-gradient(135deg, #1f0f08, #3b2215 50%, #170b05);
-  --board-shell-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 6px rgba(0,0,0,0.8);
-  --board-shell-border: rgba(255, 255, 255, 0.15);
-  
+  --seat-active-bg: linear-gradient(180deg, rgba(25,50,35,0.9) 0%, rgba(10,22,14,0.95) 100%);
+  --seat-active-border: rgba(201,148,42,0.85);
+  --seat-active-shadow: inset 0 -4px 12px rgba(201,148,42,0.2), 0 6px 20px rgba(201,148,42,0.3);
+  --seat-sup-bg: linear-gradient(180deg, #d4a31a, #a67c10);
+  --seat-sup-border: rgba(232,226,214,0.35);
+
+  --board-shell-bg: linear-gradient(135deg, #1f0f08, #3a1f12 50%, #140804);
+  --board-shell-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.08);
+  --board-shell-border: rgba(232, 226, 214, 0.12);
+
   --board-border: #0f0704;
   --board-shadow: inset 0 0 24px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.5);
-  --board-overlay: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+  --board-overlay: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 100%);
   --board-color: #d1bfae;
   --board-blend: normal, multiply;
-  --board-filter: contrast(1.15) saturate(1.1) brightness(0.9);
+  --board-filter: contrast(1.12) saturate(1.08) brightness(0.92);
+
+  --stat-chip-bg: linear-gradient(180deg, rgba(232,226,214,0.12) 0%, rgba(232,226,214,0.04) 100%);
+  --stat-chip-border: rgba(232,226,214,0.15);
+  --stat-chip-me-bg: linear-gradient(180deg, rgba(201,148,42,0.2) 0%, rgba(201,148,42,0.08) 100%);
+  --stat-chip-me-border: rgba(201,148,42,0.5);
+
+  --player-corner-bg: linear-gradient(145deg, rgba(232,226,214,0.1), rgba(232,226,214,0.04));
+  --corner-roll-bg: rgba(232,226,214,0.08);
+  --corner-roll-border: rgba(232,226,214,0.15);
+
+  --toast-danger-bg: #8c2626;
+  --toast-danger-text: #fff;
+
+  --reconnect-bg: rgba(201,148,42,0.25);
+  --reconnect-text: #e8e2d6;
+
+  --emoji-popup-bg: rgba(8,30,22,0.95);
+  --emoji-popup-border: rgba(232,226,214,0.12);
+
+  --turn-arrow-color: #d4a31a;
+  --highlight-glow: rgba(212, 163, 26, 0.6);
+  --dice-face-bg: #faf6ee;
 }
