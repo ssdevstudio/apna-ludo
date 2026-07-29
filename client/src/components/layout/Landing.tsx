@@ -5,6 +5,7 @@ import { tr } from "../../utils/i18n";
 import { AVATARS, COLORS } from "../../utils/constants";
 import { Logo } from "../ui/Logo";
 import { MiniBoard } from "../ui/MiniBoard";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
 export function Landing() {
   const navigate = useNavigate();
@@ -86,7 +87,13 @@ export function Landing() {
   };
 
   return <main className="landing">
-    <nav className="landing-nav"><Logo/><div className="nav-links"><a href="#how">How it works</a><a href="#why">Why Apna?</a></div>
+    <nav className="landing-nav">
+      <Logo />
+      <div className="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#why">Why Apna?</a>
+      </div>
+      <ThemeToggle />
       <button className="text-button" onClick={()=>{setJoinOpen(true);setJoinStep("code");}}>Join a room <span>↗</span></button>
     </nav>
     <section className="hero">

@@ -9,7 +9,8 @@ import type {
 
 import { playSound } from "../../utils/audio";
 import { tr } from "../../utils/i18n";
-import { COLOR_HEX } from "../../utils/constants";
+import { AVATARS, COLOR_HEX } from "../../utils/constants";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { useTimer } from "../../hooks/useTimer";
 
 import { SettingsPanel } from "../modals/SettingsPanel";
@@ -246,6 +247,7 @@ export function Room() {
         </> : <span>SINGLE PLAYER</span>}
       </div>
       <div className="header-actions">
+        <ThemeToggle />
         <div className="reaction-wrapper" style={{position:"relative"}}>
           <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
           {reactionPickerOpen && <div className="emoji-grid-popup">

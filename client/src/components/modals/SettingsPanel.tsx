@@ -24,19 +24,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             <span className={lng === "hi" ? "lang-active" : ""}>हि</span>
           </button>
         </div>
-        <div className="setting-row">
-          <span>{tr("dark_mode")}</span>
-          <button className={`toggle ${document.documentElement.getAttribute('data-theme') === 'dark' ? "toggle--on" : ""}`} onClick={(e) => { 
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const nextTheme = isDark ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', nextTheme);
-            try { localStorage.setItem("apna-theme", nextTheme); } catch { }
-            // force re-render of button
-            e.currentTarget.className = `toggle ${nextTheme === 'dark' ? 'toggle--on' : ''}`;
-          }}>
-            <span className="toggle-knob" />
-          </button>
-        </div>
         <p className="setting-note">Apna Ludo v1.0</p>
       </div>
     </div>
