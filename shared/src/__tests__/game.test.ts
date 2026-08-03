@@ -196,6 +196,7 @@ describe("applyRoll — with a token already on track", () => {
     state = applyRoll(state, "p0", 6); // #3 — third six, forfeit
     expect(state.dice).toBeNull();
     expect(state.lastAction?.type).toBe("turn-skipped");
+    expect(state.lastAction?.reasonThreeSixes).toBe(true);
     // Turn passes away (not extra)
     const nextActive = state.currentPlayerId;
     expect(nextActive).toBe("p1");

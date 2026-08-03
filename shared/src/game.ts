@@ -36,6 +36,7 @@ export interface LastAction {
   tokenId?: string;
   capturedTokenIds?: string[];
   starJumped?: boolean;
+  reasonThreeSixes?: boolean;
 }
 
 export interface GameState {
@@ -220,7 +221,7 @@ export function applyRoll(state: GameState, playerId: string, dice: number): Gam
 
   if (consecutiveSixes === 3) {
     next = finishTurn(
-      { ...next, lastAction: { type: "turn-skipped", playerId, dice } },
+      { ...next, lastAction: { type: "turn-skipped", playerId, dice, reasonThreeSixes: true } },
       playerId,
       false,
     );

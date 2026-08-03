@@ -147,11 +147,13 @@ export function Room() {
         setTokenAnimation(snap.game.lastAction.tokenId??null);
         setTimeout(()=>setTokenAnimation(null),600);
       }
-      if(snap.game?.lastAction?.type==="turn-skipped" && snap.game.lastAction.dice === 6) {
-        setLocalDice(6);
-        setLastRolls(prev => ({...prev, [snap.game!.lastAction!.playerId!]: 6}));
-        setSkipMsg({playerId: snap.game.lastAction.playerId!, msg: "3 Sixes! Turn Missed"});
-        setTimeout(() => setSkipMsg(null), 3000);
+      if(snap.game?.lastAction?.type==="turn-skipped" && snap.game.lastAction.dice) {
+        const rolled = snap.game.lastAction.dice;
+        setLocalDice(rolled);
+        setLastRolls(prev => ({...prev, [snap.game!.lastAction!.playerId!]: rolled}));
+        const msg = snap.game.lastAction.reasonThreeSixes ? "3 Sixes! Turn Missed" : "No legal moves available";
+        setSkipMsg({playerId: snap.game.lastAction.playerId!, msg});
+        setTimeout(() => setSkipMsg(null), snap.game.lastAction.reasonThreeSixes ? 3000 : 2000);
       }
       if(snap.game?.phase==="finished"&&snap.game?.winners.includes(playerId??""))setTimeout(()=>playSound("win"),200);
       if(snap.game?.currentPlayerId===playerId&&snap.game?.dice===null)playSound("turn");

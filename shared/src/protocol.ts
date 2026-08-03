@@ -67,6 +67,7 @@ export const lastActionSchema = z.object({
   tokenId: z.string().optional(),
   capturedTokenIds: z.array(z.string()).optional(),
   starJumped: z.boolean().optional(),
+  reasonThreeSixes: z.boolean().optional(),
 }).strict();
 
 export const gameStateSchema: z.ZodType<GameState> = z.object({
