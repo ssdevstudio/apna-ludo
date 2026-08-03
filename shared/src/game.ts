@@ -253,12 +253,7 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   const tokenIndex = player.tokens.findIndex((token) => token.id === tokenId);
   const previousProgress = player.tokens[tokenIndex]!.progress;
   
-  const myTokensOnSquare = previousProgress >= 0 
-    ? player.tokens.filter(t => t.progress === previousProgress).length 
-    : 1;
-  const isBlobMove = myTokensOnSquare >= 2 && state.dice! % 2 === 0;
-  
-  const distance = isBlobMove ? state.dice! / 2 : state.dice!;
+  const distance = state.dice!;
   const diceDestination = previousProgress === -1 ? 0 : previousProgress + distance;
 
   let finalDestination = diceDestination;
@@ -267,37 +262,21 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
     ...candidate,
     tokens: candidate.tokens.map((token) => ({ ...token })),
   }));
-  
-  if (isBlobMove) {
-    for (let i = 0; i < players[playerIndex]!.tokens.length; i++) {
-      if (players[playerIndex]!.tokens[i]!.progress === previousProgress) {
-        players[playerIndex]!.tokens[i]!.progress = finalDestination;
-      }
-    }
-  } else {
-    players[playerIndex]!.tokens[tokenIndex]!.progress = finalDestination;
-  }
+
+  players[playerIndex]!.tokens[tokenIndex]!.progress = finalDestination;
 
   const destinationSquare = globalSquare(player.color, finalDestination);
   const capturedTokenIds: string[] = [];
   if (destinationSquare !== null && !SAFE_SQUARE_SET.has(destinationSquare)) {
     for (const opponent of players) {
       if (opponent.id === playerId) continue;
-      
-      const opponentTokensHere = opponent.tokens.filter(t => globalSquare(opponent.color, t.progress) === destinationSquare);
-      
-      if (opponentTokensHere.length === 1 && !isBlobMove) {
-        // Single piece captures single piece
-        capturedTokenIds.push(opponentTokensHere[0]!.id);
-        opponentTokensHere[0]!.progress = -1;
-      } else if (opponentTokensHere.length >= 1 && isBlobMove) {
-        // Blob captures anything (single piece or blob)
-        for (const t of opponentTokensHere) {
+
+      for (const t of opponent.tokens) {
+        if (globalSquare(opponent.color, t.progress) === destinationSquare) {
           capturedTokenIds.push(t.id);
           t.progress = -1;
         }
       }
-      // If single piece lands on blob (opponentTokensHere.length >= 2 && !isBlobMove), they coexist! No capture.
     }
   }
 

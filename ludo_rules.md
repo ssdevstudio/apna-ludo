@@ -16,12 +16,9 @@ This document outlines the official rules implemented in this Ludo Game, adherin
 ## 3. Capturing
 * **Capturing Single Pieces:** If a piece lands on an opponent's single piece, the piece jumped upon is captured and returned to its starting circle (yard).
 * **Safe Squares:** A piece may not be captured if it is on a "Star" square (safe square). The starting square of each color and the star squares on the board act as safe zones.
-* **Blob Captures:** A Blob (see below) may capture another opponent's Blob or a single piece if it lands exactly on it while moving as a Blob.
 
-## 4. Blobs (Blockades)
-* **Definition:** If a square contains two or more pieces of the same side, it forms a barrier known as a 'Blob'.
-* **Blocking Opponents:** By default, a Blob cannot be passed by an opponent in a single move.
-* **Partner Pieces:** A Blob does not block a partner's pieces (your own pieces can freely pass or land on your own Blob).
-* **Passing a Blob (Single Pieces):** In order for opponents with single pieces to pass a Blob, they must first **land on the Blob** exactly. Once they land on the Blob, they coexist on that square safely. In subsequent turns, they may move on and pass it, provided the Blob hasn't moved forward leaving the single piece behind.
-* **Moving a Blob:** A Blob may be moved together as a single entity, but only by half the number if an **even number** is thrown. For example, if a "4" is thrown, the entire Blob moves 2 spaces. If a "6" is thrown, it moves 3 spaces. A Blob cannot be moved together if an odd number is thrown (you must move a single piece).
-* **Blob vs Blob:** A Blob may be passed by or captured by an opponent who is also moving a Blob.
+## 4. Blockades (Double Goti)
+* **Definition:** If a non-safe track square contains two or more pieces of the same color, it forms a barrier known as a 'Blockade' (Double Goti).
+* **Blocking Opponents:** An opponent piece cannot land on or pass through an active blockade formed by another player's tokens.
+* **Own Pieces:** A blockade does not block your own pieces (your own pieces can freely pass or stack on your own squares).
+* **Moving from a Blockade:** When moving out of a square that contains multiple pieces, tokens move individually and independently by the exact roll of the dice. Tokens do not move simultaneously, ensuring clear and expected gameplay regardless of even or odd rolls.
