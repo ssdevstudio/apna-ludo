@@ -189,24 +189,23 @@ export function Room() {
     const startTime = Date.now();
     setRolling(true);
     cmdSeq.current+=1;
-    const spinInterval = setInterval(() => {
-        setLocalDice(Math.floor(Math.random() * 6) + 1);
-    }, 60);
     socket.emit("game:roll",{expectedRevision:revisionRef.current},(res: any)=>{
+        if(res && res.dice) {
+            setLocalDice(res.dice);
+            setLastRolls(prev => ({ ...prev, [playerId ?? ""]: res.dice }));
+        }
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 450 - elapsed);
         setTimeout(() => {
-            clearInterval(spinInterval);
             setRolling(false);
             if(res && res.dice) {
-                setLocalDice(res.dice);
                 playSound("land");
                 setBoardShake(true);
                 setTimeout(()=>setBoardShake(false),200);
             }
         }, delay);
     });
-};
+  };
   const moveToken=(tokenId:string)=>{if(!socket||!canMove)return;cmdSeq.current+=1;setTokenAnimation(tokenId);socket.emit("game:move",{tokenId,expectedRevision:revisionRef.current},()=>{setTokenAnimation(null);});};
   moveTokenRef.current=moveToken;
 
