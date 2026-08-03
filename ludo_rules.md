@@ -22,3 +22,10 @@ This document outlines the official rules implemented in this Ludo Game, adherin
 * **Blocking Opponents:** An opponent piece cannot land on or pass through an active blockade formed by another player's tokens.
 * **Own Pieces:** A blockade does not block your own pieces (your own pieces can freely pass or stack on your own squares).
 * **Moving from a Blockade:** When moving out of a square that contains multiple pieces, tokens move individually and independently by the exact roll of the dice. Tokens do not move simultaneously, ensuring clear and expected gameplay regardless of even or odd rolls.
+
+## 5. Turn Timers & Player Lives
+* **Turn Duration:** Each player is given a set time limit (typically 10-30 seconds depending on game configuration) to complete their roll and token movement during their turn.
+* **Player Lives:** Each player starts a match with a total of 5 lives (represented by dots below their profile).
+* **Life Loss on Timeout:** If a player fails to take an action before their turn timer expires, their turn is automatically skipped and they lose 1 life.
+* **No Life Recovery:** A lost life is permanently consumed for that specific match and CANNOT be regained even if the player resumes taking actions in subsequent turns.
+* **Elimination:** Once a player loses all 5 lives in a single match, they are eliminated (Timed Out), their yard icon turns black with an "OUT" banner, and any remaining active players continue until a winner is declared (or if only 1 active player remains, they win automatically).

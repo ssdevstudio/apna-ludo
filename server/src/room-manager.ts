@@ -369,13 +369,6 @@ export function handleRoll(
   const dice = rollDice();
   try {
     room.game = applyRoll(room.game, player.id, dice);
-    // Reset missed turn counter on successful roll
-    room.game = {
-      ...room.game,
-      players: room.game.players.map(p =>
-        p.id === player.id ? { ...p, missedTurnCount: 0 } : p
-      ),
-    };
   } catch {
     return { ok: false, code: "COMMAND_FAILED", message: "Cannot roll now", commandId };
   }
@@ -405,13 +398,6 @@ export function handleMove(
 
   try {
     room.game = applyMove(room.game, player.id, tokenId);
-    // Reset missed turn counter on successful move
-    room.game = {
-      ...room.game,
-      players: room.game.players.map(p =>
-        p.id === player.id ? { ...p, missedTurnCount: 0 } : p
-      ),
-    };
   } catch {
     return { ok: false, code: "COMMAND_FAILED", message: "Cannot move that token", commandId };
   }

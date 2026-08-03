@@ -133,6 +133,6 @@ export function PlayerRankItem({ p, i, winners, playerId, avatar }: { p: GamePla
   const homeCount = p.tokens.filter((t: any)=>t.progress===FINISH_PROGRESS).length;
   const isBot = p.id.startsWith("bot-");
   const av = isBot ? "🤖" : avatar;
-  const stat = p.status==="won" ? "🏆 Finished" : p.status==="forfeited" ? "Forfeited" : homeCount + " home";
+  const stat = p.status==="won" ? "🏆 Finished" : p.status==="forfeited" ? "Forfeited" : p.status==="timed_out" ? "Timed Out" : homeCount + " home";
   return <li key={p.id}><b>{i+1}</b><span className="avatar" style={{background:COLOR_HEX[p.color as PlayerColor]}}>{av}</span><strong>{p.name}{isBot?" 🤖":""}{p.id===playerId?" (You)":""}</strong><small>{stat}</small></li>;
 }
