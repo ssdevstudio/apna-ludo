@@ -138,27 +138,39 @@ export function canMoveToken(
     return false;
   }
 
-  const diceDestination = token.progress === -1 ? (dice === 6 ? 0 : null) : token.progress + dice;
-  if (diceDestination === null) return false;
+  const previousProgress = token.progress;
+  const previousSquare = globalSquare(player.color, previousProgress);
+  const isOnSafeSquare = previousSquare !== null && SAFE_SQUARE_SET.has(previousSquare);
+  const tokensOnSquare = previousProgress >= 0
+    ? player.tokens.filter((t) => t.progress === previousProgress).length
+    : 1;
+  const isBlobMove = tokensOnSquare >= 2 && !isOnSafeSquare && dice % 2 === 0;
 
-  const finalDestination = diceDestination;
+  const distance = previousProgress === -1 ? (dice === 6 ? 0 : null) : (isBlobMove ? dice / 2 : dice);
+  if (distance === null) return false;
+
+  const finalDestination = previousProgress === -1 ? 0 : previousProgress + distance;
   if (finalDestination > FINISH_PROGRESS) return false;
 
-  // Blockade check
-  const startProgress = token.progress === -1 ? 0 : token.progress + 1;
+  // Blockade check along path
+  const startProgress = previousProgress === -1 ? 0 : previousProgress + 1;
   for (let step = startProgress; step <= finalDestination; step++) {
     const stepSquare = globalSquare(player.color, step);
-    if (stepSquare !== null) {
+    if (stepSquare !== null && !SAFE_SQUARE_SET.has(stepSquare)) {
       for (const opponent of state.players) {
         if (opponent.id === playerId) continue;
-        let tokensOnSquare = 0;
+        let oppTokensOnSquare = 0;
         for (const oppToken of opponent.tokens) {
           if (globalSquare(opponent.color, oppToken.progress) === stepSquare) {
-            tokensOnSquare++;
+            oppTokensOnSquare++;
           }
         }
-        if (tokensOnSquare >= 2) {
-          return false; // Cannot pass or land on an opponent's blockade
+        if (oppTokensOnSquare >= 2) {
+          // Single piece cannot pass through an opponent's blob in a single move, but CAN land on it.
+          // A moving blob can pass through or land on (capture) an opponent's blob.
+          if (!isBlobMove && step < finalDestination) {
+            return false;
+          }
         }
       }
     }
@@ -254,7 +266,14 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   const tokenIndex = player.tokens.findIndex((token) => token.id === tokenId);
   const previousProgress = player.tokens[tokenIndex]!.progress;
   
-  const distance = state.dice!;
+  const previousSquare = globalSquare(player.color, previousProgress);
+  const isOnSafeSquare = previousSquare !== null && SAFE_SQUARE_SET.has(previousSquare);
+  const tokensOnSquare = previousProgress >= 0
+    ? player.tokens.filter((t) => t.progress === previousProgress).length
+    : 1;
+  const isBlobMove = tokensOnSquare >= 2 && !isOnSafeSquare && state.dice! % 2 === 0;
+
+  const distance = isBlobMove ? state.dice! / 2 : state.dice!;
   const diceDestination = previousProgress === -1 ? 0 : previousProgress + distance;
 
   let finalDestination = diceDestination;
@@ -264,7 +283,15 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
     tokens: candidate.tokens.map((token) => ({ ...token })),
   }));
 
-  players[playerIndex]!.tokens[tokenIndex]!.progress = finalDestination;
+  if (isBlobMove) {
+    for (let i = 0; i < players[playerIndex]!.tokens.length; i++) {
+      if (players[playerIndex]!.tokens[i]!.progress === previousProgress) {
+        players[playerIndex]!.tokens[i]!.progress = finalDestination;
+      }
+    }
+  } else {
+    players[playerIndex]!.tokens[tokenIndex]!.progress = finalDestination;
+  }
 
   const destinationSquare = globalSquare(player.color, finalDestination);
   const capturedTokenIds: string[] = [];
@@ -272,12 +299,20 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
     for (const opponent of players) {
       if (opponent.id === playerId) continue;
 
-      for (const t of opponent.tokens) {
-        if (globalSquare(opponent.color, t.progress) === destinationSquare) {
+      const opponentTokensHere = opponent.tokens.filter(t => globalSquare(opponent.color, t.progress) === destinationSquare);
+
+      if (opponentTokensHere.length === 1 && !isBlobMove) {
+        // Single piece captures single piece
+        capturedTokenIds.push(opponentTokensHere[0]!.id);
+        opponentTokensHere[0]!.progress = -1;
+      } else if (opponentTokensHere.length >= 1 && isBlobMove) {
+        // Blob captures anything (single piece or opponent blob)
+        for (const t of opponentTokensHere) {
           capturedTokenIds.push(t.id);
           t.progress = -1;
         }
       }
+      // If single piece lands on opponent blob (opponentTokensHere.length >= 2 && !isBlobMove), they coexist! No capture.
     }
   }
 

@@ -785,9 +785,8 @@ describe("safety and blockades", () => {
     expect(state.players[0]!.tokens[0]!.progress).toBe(-1); // captured!
   });
 
-  it("blockades block opponent from landing", () => {
-    // Place two red tokens on same global square, green can't land there
-    // Red double-occupancy at progress 10 (global 10). Green cannot land on global 10.
+  it("blockades block opponent from passing through but allow landing on it safely", () => {
+    // Red double-occupancy at progress 10 (global 10). Green at progress 48 (global 9).
     let state = createGame(makePlayers(2));
     state = {
       ...state,
@@ -813,8 +812,109 @@ describe("safety and blockades", () => {
       ],
       currentPlayerId: "p1",
     };
+    // Landing on the blob (roll 1 -> progress 49 = global 10) is allowed (coexists safely)
+    expect(canMoveToken(state, "p1", "p1:0", 1)).toBe(true);
+    // Passing through the blob (roll 2 -> progress 50 = global 11) is blocked
+    expect(canMoveToken(state, "p1", "p1:0", 2)).toBe(false);
+
+    // When landing on the blob, red tokens are NOT captured (they coexist)
     state = applyRoll(state, "p1", 1);
-    expect(canMoveToken(state, "p1", "p1:0", 1)).toBe(false);
+    state = applyMove(state, "p1", "p1:0");
+    expect(state.players[1]!.tokens[0]!.progress).toBe(49);
+    expect(state.players[0]!.tokens[0]!.progress).toBe(10);
+    expect(state.players[0]!.tokens[1]!.progress).toBe(10);
+  });
+
+  it("safe squares with 2+ tokens do not block opponents", () => {
+    // Red has 2 tokens on red start square (progress 0, global 0 = safe)
+    // Green is at progress 38 (global 51). Roll 2 moves green to progress 40 (global 1) passing through global 0.
+    let state = createGame(makePlayers(2));
+    state = {
+      ...state,
+      players: [
+        {
+          ...state.players[0]!,
+          tokens: [
+            { id: "p0:0", progress: 0 },
+            { id: "p0:1", progress: 0 },
+            { id: "p0:2", progress: -1 },
+            { id: "p0:3", progress: -1 },
+          ],
+        },
+        {
+          ...state.players[1]!,
+          tokens: [
+            { id: "p1:0", progress: 38 },
+            { id: "p1:1", progress: -1 },
+            { id: "p1:2", progress: -1 },
+            { id: "p1:3", progress: -1 },
+          ],
+        },
+      ],
+      currentPlayerId: "p1",
+    };
+    // Green can pass through safe square with multiple red tokens
+    expect(canMoveToken(state, "p1", "p1:0", 2)).toBe(true);
+  });
+
+  it("blob on track moves half distance on even roll and breaks on odd roll", () => {
+    // Red has 2 tokens at progress 5 (non-safe track)
+    let state = createGame(makePlayers(2));
+    state = {
+      ...state,
+      players: [
+        {
+          ...state.players[0]!,
+          tokens: [
+            { id: "p0:0", progress: 5 },
+            { id: "p0:1", progress: 5 },
+            { id: "p0:2", progress: -1 },
+            { id: "p0:3", progress: -1 },
+          ],
+        },
+        state.players[1]!,
+      ],
+      currentPlayerId: "p0",
+    };
+
+    // Even roll: 4 -> moves both tokens by 2 spaces (5 + 2 = 7)
+    let stateEven = applyRoll(state, "p0", 4);
+    stateEven = applyMove(stateEven, "p0", "p0:0");
+    expect(stateEven.players[0]!.tokens[0]!.progress).toBe(7);
+    expect(stateEven.players[0]!.tokens[1]!.progress).toBe(7);
+
+    // Odd roll: 3 -> moves only clicked token by 3 spaces (5 + 3 = 8), breaking the blob
+    let stateOdd = applyRoll(state, "p0", 3);
+    stateOdd = applyMove(stateOdd, "p0", "p0:0");
+    expect(stateOdd.players[0]!.tokens[0]!.progress).toBe(8);
+    expect(stateOdd.players[0]!.tokens[1]!.progress).toBe(5);
+  });
+
+  it("tokens on safe square move individually by full dice value even on even rolls", () => {
+    // Red has 2 tokens at start square (progress 0, safe)
+    let state = createGame(makePlayers(2));
+    state = {
+      ...state,
+      players: [
+        {
+          ...state.players[0]!,
+          tokens: [
+            { id: "p0:0", progress: 0 },
+            { id: "p0:1", progress: 0 },
+            { id: "p0:2", progress: -1 },
+            { id: "p0:3", progress: -1 },
+          ],
+        },
+        state.players[1]!,
+      ],
+      currentPlayerId: "p0",
+    };
+
+    // Even roll: 4 on safe square moves ONLY the clicked token by full 4 spaces (0 + 4 = 4)
+    state = applyRoll(state, "p0", 4);
+    state = applyMove(state, "p0", "p0:0");
+    expect(state.players[0]!.tokens[0]!.progress).toBe(4);
+    expect(state.players[0]!.tokens[1]!.progress).toBe(0);
   });
 });
 
