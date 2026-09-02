@@ -79,6 +79,13 @@
   --turn-arrow-color: #d4a31a;
   --highlight-glow: rgba(255, 255, 255, 0.7);
   --dice-face-bg: #faf6ee;
+  --die-size: 44px;
+  --die-radius: 8px;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 
   font-family: 'Fredoka', 'Manrope', sans-serif;
   color: var(--text-primary);

@@ -235,7 +235,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       }
       const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
       const innerClass = `game-pawn-inner ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""}`;
-      const style: React.CSSProperties = { position: 'absolute', top, left, transform, transition: 'top 0.25s linear, left 0.25s linear, transform 0.25s linear', zIndex: isYard ? 5 : 10 + (allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (isYard ? -1 : tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0)).findIndex(x => x.id === t.id)), width: 'clamp(20px,2.8vw,36px)', height: 'clamp(26px,3.6vw,46px)', '--token-color': COLOR_HEX[t.color] } as any;
+      const style: React.CSSProperties = { position: 'absolute', top, left, transform, transition: 'top 0.25s linear, left 0.25s linear, transform 0.25s linear', zIndex: isYard ? 5 : 10 + (allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (isYard ? -1 : tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0)).findIndex(x => x.id === t.id)), '--token-color': COLOR_HEX[t.color] } as any;
       if(isLegalToken) {
         return (
           <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>

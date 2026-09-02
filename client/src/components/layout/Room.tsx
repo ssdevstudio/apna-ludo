@@ -290,14 +290,7 @@ export function Room() {
           <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code??code).toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
         </> : <span>SINGLE PLAYER</span>}
         {globalTimeLeft !== null && (
-          <span className="global-timer" style={{ 
-            marginLeft: 20, 
-            padding: '4px 12px',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            borderRadius: '20px',
-            fontWeight: "bold", 
-            color: globalTimeLeft < 60000 ? "var(--red)" : "inherit" 
-          }}>
+          <span className={`global-timer ${globalTimeLeft < 60000 ? "timer-critical" : ""}`}>
             🕒 {formatGlobalTime(globalTimeLeft)}
           </span>
         )}
@@ -318,7 +311,7 @@ export function Room() {
         </div>
       </div>
     </header>
-    <div className="game-layout">
+    <div className={`game-layout ${snapshot?.game?.phase === "playing" ? "game-playing" : "game-lobby"} ${chatOpen ? "chat-visible" : ""}`}>
         <EmojiReactionSystem reactions={reactions} />
       <aside className="players-panel">
         <div className="panel-heading"><span>PLAYERS</span><b>{snapshot?.players.length}/4</b></div>
