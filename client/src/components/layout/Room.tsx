@@ -301,10 +301,12 @@ export function Room() {
 
   return <main className="room-page">
     <header className="room-header"><Logo compact/>
-      <div className="room-code">
-        {!isBotGame ? <>
-          <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code ?? code ?? "").toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
-        </> : <span>SINGLE PLAYER</span>}
+      <div className="room-header-center">
+        <div className="room-code">
+          {!isBotGame ? <>
+            <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code ?? code ?? "").toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
+          </> : <span className="mode-badge">SINGLE PLAYER</span>}
+        </div>
         {globalTimeLeft !== null && (
           <span className={`global-timer ${globalTimeLeft < 60000 ? "timer-critical" : ""}`}>
             🕒 {formatGlobalTime(globalTimeLeft)}
@@ -313,13 +315,19 @@ export function Room() {
       </div>
       <div className="header-actions">
         <button className="icon-btn drawer-toggle" onClick={()=>setDrawerOpen(o=>!o)} aria-label="Menu">{drawerOpen?"✕":"☰"}</button>
+        {drawerOpen && <div style={{position:"fixed", inset:0, zIndex:50}} onClick={()=>setDrawerOpen(false)} />}
         <div className={`drawer-items ${drawerOpen?"drawer--open":""}`}>
           <ThemeToggle />
           <div className="reaction-wrapper" style={{position:"relative"}}>
             <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
-            {reactionPickerOpen && <div className="emoji-grid-popup">
-                {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className={`emoji-btn ${sentEmoji===e?"emoji-btn--sent":""}`}>{e}</button>)}
-              </div>}
+            {reactionPickerOpen && (
+              <>
+                <div style={{position:"fixed", inset:0, zIndex:99}} onClick={()=>setReactionPickerOpen(false)} />
+                <div className="emoji-grid-popup">
+                  {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className={`emoji-btn ${sentEmoji===e?"emoji-btn--sent":""}`}>{e}</button>)}
+                </div>
+              </>
+            )}
           </div>
           <button className="icon-btn" onClick={() => { const next = toggleSound(); setSoundOn(next); }} aria-label="Toggle sound" title={soundOn ? "Mute sound" : "Unmute sound"}>{soundOn ? "🔊" : "🔇"}</button>
           <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>

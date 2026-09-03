@@ -6,10 +6,9 @@ interface Props {
   direction: 'left' | 'right';
 }
 
-export function PlayerTurnIndicator({ color, direction }: Props) {
+export function PlayerTurnIndicator({ color: _color, direction }: Props) {
   return (
     <div className={`turn-indicator-wrapper turn-${direction}`} aria-hidden="true">
-      <div className={`turn-glow-ring ring-${color}`} />
       <div className={`turn-arrow arrow-${direction}`}>
         {direction === 'right' ? (
           /* Arrow pointing LEFT (◀) directly at the die */
