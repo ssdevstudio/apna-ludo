@@ -172,7 +172,11 @@ export function Room() {
         setLocalDice(rolled);
         setLastRolls(prev => ({...prev, [snap.game!.lastAction!.playerId!]: rolled}));
       }
-      if(snap.game?.phase==="finished"&&snap.game?.winners.includes(playerId??""))setTimeout(()=>playSound("win"),200);
+      if(snap.game?.phase==="finished"){
+        const isWinner = snap.game.winners && snap.game.winners.length > 0 && snap.game.winners[0] === playerId;
+        if (isWinner) setTimeout(()=>playSound("win"), 200);
+        else setTimeout(()=>playSound("lose"), 200);
+      }
       if(snap.game?.currentPlayerId===playerId&&snap.game?.dice===null)playSound("turn");
       if(snap.game?.movableTokenIds?.length===1&&snap.game.currentPlayerId===playerId){setTimeout(()=>{moveTokenRef.current(snap.game!.movableTokenIds[0]!);},300);}
     });
@@ -250,7 +254,7 @@ export function Room() {
   const displayPlayers:(RoomPlayerSnapshot|undefined)[]=snapshot?[...snapshot.players,...Array(Math.max(0,4-snapshot.players.length)).fill(undefined)]:[];
   const finished=snapshot?.game?.phase==="finished";
   const winners=snapshot?.game?.winners??[];
-  const iWon=winners.includes(playerId??"");
+  const iWon = winners.length > 0 && winners[0] === playerId;
   const allChatMessages = chatMsgs;
 
   const renderCorner = (color: PlayerColor, pos: 'top-left'|'top-right'|'bottom-left'|'bottom-right') => {

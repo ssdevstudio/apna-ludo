@@ -237,6 +237,23 @@
 
 .game-over{background:var(--panel-bg);padding:30px 40px;border-radius:16px;border:3px solid var(--panel-border);text-align:center;box-shadow:8px 8px 0 var(--yellow);position:relative;z-index:100;max-width:90%;margin:0 auto;color:var(--text-primary)}.winner-burst{font-size:22px;color:var(--yellow);display:flex;justify-content:center;align-items:center;gap:16px}.winner-burst b{font-size:48px;color:var(--teal)}.game-over h2{font-size:40px;margin:8px 0 12px}.game-over>p:not(.section-kicker){font-size:12px;color:var(--text-secondary)}.game-over ol{padding:0;margin:20px 0;list-style:none}.game-over li{display:flex;align-items:center;gap:8px;padding:6px;border-bottom:1px solid var(--line);text-align:left}.game-over li>b{font-family:'Yeseva One';width:16px;font-size:14px}.game-over .avatar{width:26px;height:26px}.game-over li strong{font-size:11px}.game-over li small{margin-left:auto;font:8px 'DM Mono';color:var(--text-secondary)}.game-over>.text-button{margin-top:10px;font-size:11px}
 
+.game-over--win {
+  border-color: #ffc700;
+  box-shadow: 0 0 25px rgba(255, 199, 0, 0.4), 8px 8px 0 var(--yellow);
+}
+.modal-win-text {
+  color: #10b981;
+}
+
+.game-over--lose {
+  border-color: #ef4444;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3), 8px 8px 0 rgba(239, 68, 68, 0.6);
+}
+.modal-lose-text {
+  color: #ef4444;
+  text-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
+}
+
 @media(max-width:760px){
   .players-panel{height:76px;flex:none;padding:8px;display:flex;align-items:center;gap:8px;overflow-x:auto;border:0;border-bottom:1px solid var(--line);background:rgba(0,0,0,0.08)}
   .panel-heading{display:none}

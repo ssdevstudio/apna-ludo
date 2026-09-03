@@ -11,7 +11,7 @@ export const T: Record<string, {en:string,hi:string}> = {
   "legal.moves": {en:"Legal moves",hi:"चलने योग्य मोहरे"},
   "roll.the.dice": {en:"Roll the dice",hi:"पासा फेंकें"},
   "win.msg": {en:"You won! 🎉",hi:"आप जीत गए! 🎉"},
-  "lose.msg": {en:"You lost!",hi:"आप हार गए!"},
+  "lose.msg": {en:"You lose! 💔",hi:"आप हार गए! 💔"},
   "game.over": {en:"Game over",hi:"खेल समाप्त"},
   "play.again": {en:"Play again",hi:"फिर से खेलें"},
   "back.home": {en:"Back home",hi:"होम जाएं"},

@@ -20,16 +20,24 @@ export function VictoryModal({
   const winners = snapshot?.game?.winners ?? [];
   return (
     <div className="modal-backdrop">
-      <div className="confetti" style={{left:"10%", animationDelay:"0s"}}/>
-      <div className="confetti" style={{left:"30%", animationDelay:"0.2s"}}/>
-      <div className="confetti" style={{left:"50%", animationDelay:"0.5s"}}/>
-      <div className="confetti" style={{left:"70%", animationDelay:"0.1s"}}/>
-      <div className="confetti" style={{left:"90%", animationDelay:"0.4s"}}/>
-      <div className="game-over" role="dialog" aria-modal="true">
-        <div className="winner-burst" aria-hidden><span>✦</span><b>★</b><span>✦</span></div>
+      {iWon && (
+        <>
+          <div className="confetti" style={{left:"10%", animationDelay:"0s"}}/>
+          <div className="confetti" style={{left:"30%", animationDelay:"0.2s"}}/>
+          <div className="confetti" style={{left:"50%", animationDelay:"0.5s"}}/>
+          <div className="confetti" style={{left:"70%", animationDelay:"0.1s"}}/>
+          <div className="confetti" style={{left:"90%", animationDelay:"0.4s"}}/>
+        </>
+      )}
+      <div className={`game-over ${iWon ? "game-over--win" : "game-over--lose"}`} role="dialog" aria-modal="true">
+        <div className="winner-burst" aria-hidden>
+          {iWon ? <span>✦<b>★</b>✦</span> : <span style={{fontSize:'32px'}}>💔</span>}
+        </div>
         <p className="section-kicker">{tr("game.over")}</p>
-        <h2>{iWon?tr("win.msg"):tr("lose.msg")}</h2>
-        <p>All tokens home. Time for another round?</p>
+        <h2 className={iWon ? "modal-win-text" : "modal-lose-text"}>
+          {iWon ? tr("win.msg") : tr("lose.msg")}
+        </h2>
+        <p>{iWon ? "All tokens home. Great game! 🏆" : "Better luck next time! 💔"}</p>
         <ol>
           {snapshot?.game?.players.slice().sort((a,b)=>{
             const aW = winners.indexOf(a.id);

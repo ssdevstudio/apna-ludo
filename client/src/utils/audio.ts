@@ -58,7 +58,7 @@ export function toggleSound(): boolean {
   return setSoundEnabled(!soundEnabled.current);
 }
 
-export function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"enter"|"six"|"star"|"land") {
+export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land") {
   if (!soundEnabled.current) return;
   try {
     const ctx = getCtx();
@@ -70,6 +70,17 @@ export function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"en
         o.frequency.value=f;g.gain.setValueAtTime(.15,n+i*.18);
         g.gain.exponentialRampToValueAtTime(.001,n+i*.18+.25);
         o.start(n+i*.18);o.stop(n+i*.18+.25);
+      });
+      return;
+    }
+    if (type==="lose") {
+      [392.00, 349.23, 311.13, 261.63].forEach((f,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type="triangle";
+        o.frequency.value=f;g.gain.setValueAtTime(.15,n+i*.22);
+        g.gain.exponentialRampToValueAtTime(.001,n+i*.22+.3);
+        o.start(n+i*.22);o.stop(n+i*.22+.3);
       });
       return;
     }
