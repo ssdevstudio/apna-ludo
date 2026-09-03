@@ -148,6 +148,9 @@ export function Room() {
         setLocalDice(snap.game.dice);
         setLastRolls(prev => ({...prev, [snap.game!.currentPlayerId]: snap.game!.dice!}));
       }
+      if (snap.game?.lastAction?.type === "rolled" && snap.game.lastAction.playerId !== playerId) {
+        playSound("dice");
+      }
       if(snap.game?.lastAction?.type==="moved"){
         setTokenAnimation(snap.game.lastAction.tokenId??null);
         setTimeout(()=>setTokenAnimation(null),600);
