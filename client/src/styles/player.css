@@ -207,24 +207,25 @@
 .turn-arrow {
   position: absolute;
   top: 50%;
-  margin-top: -16px;
+  margin-top: -14px;
   color: var(--turn-arrow-color);
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) drop-shadow(0 0 8px var(--turn-arrow-color));
   animation: arrowFloat 0.5s infinite alternate ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 25;
 }
-.turn-right .turn-arrow { right: -5px; animation-name: floatRight; }
-.turn-left .turn-arrow { left: -5px; animation-name: floatLeft; }
+.turn-right .turn-arrow { right: -4px; animation-name: floatPointLeft; }
+.turn-left .turn-arrow { left: -4px; animation-name: floatPointRight; }
 
-@keyframes floatLeft {
+@keyframes floatPointLeft {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-8px); }
+  100% { transform: translateX(-6px); }
 }
-@keyframes floatRight {
+@keyframes floatPointRight {
   0% { transform: translateX(0); }
-  100% { transform: translateX(8px); }
+  100% { transform: translateX(6px); }
 }
 
 .turn-highlight-border {
