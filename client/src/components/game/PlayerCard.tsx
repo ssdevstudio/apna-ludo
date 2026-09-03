@@ -30,7 +30,6 @@ export function PlayerCorner({
   canMove,
   onRoll,
   avatar,
-  skipMsg,
   timeLeft,
   missedCount,
 }: {
@@ -43,7 +42,6 @@ export function PlayerCorner({
   canMove: boolean;
   onRoll: () => void;
   avatar: string;
-  skipMsg?: string;
   timeLeft?: number;
   missedCount?: number;
 }) {
@@ -91,7 +89,6 @@ export function PlayerCorner({
         >
           <Die value={diceValue ?? 1} rolling={isRolling} />
         </button>
-        {skipMsg && <div className="skip-toast">{skipMsg}</div>}
       </div>
     </div>
   );

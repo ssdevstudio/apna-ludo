@@ -16,6 +16,7 @@ import { useTimer } from "../../hooks/useTimer";
 
 import { SettingsPanel } from "../modals/SettingsPanel";
 import { VictoryModal } from "../modals/VictoryModal";
+import { QuitGameModal } from "../modals/QuitGameModal";
 import { Logo } from "../ui/Logo";
 import { PlayerSeat, PlayerCorner } from "../game/PlayerCard";
 import { LudoBoard } from "../game/LudoBoard";
@@ -47,11 +48,11 @@ export function Room() {
   const [reactions,setReactions]=useState<{id:string, emoji:string, playerId:string}[]>([]);
   const [sentEmoji,setSentEmoji]=useState<string|null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [quitModalOpen, setQuitModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
-  const [skipMsg, setSkipMsg] = useState<{playerId: string, msg: string} | null>(null);
-  const [rolling, setRolling] = useState(false);
+  const [rollingPlayerId, setRollingPlayerId] = useState<string | null>(null);
   const [tokenAnimation, setTokenAnimation] = useState<string|null>(null);
   const [soundOn, setSoundOn] = useState(soundEnabled.current);
   const [localDice, setLocalDice] = useState(6);
@@ -95,15 +96,18 @@ export function Room() {
   const me=snapshot?.players.find(p=>p.id===playerId)??null;
   const isMyTurn=snapshot?.game?.currentPlayerId===playerId;
   const legalTokens=(isMyTurn&&snapshot?.game?.movableTokenIds)?snapshot.game.movableTokenIds:[];
-  const canRoll=isMyTurn&&snapshot?.game?.dice===null&&!rolling;
+  const canRoll=isMyTurn&&snapshot?.game?.dice===null&&!rollingPlayerId;
   const canMove=legalTokens.length>0;
   const {timeLeft,timerRunning}=useTimer(isMyTurn??false,snapshot);
   const myAvatar=sessionStorage.getItem("apna-avatar")??"😀";
 
-  // Block browser back while in game
+  // Block browser back while in game and show Quit modal
   useEffect(()=>{
     if(!code)return;
-    const handler=()=>{window.history.pushState(null,"",window.location.href);};
+    const handler=()=>{
+      window.history.pushState(null,"",window.location.href);
+      setQuitModalOpen(true);
+    };
     window.history.pushState(null,"",window.location.href);
     window.addEventListener("popstate",handler);
     return ()=>window.removeEventListener("popstate",handler);
@@ -148,8 +152,16 @@ export function Room() {
         setLocalDice(snap.game.dice);
         setLastRolls(prev => ({...prev, [snap.game!.currentPlayerId]: snap.game!.dice!}));
       }
-      if (snap.game?.lastAction?.type === "rolled" && snap.game.lastAction.playerId !== playerId) {
-        playSound("dice");
+      if (snap.game?.lastAction?.type === "rolled" || (snap.game?.lastAction?.type === "turn-skipped" && snap.game.lastAction.dice)) {
+        const actorId = snap.game.lastAction.playerId;
+        if (actorId && actorId !== playerId) {
+          setRollingPlayerId(actorId);
+          playSound("dice");
+          setTimeout(() => {
+            setRollingPlayerId(prev => (prev === actorId ? null : prev));
+            playSound("land");
+          }, 450);
+        }
       }
       if(snap.game?.lastAction?.type==="moved"){
         setTokenAnimation(snap.game.lastAction.tokenId??null);
@@ -159,9 +171,6 @@ export function Room() {
         const rolled = snap.game.lastAction.dice;
         setLocalDice(rolled);
         setLastRolls(prev => ({...prev, [snap.game!.lastAction!.playerId!]: rolled}));
-        const msg = snap.game.lastAction.reasonThreeSixes ? "3 Sixes! Turn Missed" : "No legal moves available";
-        setSkipMsg({playerId: snap.game.lastAction.playerId!, msg});
-        setTimeout(() => setSkipMsg(null), snap.game.lastAction.reasonThreeSixes ? 3000 : 2000);
       }
       if(snap.game?.phase==="finished"&&snap.game?.winners.includes(playerId??""))setTimeout(()=>playSound("win"),200);
       if(snap.game?.currentPlayerId===playerId&&snap.game?.dice===null)playSound("turn");
@@ -195,7 +204,7 @@ export function Room() {
     if(!socket||!canRoll)return;
     playSound("dice");
     const startTime = Date.now();
-    setRolling(true);
+    setRollingPlayerId(playerId);
     cmdSeq.current+=1;
     socket.emit("game:roll",{expectedRevision:revisionRef.current},(res: any)=>{
         if(res && res.dice) {
@@ -205,7 +214,7 @@ export function Room() {
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 450 - elapsed);
         setTimeout(() => {
-            setRolling(false);
+            setRollingPlayerId(prev => (prev === playerId ? null : prev));
             if(res && res.dice) {
                 playSound("land");
             }
@@ -248,7 +257,7 @@ export function Room() {
     const p = snapshot?.game ? snapshot.game.players.find(p=>p.color===color) : snapshot?.players.find(p=>p.color===color);
     const isActive = snapshot?.phase === "playing" && snapshot?.game?.currentPlayerId === p?.id;
     const isMe = p?.id === playerId;
-    const visualActivePlayerId = rolling ? playerId : snapshot?.game?.currentPlayerId;
+    const visualActivePlayerId = rollingPlayerId ? rollingPlayerId : snapshot?.game?.currentPlayerId;
     
     let displayDice = 1;
     if (isActive && localDice) displayDice = localDice;
@@ -261,12 +270,11 @@ export function Room() {
       position={pos}
       isActive={visualActivePlayerId === p?.id && snapshot?.game?.phase === "playing"}
       diceValue={displayDice}
-      isRolling={visualActivePlayerId === p?.id && rolling}
-      canRoll={canRoll && isMe}
+      isRolling={rollingPlayerId === p?.id}
+      canRoll={canRoll && isMe && !rollingPlayerId}
       canMove={canMove && isMe}
       onRoll={rollDice}
       avatar={isMe ? myAvatar : ""}
-      skipMsg={skipMsg?.playerId === p?.id ? skipMsg?.msg : undefined}
       timeLeft={timerRunning ? timeLeft : undefined}
       missedCount={gp?.missedTurnCount ?? 0}
     />
@@ -312,7 +320,7 @@ export function Room() {
           <button className="icon-btn" onClick={() => { const next = toggleSound(); setSoundOn(next); }} aria-label="Toggle sound" title={soundOn ? "Mute sound" : "Unmute sound"}>{soundOn ? "🔊" : "🔇"}</button>
           <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>
           <button className="icon-btn" onClick={()=>setSettingsOpen(true)} aria-label="Settings" title="Settings">⚙️</button>
-          <button className="icon-btn exit-btn" onClick={leaveRoom} aria-label="Exit game">🚪</button>
+          <button className="icon-btn exit-btn" onClick={() => setQuitModalOpen(true)} aria-label="Exit game">🚪</button>
         </div>
       </div>
     </header>
@@ -386,6 +394,7 @@ export function Room() {
       />
     </div>
     {settingsOpen&&<SettingsPanel onClose={()=>setSettingsOpen(false)}/>}
+    {quitModalOpen && <QuitGameModal isOpen={quitModalOpen} onConfirm={leaveRoom} onCancel={() => setQuitModalOpen(false)} />}
     {finished&&<VictoryModal 
         snapshot={snapshot} 
         playerId={playerId} 

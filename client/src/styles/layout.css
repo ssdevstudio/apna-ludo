@@ -74,6 +74,94 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   color: var(--text-secondary);
 }
 
+/* Quit Game Modal - Matching Reference */
+.quit-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.72);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  backdrop-filter: blur(5px);
+}
+.quit-modal-box {
+  background: linear-gradient(180deg, #0b459c 0%, #062b66 100%);
+  border: 3.5px solid #ffb300;
+  box-shadow: 0 0 25px rgba(255, 179, 0, 0.45), inset 0 0 15px rgba(255, 255, 255, 0.15), 0 12px 35px rgba(0, 0, 0, 0.8);
+  border-radius: 20px;
+  width: min(92vw, 420px);
+  padding: 34px 24px 30px;
+  text-align: center;
+  position: relative;
+  animation: quitPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes quitPop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.quit-modal-title {
+  font-family: 'Fredoka', -apple-system, sans-serif;
+  font-size: clamp(26px, 6vw, 36px);
+  font-weight: 900;
+  color: #ffc800;
+  letter-spacing: 1.5px;
+  margin: 0 0 26px;
+  text-shadow: 
+    -2px -2px 0 #000, 
+    2px -2px 0 #000, 
+    -2px 2px 0 #000, 
+    2px 2px 0 #000, 
+    0 4px 8px rgba(0, 0, 0, 0.85);
+}
+.quit-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.quit-btn {
+  background: linear-gradient(180deg, #1e88e5 0%, #0d47a1 100%);
+  border: 3px solid #ffb300;
+  box-shadow: 0 0 12px rgba(255, 179, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.35), 0 4px 10px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  user-select: none;
+}
+.quit-btn:hover {
+  transform: scale(1.06);
+  filter: brightness(1.1);
+}
+.quit-btn:active {
+  transform: scale(0.96);
+  filter: brightness(0.92);
+}
+.quit-btn-action {
+  height: 48px;
+  min-width: 95px;
+  padding: 0 22px;
+  border-radius: 26px;
+  font-family: 'Fredoka', -apple-system, sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 
+    -1.5px -1.5px 0 #000, 
+    1.5px -1.5px 0 #000, 
+    -1.5px 1.5px 0 #000, 
+    1.5px 1.5px 0 #000, 
+    0 3px 5px rgba(0, 0, 0, 0.9);
+}
+.quit-btn-sound {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0;
+}
+
 .room-page {
   min-height: 100vh;
   min-height: 100dvh;
