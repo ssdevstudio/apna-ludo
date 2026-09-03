@@ -52,11 +52,25 @@
 
 .finish-mark{display:none}
 
-.yard-overlay-container {
+.yard-overlay {
   position: absolute;
-  inset: 0;
+  width: 40%;
+  height: 40%;
   pointer-events: none;
-  z-index: 12;
+  border-radius: 12px;
+  z-index: 10;
+}
+.yard-overlay-green { top: 0; left: 0; }
+.yard-overlay-yellow { top: 0; right: 0; }
+.yard-overlay-red { bottom: 0; left: 0; }
+.yard-overlay-blue { bottom: 0; right: 0; }
+
+.yard-out-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
 }
 
 .yard-name-badge {

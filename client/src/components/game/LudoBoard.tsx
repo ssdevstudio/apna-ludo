@@ -182,21 +182,16 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     {game.players.map(p => {
       const isCurrent = game.currentPlayerId === p.id;
       const isOut = p.status === "forfeited" || p.status === "timed_out";
-
-      const style: React.CSSProperties = { position: 'absolute', width: '40%', height: '40%', zIndex: isOut ? 20 : 10, pointerEvents: 'none', borderRadius: '12px' };
-      if (p.color === 'green') { style.top = '0'; style.left = '0'; }
-      else if (p.color === 'yellow') { style.top = '0'; style.right = '0'; }
-      else if (p.color === 'red') { style.bottom = '0'; style.left = '0'; }
-      else if (p.color === 'blue') { style.bottom = '0'; style.right = '0'; }
-
       const isBot = p.id.startsWith("bot-");
       const displayName = isBot ? `🤖 ${p.name}` : p.name;
 
       return (
         <Fragment key={p.id}>
-          {isCurrent && !isOut && <div style={style} className={`yard-blink-overlay color-${p.color} turn-highlight-border`} />}
+          {isCurrent && !isOut && (
+            <div className={`yard-overlay yard-overlay-${p.color} yard-blink-overlay color-${p.color} turn-highlight-border`} />
+          )}
           
-          <div style={style} className="yard-overlay-container">
+          <div className={`yard-overlay yard-overlay-${p.color}`}>
             <div 
               className={`yard-name-badge yard-name-${p.color} ${isCurrent ? 'yard-name--active' : ''}`}
               style={{ transform: `translateX(-50%) rotate(-${boardRotation}deg)` }}
@@ -206,7 +201,7 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
           </div>
 
           {isOut && (
-            <div style={{ ...style, backgroundColor: 'rgba(0, 0, 0, 0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className={`yard-overlay yard-overlay-${p.color} yard-out-overlay`}>
               <span style={{
                 color: 'var(--red)',
                 fontSize: 'clamp(20px, 4vw, 36px)',
