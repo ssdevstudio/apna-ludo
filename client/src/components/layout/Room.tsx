@@ -8,7 +8,7 @@ import type {
 } from "@apna-ludo/shared";
 import { FINISH_PROGRESS } from "@apna-ludo/shared";
 
-import { playSound } from "../../utils/audio";
+import { playSound, soundEnabled, toggleSound } from "../../utils/audio";
 import { tr } from "../../utils/i18n";
 import { AVATARS, COLOR_HEX } from "../../utils/constants";
 import { ThemeToggle } from "../ui/ThemeToggle";
@@ -23,20 +23,19 @@ import { ChatSidebar } from "../chat/ChatSidebar";
 import { EmojiReactionSystem } from "../chat/EmojiReactionSystem";
 
 function connect(): Socket<ServerToClientEvents, ClientToServerEvents> {
-  const s = io({ transports: ["websocket", "polling"] });
-  return s;
+  return io("/", { path: "/socket.io", transports: ["websocket", "polling"], autoConnect: true });
 }
 
 export function Room() {
-  const {code=""}=useParams();
-  const navigate=useNavigate();
-  const [socket,setSocket]=useState<Socket<ServerToClientEvents,ClientToServerEvents>|null>(null);
+  const { code } = useParams<{ code: string }>();
+  const navigate = useNavigate();
+  const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const [connState,setConnState]=useState<string>("connecting");
-  const [snapshot,setSnapshot]=useState<RoomSnapshot|null>(null);
-  const [playerId,setPlayerId]=useState<string|null>(()=>sessionStorage.getItem(`apna-playerid-${code}`));
+  const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(() => sessionStorage.getItem(`apna-playerid-${code?.trim().toUpperCase()}`));
   const [reconnectToken,setReconnectToken]=useState<string|null>(()=>sessionStorage.getItem(`apna-token-${code}`));
-  const [copied,setCopied]=useState(false);
-  const [chatOpen,setChatOpen]=useState(false);
+  const [copied, setCopied] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const chatOpenRef=useRef(false);
   const [unreadCount,setUnreadCount]=useState(0);
   useEffect(() => { if(chatOpen) setUnreadCount(0); }, [chatOpen]);
@@ -47,21 +46,27 @@ export function Room() {
   const [reactionPickerOpen,setReactionPickerOpen]=useState(false);
   const [reactions,setReactions]=useState<{id:string, emoji:string, playerId:string}[]>([]);
   const [sentEmoji,setSentEmoji]=useState<string|null>(null);
-  const [settingsOpen,setSettingsOpen]=useState(false);
-  const [drawerOpen,setDrawerOpen]=useState(false);
-  const [message,setMessage]=useState("");
-  const [chatMsgs,setChatMsgs]=useState<ChatMessage[]>([]);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
   const [skipMsg, setSkipMsg] = useState<{playerId: string, msg: string} | null>(null);
-  const [rolling,setRolling]=useState(false);
-  const [tokenAnimation,setTokenAnimation]=useState<string|null>(null);
-    const [boardShake,setBoardShake]=useState(false);
-  const [localDice,setLocalDice]=useState(6);
-  const [lastRolls,setLastRolls]=useState<Record<string,number>>({});
-  const chatEnd=useRef<HTMLDivElement>(null);
-  const revisionRef=useRef(0);
-  useEffect(()=>{if(snapshot)revisionRef.current=snapshot.revision;},[snapshot]);
-  const cmdSeq=useRef(0);
-  const moveTokenRef=useRef<(tokenId:string)=>void>(()=>{});
+  const [rolling, setRolling] = useState(false);
+  const [tokenAnimation, setTokenAnimation] = useState<string|null>(null);
+  const [soundOn, setSoundOn] = useState(soundEnabled.current);
+  const [localDice, setLocalDice] = useState(6);
+  const [lastRolls, setLastRolls] = useState<Record<string,number>>({});
+  const chatEnd = useRef<HTMLDivElement>(null);
+  const revisionRef = useRef(0);
+  useEffect(() => { if (snapshot) revisionRef.current = snapshot.revision; }, [snapshot]);
+  const cmdSeq = useRef(0);
+  const moveTokenRef = useRef<(tokenId:string)=>void>(()=>{});
+
+  useEffect(() => {
+    const handler = (e: any) => setSoundOn(e.detail);
+    window.addEventListener("sound-toggled", handler);
+    return () => window.removeEventListener("sound-toggled", handler);
+  }, []);
 
   const [globalTimeLeft, setGlobalTimeLeft] = useState<number | null>(null);
 
@@ -200,8 +205,6 @@ export function Room() {
             setRolling(false);
             if(res && res.dice) {
                 playSound("land");
-                setBoardShake(true);
-                setTimeout(()=>setBoardShake(false),200);
             }
         }, delay);
     });
@@ -211,8 +214,6 @@ export function Room() {
 
   const handleCapture = useCallback(() => {
     playSound("capture");
-    setBoardShake(true);
-    setTimeout(() => setBoardShake(false), 300);
   }, []);
 
   const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
@@ -287,7 +288,7 @@ export function Room() {
     <header className="room-header"><Logo compact/>
       <div className="room-code">
         {!isBotGame ? <>
-          <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code??code).toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
+          <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code ?? code ?? "").toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
         </> : <span>SINGLE PLAYER</span>}
         {globalTimeLeft !== null && (
           <span className={`global-timer ${globalTimeLeft < 60000 ? "timer-critical" : ""}`}>
@@ -305,8 +306,9 @@ export function Room() {
                 {["\u{1F600}","\u{1F602}","\u{1F621}","\u{1F62D}","\u{1F60E}","\u{1F44F}","\u{1F525}","\u{2764}\u{FE0F}","\u{1F44D}","\u{1F389}","\u{1F634}","\u{1F914}"].map(e=><button key={e} onClick={()=>sendReaction(e)} className={`emoji-btn ${sentEmoji===e?"emoji-btn--sent":""}`}>{e}</button>)}
               </div>}
           </div>
+          <button className="icon-btn" onClick={() => { const next = toggleSound(); setSoundOn(next); }} aria-label="Toggle sound" title={soundOn ? "Mute sound" : "Unmute sound"}>{soundOn ? "🔊" : "🔇"}</button>
           <button className="icon-btn" onClick={()=>setChatOpen(c=>!c)} aria-label="Toggle chat">💬 {unreadCount>0&&<span className="badge">{unreadCount}</span>}</button>
-          <button className="icon-btn" onClick={()=>setSettingsOpen(true)}>⚙️</button>
+          <button className="icon-btn" onClick={()=>setSettingsOpen(true)} aria-label="Settings" title="Settings">⚙️</button>
           <button className="icon-btn exit-btn" onClick={leaveRoom} aria-label="Exit game">🚪</button>
         </div>
       </div>
@@ -345,7 +347,7 @@ export function Room() {
           {renderCorner(tlColor, 'top-left')}
           {renderCorner(trColor, 'top-right')}
           
-          <div className={`board-center ${boardShake ? "board-shake" : ""}`}>
+          <div className="board-center">
             {snapshot?.game ? <LudoBoard 
               game={snapshot.game} 
               myPlayerId={playerId} 

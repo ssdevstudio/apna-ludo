@@ -6,10 +6,12 @@ import { AVATARS, COLORS } from "../../utils/constants";
 import { Logo } from "../ui/Logo";
 import { MiniBoard } from "../ui/MiniBoard";
 import { ThemeToggle } from "../ui/ThemeToggle";
+import { SettingsPanel } from "../modals/SettingsPanel";
 
 export function Landing() {
   const navigate = useNavigate();
   const [joinOpen,setJoinOpen]=useState(false);
+  const [settingsOpen,setSettingsOpen]=useState(false);
   const [name,setName]=useState(()=>sessionStorage.getItem("apna-player")??"");
   
   const initialCode = new URLSearchParams(window.location.search).get("join") || "";
@@ -94,6 +96,7 @@ export function Landing() {
         <a href="#why">Why Apna?</a>
       </div>
       <ThemeToggle />
+      <button className="icon-btn" onClick={()=>setSettingsOpen(true)} title="Settings" aria-label="Settings">⚙️</button>
       <button className="text-button" onClick={()=>{setJoinOpen(true);setJoinStep("code");}}>Join a room <span>↗</span></button>
     </nav>
     <section className="hero">
@@ -183,5 +186,6 @@ export function Landing() {
         )}
       </div>
     </div>}
+    {settingsOpen && <SettingsPanel onClose={()=>setSettingsOpen(false)} />}
   </main>;
 }

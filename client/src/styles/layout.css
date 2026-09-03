@@ -22,6 +22,58 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 .settings-panel{background:var(--panel-bg);padding:40px;width:min(100%,360px);position:relative;box-shadow:12px 12px 0 rgba(196,168,130,0.5);backdrop-filter:blur(12px);border-radius:16px;}.settings-panel h2{font-size:32px;margin:6px 0 24px}.setting-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:600}.toggle{width:42px;height:22px;border-radius:11px;border:0;background:#888;position:relative;transition:background .2s;cursor:pointer}.toggle--on{background:var(--teal)}.toggle-knob{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:white;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}.toggle--on .toggle-knob{left:22px}.setting-code{font-family:'DM Mono';font-size:11px;color:var(--teal);cursor:pointer;font-weight:700}.setting-note{text-align:center;font-size:10px;color:var(--text-secondary);margin-top:16px}.lang-btn{display:flex;gap:4px;border:1px solid var(--line);background:var(--panel-bg);padding:5px 7px;border-radius:6px;cursor:pointer;font-weight:700;font-size:11px}.lang-btn span{padding:2px 6px;border-radius:4px}.lang-btn .lang-active{background:var(--deep);color:#fff}
 
+.sound-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.sound-action-btn--on {
+  background: var(--teal, #0f5e4e);
+  color: #ffffff;
+  border-color: rgba(255,255,255,0.25);
+}
+.sound-action-btn--on:hover {
+  filter: brightness(1.1);
+  transform: scale(1.04);
+}
+.sound-action-btn--off {
+  background: rgba(0,0,0,0.12);
+  color: var(--text-secondary);
+  border-color: var(--line);
+}
+.sound-action-btn--off:hover {
+  background: rgba(0,0,0,0.18);
+  transform: scale(1.04);
+}
+.setting-label-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.setting-icon {
+  font-size: 20px;
+  width: 28px;
+  text-align: center;
+}
+.setting-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+.setting-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
 .room-page {
   min-height: 100vh;
   min-height: 100dvh;

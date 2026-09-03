@@ -4,6 +4,25 @@ function getCtx() { if (!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
 function loadBool(key: string, def: boolean): boolean { try { const v = localStorage.getItem(key); return v === null ? def : v === "true"; } catch { return def; } }
 export const soundEnabled = { current: loadBool("apna-sound", true) };
 
+export function isSoundEnabled(): boolean {
+  return soundEnabled.current;
+}
+
+export function setSoundEnabled(val: boolean): boolean {
+  soundEnabled.current = val;
+  try {
+    localStorage.setItem("apna-sound", String(val));
+  } catch {}
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("sound-toggled", { detail: val }));
+  }
+  return val;
+}
+
+export function toggleSound(): boolean {
+  return setSoundEnabled(!soundEnabled.current);
+}
+
 export function playSound(type: "dice"|"move"|"capture"|"win"|"turn"|"click"|"enter"|"six"|"star"|"land") {
   if (!soundEnabled.current) return;
   try {
