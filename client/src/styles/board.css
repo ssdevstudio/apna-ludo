@@ -52,6 +52,61 @@
 
 .finish-mark{display:none}
 
+.yard-overlay-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.yard-name-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(12, 18, 15, 0.82);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  padding: 3px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  max-width: 86%;
+  box-sizing: border-box;
+}
+
+.yard-name-text {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: clamp(10px, 1.8vw, 13px);
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.yard-name-red { border-color: #ef4444; }
+.yard-name-green { border-color: #22c55e; }
+.yard-name-yellow { border-color: #eab308; }
+.yard-name-blue { border-color: #3b82f6; }
+
+.yard-name--active {
+  border-color: #facc15;
+  box-shadow: 0 0 12px rgba(250, 204, 21, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.4);
+  animation: activeYardNamePulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes activeYardNamePulse {
+  0% { filter: brightness(1) drop-shadow(0 0 2px rgba(250, 204, 21, 0.4)); }
+  100% { filter: brightness(1.25) drop-shadow(0 0 8px rgba(250, 204, 21, 0.9)); }
+}
+
 .home-yard{position:absolute;display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px;z-index:3}.yard-red{left:0;bottom:0;width:40%;height:40%}.yard-green{left:0;top:0;width:40%;height:40%}.yard-yellow{right:0;top:0;width:40%;height:40%}.yard-blue{right:0;bottom:0;width:40%;height:40%}.yard-token{width:100%;max-width:40px;height:auto;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));place-self:center}
 
 .game-pawn-wrapper{
@@ -187,6 +242,13 @@
   .game-pawn-wrapper{width:5.8%;height:7.6%;min-width:14px;min-height:18px}
   .game-pawn-wrapper.legal-token::before,.game-pawn-wrapper.legal-token::after{display:none}
   .game-pawn-inner img{filter:drop-shadow(0 1px 2px rgba(0,0,0,0.5))}
+  .yard-name-badge{bottom:5px;padding:2px 8px;border-radius:12px;max-width:90%}
+  .yard-name-text{font-size:clamp(8px, 2.2vw, 11px)}
+}
+
+@media(max-width:400px){
+  .yard-name-badge{bottom:3px;padding:1px 6px;border-radius:8px}
+  .yard-name-text{font-size:9px}
 }
 
 @media(max-height:540px) and (orientation: landscape){
@@ -197,4 +259,6 @@
     max-width: min(calc(100dvh - 44px), 400px);
   }
   .game-pawn-wrapper{width:5.6%;height:7.4%;min-width:12px;min-height:16px}
+  .yard-name-badge{bottom:3px;padding:1px 6px}
+  .yard-name-text{font-size:9px}
 }

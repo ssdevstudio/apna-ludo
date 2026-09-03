@@ -56,9 +56,8 @@ export function PlayerCorner({
 
   return (
     <div className={`player-corner corner-${position} corner-${player.color} ${isActive ? "active" : ""}`}>
-      <div className="corner-profile">
+      <div className="corner-profile" title={player.name} aria-label={player.name}>
         <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
-        <b>{player.name}</b>
       </div>
 
       {missedCount !== undefined && (
