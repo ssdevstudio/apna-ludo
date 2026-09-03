@@ -7,11 +7,11 @@ interface Props {
 }
 
 export function PlayerTurnIndicator({ color, direction }: Props) {
-  // If direction is 'right' (arrow sits on right side of the box), point LEFT (◀) towards the box.
-  // If direction is 'left' (arrow sits on left side of the box), point RIGHT (▶) towards the box.
+  // If direction is 'right' (arrow sits outside on right side of the box), point LEFT (◀) into the box.
+  // If direction is 'left' (arrow sits outside on left side of the box), point RIGHT (▶) into the box.
   const pathD = direction === 'right'
-    ? "M18 6 L6 12 L18 18 Z" // Points LEFT (◀) into the box
-    : "M6 6 L18 12 L6 18 Z"; // Points RIGHT (▶) into the box
+    ? "M19 4 L5 12 L19 20 Z" // Sharp triangle pointing LEFT (◀) into the box
+    : "M5 4 L19 12 L5 20 Z"; // Sharp triangle pointing RIGHT (▶) into the box
 
   return (
     <div className={`turn-indicator-wrapper turn-${direction}`} aria-hidden="true">
