@@ -182,8 +182,8 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     {game.players.map(p => {
       const isCurrent = game.currentPlayerId === p.id;
       const isOut = p.status === "forfeited" || p.status === "timed_out";
-      const isBot = p.id.startsWith("bot-");
-      const displayName = isBot ? `🤖 ${p.name}` : p.name;
+      const displayName = p.id === myPlayerId ? (p.name || "You") : p.name;
+      const isTop = p.color === 'green' || p.color === 'yellow';
 
       return (
         <Fragment key={p.id}>
@@ -193,10 +193,10 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
           
           <div className={`yard-overlay yard-overlay-${p.color}`}>
             <div 
-              className={`yard-name-badge yard-name-${p.color} ${isCurrent ? 'yard-name--active' : ''}`}
+              className={`yard-name-clean ${isTop ? 'yard-name-top' : 'yard-name-bottom'} ${isCurrent ? 'yard-name--active' : ''}`}
               style={{ transform: `translateX(-50%) rotate(-${boardRotation}deg)` }}
             >
-              <span className="yard-name-text">{displayName}</span>
+              {displayName}
             </div>
           </div>
 

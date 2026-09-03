@@ -144,15 +144,15 @@
   .turn-glow-ring{width:32px;height:32px;margin-top:-16px}
   .turn-right .turn-glow-ring{left:10px}
   .turn-left .turn-glow-ring{right:10px}
-  .turn-right .turn-arrow { right: -28px; }
-  .turn-left .turn-arrow { left: -28px; }
+  .turn-right .turn-arrow { right: -36px; }
+  .turn-left .turn-arrow { left: -36px; }
 }
 
 @media(max-width:400px){
   .player-corner{padding:2px 4px;gap:3px}
   .player-corner .avatar{width:30px;height:30px;font-size:14px}
-  .turn-right .turn-arrow { right: -24px; }
-  .turn-left .turn-arrow { left: -24px; }
+  .turn-right .turn-arrow { right: -30px; }
+  .turn-left .turn-arrow { left: -30px; }
 }
 
 .skip-toast { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: var(--toast-danger-bg); color: var(--toast-danger-text); font: 700 11px 'Fredoka', sans-serif; padding: 4px 8px; border-radius: 8px; white-space: nowrap; pointer-events: none; animation: popToast 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
@@ -208,18 +208,15 @@
 .turn-arrow {
   position: absolute;
   top: 50%;
-  margin-top: -15px;
-  color: var(--turn-arrow-color);
-  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6)) drop-shadow(0 0 10px var(--turn-arrow-color));
-  animation: arrowFloat 0.5s infinite alternate ease-in-out;
+  margin-top: -16px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 30;
   pointer-events: none;
 }
-.turn-right .turn-arrow { right: -32px; animation-name: floatPointLeft; }
-.turn-left .turn-arrow { left: -32px; animation-name: floatPointRight; }
+.turn-right .turn-arrow { right: -42px; animation: floatPointLeft 0.5s infinite alternate ease-in-out; }
+.turn-left .turn-arrow { left: -42px; animation: floatPointRight 0.5s infinite alternate ease-in-out; }
 
 @keyframes floatPointLeft {
   0% { transform: translateX(0); }
