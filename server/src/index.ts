@@ -99,15 +99,16 @@ app.post("/api/room", (req, res) => {
     res.status(400).json({ ok: false, error: "INVALID_VS_COMPUTER" }); return;
   }
   const isVsBot = vsComputerRaw === true;
+  const entryFee = typeof req.body?.entryFee === "number" && req.body.entryFee >= 0 ? req.body.entryFee : 0;
   if (isVsBot) {
-    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers);
+    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers, entryFee);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {
       res.status(500).json(result);
     }
   } else {
-    const result = createRoom(io, name, maxPlayers, "", req.body?.color);
+    const result = createRoom(io, name, maxPlayers, "", req.body?.color, entryFee);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {

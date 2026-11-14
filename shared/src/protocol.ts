@@ -16,6 +16,7 @@ export const createRoomSchema = z.object({
   name: playerNameSchema,
   maxPlayers: z.number().int().min(2).max(4).default(4),
   color: z.enum(PLAYER_COLORS).optional(),
+  entryFee: z.number().int().nonnegative().optional(),
   commandId: commandIdSchema.optional(),
 }).strict();
 
@@ -107,6 +108,7 @@ export interface RoomSnapshot {
   phase: "lobby" | "playing" | "finished";
   revision: number;
   maxPlayers: number;
+  entryFee?: number;
   players: RoomPlayerSnapshot[];
   game: GameState | null;
   chat: ChatMessage[];
@@ -136,6 +138,7 @@ export const roomSnapshotSchema: z.ZodType<RoomSnapshot> = z.object({
   phase: z.enum(["lobby", "playing", "finished"]),
   revision: z.number().int().nonnegative(),
   maxPlayers: z.number().int().min(2).max(4),
+  entryFee: z.number().int().nonnegative().optional(),
   players: z.array(roomPlayerSnapshotSchema).min(1).max(4),
   game: gameStateSchema.nullable(),
   chat: z.array(chatMessageSchema).max(100),

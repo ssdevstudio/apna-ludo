@@ -17,6 +17,8 @@ import { useTimer } from "../../hooks/useTimer";
 import { SettingsPanel } from "../modals/SettingsPanel";
 import { VictoryModal } from "../modals/VictoryModal";
 import { QuitGameModal } from "../modals/QuitGameModal";
+import { DailyBonusModal } from "../modals/DailyBonusModal";
+import { CoinHeader } from "../ui/CoinHeader";
 import { Logo } from "../ui/Logo";
 import { PlayerSeat, PlayerCorner } from "../game/PlayerCard";
 import { LudoBoard } from "../game/LudoBoard";
@@ -49,6 +51,8 @@ export function Room() {
   const [sentEmoji,setSentEmoji]=useState<string|null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [quitModalOpen, setQuitModalOpen] = useState(false);
+  const [bonusOpen, setBonusOpen] = useState(false);
+  const [tokensCaptured, setTokensCaptured] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chatMsgs, setChatMsgs] = useState<ChatMessage[]>([]);
@@ -230,6 +234,7 @@ export function Room() {
 
   const handleCapture = useCallback(() => {
     playSound("capture");
+    setTokensCaptured((prev) => prev + 1);
   }, []);
 
   const sendChat=(e:FormEvent)=>{e.preventDefault();if(!message.trim()||!socket)return;socket.emit("chat:send",{text:message.trim()},()=>{});setMessage("");};
@@ -298,6 +303,8 @@ export function Room() {
   const blColor = shifted[3];
   const boardRotation = shift * 90;
   const isBotGame = snapshot?.players.some(p => p.id.startsWith("bot-") || (p as any).isBot);
+  const entryFee = snapshot?.entryFee ?? Number(sessionStorage.getItem("apna-bet")) ?? 0;
+  const potAmount = entryFee > 0 ? entryFee * (snapshot?.players?.length || 2) : 0;
 
   return <main className="room-page">
     <header className="room-header"><Logo compact/>
@@ -307,6 +314,11 @@ export function Room() {
             <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code ?? code ?? "").toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
           </> : <span className="mode-badge">SINGLE PLAYER</span>}
         </div>
+        {potAmount > 0 && (
+          <span className="pot-badge-pill" title="Total Prize Pool">
+            🏆 {potAmount.toLocaleString()} 🪙
+          </span>
+        )}
         {globalTimeLeft !== null && (
           <span className={`global-timer ${globalTimeLeft < 60000 ? "timer-critical" : ""}`}>
             🕒 {formatGlobalTime(globalTimeLeft)}
@@ -314,6 +326,7 @@ export function Room() {
         )}
       </div>
       <div className="header-actions">
+        <CoinHeader onOpenBonus={() => setBonusOpen(true)} compact />
         <button className="icon-btn drawer-toggle" onClick={()=>setDrawerOpen(o=>!o)} aria-label="Menu">{drawerOpen?"✕":"☰"}</button>
         {drawerOpen && <div style={{position:"fixed", inset:0, zIndex:50}} onClick={()=>setDrawerOpen(false)} />}
         <div className={`drawer-items ${drawerOpen?"drawer--open":""}`}>
@@ -412,8 +425,10 @@ export function Room() {
         playerId={playerId} 
         iWon={iWon} 
         myAvatar={myAvatar} 
+        tokensCaptured={tokensCaptured}
         onRematch={rematchRoom} 
         onLeave={leaveRoom} 
       />}
+    {bonusOpen && <DailyBonusModal isOpen={bonusOpen} onClose={() => setBonusOpen(false)} />}
   </main>;
 }

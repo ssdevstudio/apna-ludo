@@ -58,11 +58,37 @@ export function toggleSound(): boolean {
   return setSoundEnabled(!soundEnabled.current);
 }
 
-export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land") {
+export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp") {
   if (!soundEnabled.current) return;
   try {
     const ctx = getCtx();
     const n = ctx.currentTime;
+    if (type==="coin") {
+      // Sparkling double coin bell sound (Ludo King style)
+      [987.77, 1318.51, 1760.00].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.12, n + i * 0.08);
+        g.gain.exponentialRampToValueAtTime(0.001, n + i * 0.08 + 0.18);
+        o.start(n + i * 0.08); o.stop(n + i * 0.08 + 0.2);
+      });
+      return;
+    }
+    if (type==="levelUp") {
+      // Triumphant brass/fanfare chord
+      [523.25, 659.25, 783.99, 1046.5, 1318.51].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "triangle";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.15, n + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, n + i * 0.1 + 0.35);
+        o.start(n + i * 0.1); o.stop(n + i * 0.1 + 0.4);
+      });
+      return;
+    }
     if (type==="win") {
       [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>{
         const o=ctx.createOscillator(),g=ctx.createGain();

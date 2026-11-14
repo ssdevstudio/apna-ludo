@@ -31,6 +31,7 @@ type TypedServer = Server<ClientToServerEvents, ServerToClientEvents, InterServe
 export interface RoomData {
   code: string;
   maxPlayers: number;
+  entryFee?: number;
   phase: "lobby" | "playing" | "finished";
   revision: number;
   players: Map<string, RoomPlayerData>;
@@ -114,6 +115,7 @@ function buildSnapshot(room: RoomData): RoomSnapshot {
     phase: room.phase,
     revision: room.revision,
     maxPlayers: room.maxPlayers,
+    entryFee: room.entryFee,
     players,
     game: room.game,
     chat: [...room.chat],
@@ -130,7 +132,8 @@ export function createRoom(
   name: string,
   maxPlayers: number,
   hostSocketId: string,
-  preferredColor?: PlayerColor
+  preferredColor?: PlayerColor,
+  entryFee?: number
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   const code = generateRoomCode();
   const playerId = crypto.randomUUID();
@@ -151,6 +154,7 @@ export function createRoom(
   const room: RoomData = {
     code,
     maxPlayers,
+    entryFee: typeof entryFee === "number" && entryFee >= 0 ? entryFee : 0,
     phase: "lobby",
     revision: 0,
     players: new Map([[playerId, player]]),
@@ -174,10 +178,11 @@ export function createRoomWithComputer(
   name: string,
   hostSocketId: string,
   preferredColor: PlayerColor = "red",
-  maxPlayers: number = 2
+  maxPlayers: number = 2,
+  entryFee?: number
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   // Create room first
-  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor);
+  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor, entryFee);
   if (!createResult.ok) return createResult;
   const room = rooms.get(createResult.room.code)!;
 

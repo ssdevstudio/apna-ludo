@@ -7,11 +7,15 @@ import { Logo } from "../ui/Logo";
 import { MiniBoard } from "../ui/MiniBoard";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { SettingsPanel } from "../modals/SettingsPanel";
+import { CoinHeader } from "../ui/CoinHeader";
+import { DailyBonusModal } from "../modals/DailyBonusModal";
+import { deductCoins, getProgression } from "../../utils/progression";
 
 export function Landing() {
   const navigate = useNavigate();
   const [joinOpen,setJoinOpen]=useState(false);
   const [settingsOpen,setSettingsOpen]=useState(false);
+  const [bonusOpen,setBonusOpen]=useState(false);
   const [name,setName]=useState(()=>sessionStorage.getItem("apna-player")??"");
   
   const initialCode = new URLSearchParams(window.location.search).get("join") || "";
@@ -21,6 +25,7 @@ export function Landing() {
   const [showAvatars,setShowAvatars]=useState(false);
   const [maxPlayers,setMaxPlayers]=useState<2|3|4>(4);
   const [preferredColor,setPreferredColor]=useState<PlayerColor>("red");
+  const [entryBet,setEntryBet]=useState<number>(500);
   
   const [joinStep, setJoinStep] = useState<"code"|"preview">("code");
   const [previewData, setPreviewData] = useState<any>(null);
@@ -35,23 +40,51 @@ export function Landing() {
 
   const createRoom = async () => {
     if (!name.trim()) return setError("Enter your name first.");
+    if (entryBet > 0 && !deductCoins(entryBet)) {
+      setError("Not enough coins! Claim your daily free bonus 🪙");
+      setBonusOpen(true);
+      return;
+    }
     sessionStorage.setItem("apna-player",name.trim());
     sessionStorage.setItem("apna-avatar",avatar);
+    sessionStorage.setItem("apna-bet",String(entryBet));
     try {
-      const r=await fetch("/api/room",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim(),maxPlayers,color:preferredColor})});
+      const r=await fetch("/api/room",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name:name.trim(),maxPlayers,color:preferredColor,entryFee:entryBet})
+      });
       const d=await r.json();
-      if (d.ok) { sessionStorage.setItem(`apna-token-${d.room.code}`,d.reconnectToken);sessionStorage.setItem(`apna-playerid-${d.room.code}`,d.playerId);navigate(`/room/${d.room.code}`); }
-      else setError("Failed.");
+      if (d.ok) {
+        sessionStorage.setItem(`apna-token-${d.room.code}`,d.reconnectToken);
+        sessionStorage.setItem(`apna-playerid-${d.room.code}`,d.playerId);
+        navigate(`/room/${d.room.code}`);
+      } else setError("Failed.");
     } catch { setError("Server unreachable."); }
   };
+
   const playVsComputer = async () => {
     if (!name.trim()) return setError("Enter your name first.");
-    sessionStorage.setItem("apna-player",name.trim());sessionStorage.setItem("apna-avatar",avatar);
+    if (entryBet > 0 && !deductCoins(entryBet)) {
+      setError("Not enough coins! Claim your daily free bonus 🪙");
+      setBonusOpen(true);
+      return;
+    }
+    sessionStorage.setItem("apna-player",name.trim());
+    sessionStorage.setItem("apna-avatar",avatar);
+    sessionStorage.setItem("apna-bet",String(entryBet));
     try {
-      const r=await fetch("/api/room",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers})});
+      const r=await fetch("/api/room",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers,entryFee:entryBet})
+      });
       const d=await r.json();
-      if (d.ok) { sessionStorage.setItem(`apna-token-${d.room.code}`,d.reconnectToken);sessionStorage.setItem(`apna-playerid-${d.room.code}`,d.playerId);navigate(`/room/${d.room.code}`); }
-      else setError("Failed.");
+      if (d.ok) {
+        sessionStorage.setItem(`apna-token-${d.room.code}`,d.reconnectToken);
+        sessionStorage.setItem(`apna-playerid-${d.room.code}`,d.playerId);
+        navigate(`/room/${d.room.code}`);
+      } else setError("Failed.");
     } catch { setError("Server unreachable."); }
   };
 
@@ -80,8 +113,15 @@ export function Landing() {
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     const r = code.trim().toUpperCase();
+    const fee = previewData?.entryFee || 0;
+    if (fee > 0 && !deductCoins(fee)) {
+      setError(`This room requires ${fee} coins to enter! Claim your daily bonus 🪙`);
+      setBonusOpen(true);
+      return;
+    }
     sessionStorage.setItem("apna-player",name.trim());
     sessionStorage.setItem("apna-avatar",avatar);
+    sessionStorage.setItem("apna-bet",String(fee));
     sessionStorage.setItem(`apna-join-color-${r}`, joinColor);
     sessionStorage.removeItem(`apna-token-${r}`);
     sessionStorage.removeItem(`apna-playerid-${r}`);
@@ -95,6 +135,7 @@ export function Landing() {
         <a href="#how">How it works</a>
         <a href="#why">Why Apna?</a>
       </div>
+      <CoinHeader onOpenBonus={() => setBonusOpen(true)} />
       <ThemeToggle />
       <button className="icon-btn" onClick={()=>setSettingsOpen(true)} title="Settings" aria-label="Settings">⚙️</button>
       <button className="text-button" onClick={()=>{setJoinOpen(true);setJoinStep("code");}}>Join a room <span>↗</span></button>
@@ -128,6 +169,28 @@ export function Landing() {
                   <button key={c} type="button" className={`color-btn ${c} ${preferredColor===c?"active":""}`} onClick={()=>setPreferredColor(c)}/>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Ludo King Style Entry Bet Selector */}
+          <div className="bet-selection-section">
+            <div className="bet-header-row">
+              <label style={{fontSize:"12px",display:"block"}}>Entry Bet</label>
+              <span className="pot-prize-badge">
+                🏆 Pot: <b>{entryBet > 0 ? `${(entryBet * maxPlayers).toLocaleString()} 🪙` : "Practice"}</b>
+              </span>
+            </div>
+            <div className="bet-pills-row">
+              {[0, 500, 1000, 2500, 5000].map((amount) => (
+                <button
+                  key={amount}
+                  type="button"
+                  className={`bet-pill ${entryBet === amount ? "active" : ""}`}
+                  onClick={() => setEntryBet(amount)}
+                >
+                  {amount === 0 ? "Free" : `🪙 ${amount >= 1000 ? `${amount / 1000}K` : amount}`}
+                </button>
+              ))}
             </div>
           </div>
           
@@ -187,5 +250,6 @@ export function Landing() {
       </div>
     </div>}
     {settingsOpen && <SettingsPanel onClose={()=>setSettingsOpen(false)} />}
+    {bonusOpen && <DailyBonusModal isOpen={bonusOpen} onClose={()=>setBonusOpen(false)} />}
   </main>;
 }

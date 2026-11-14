@@ -8,6 +8,8 @@ export default defineConfig({
       'shared/src/**/*.{test,spec}.{ts,tsx}',
       'server/src/**/__tests__/**/*.{ts,tsx}',
       'server/src/**/*.{test,spec}.{ts,tsx}',
+      'client/src/**/__tests__/**/*.{ts,tsx}',
+      'client/src/**/*.{test,spec}.{ts,tsx}',
     ],
     // Use tsconfig.test.json for shared (which includes vitest types)
     // vitest handles vitest imports itself — no separate tsconfig project needed for running
