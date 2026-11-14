@@ -100,15 +100,16 @@ app.post("/api/room", (req, res) => {
   }
   const isVsBot = vsComputerRaw === true;
   const entryFee = typeof req.body?.entryFee === "number" && req.body.entryFee >= 0 ? req.body.entryFee : 0;
+  const gameType = req.body?.gameType === "snake" ? "snake" : "ludo";
   if (isVsBot) {
-    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers, entryFee);
+    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers, entryFee, gameType);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {
       res.status(500).json(result);
     }
   } else {
-    const result = createRoom(io, name, maxPlayers, "", req.body?.color, entryFee);
+    const result = createRoom(io, name, maxPlayers, "", req.body?.color, entryFee, gameType);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {
@@ -154,6 +155,8 @@ app.get("/api/room/:code/preview", (req, res) => {
   
   res.json({ 
     ok: true, 
+    gameType: room.gameType ?? "ludo",
+    entryFee: room.entryFee ?? 0,
     maxPlayers: room.maxPlayers, 
     currentPlayers: room.players.size,
     phase: room.phase,
@@ -193,7 +196,7 @@ io.on("connection", (socket) => {
       return;
     }
     const result = withIdempotency(parsed.data.commandId, () =>
-      createRoom(io, parsed.data.name, parsed.data.maxPlayers, socket.id, parsed.data.color),
+      createRoom(io, parsed.data.name, parsed.data.maxPlayers, socket.id, parsed.data.color, parsed.data.entryFee, parsed.data.gameType ?? "ludo"),
     );
     if (result.ok) {
       socket.data.roomCode = result.room.code;
@@ -213,7 +216,7 @@ io.on("connection", (socket) => {
       return;
     }
     const result = withIdempotency(parsed.data.commandId, () =>
-      createRoomWithComputer(io, parsed.data.name, socket.id),
+      createRoomWithComputer(io, parsed.data.name, socket.id, parsed.data.color ?? "red", parsed.data.maxPlayers ?? 2, parsed.data.entryFee, parsed.data.gameType ?? "ludo"),
     );
     if (result.ok) {
       socket.data.roomCode = result.room.code;

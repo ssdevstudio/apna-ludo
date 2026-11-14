@@ -17,6 +17,7 @@ export const createRoomSchema = z.object({
   maxPlayers: z.number().int().min(2).max(4).default(4),
   color: z.enum(PLAYER_COLORS).optional(),
   entryFee: z.number().int().nonnegative().optional(),
+  gameType: z.enum(["ludo", "snake"]).optional(),
   commandId: commandIdSchema.optional(),
 }).strict();
 
@@ -49,7 +50,7 @@ export const roomReactSchema = z.object({
 
 export const tokenStateSchema = z.object({
   id: z.string(),
-  progress: z.number().int().min(-1).max(57),
+  progress: z.number().int().min(-1).max(100),
 }).strict();
 
 export const gamePlayerSchema = z.object({
@@ -57,7 +58,7 @@ export const gamePlayerSchema = z.object({
   name: z.string(),
   color: z.enum(PLAYER_COLORS),
   status: z.enum(["active", "won", "forfeited", "timed_out"]),
-  tokens: z.array(tokenStateSchema).length(4),
+  tokens: z.array(tokenStateSchema).min(1).max(4),
   missedTurnCount: z.number().int().min(0).max(5).default(0),
 }).strict();
 
@@ -69,9 +70,12 @@ export const lastActionSchema = z.object({
   capturedTokenIds: z.array(z.string()).optional(),
   starJumped: z.boolean().optional(),
   reasonThreeSixes: z.boolean().optional(),
+  ladderClimbed: z.object({ from: z.number().int(), to: z.number().int() }).optional(),
+  snakeBitten: z.object({ from: z.number().int(), to: z.number().int() }).optional(),
 }).strict();
 
 export const gameStateSchema: z.ZodType<GameState> = z.object({
+  gameType: z.enum(["ludo", "snake"]).optional(),
   phase: z.enum(["playing", "finished"]),
   revision: z.number().int().nonnegative(),
   players: z.array(gamePlayerSchema).min(2).max(4),
@@ -105,6 +109,7 @@ export interface ChatMessage {
 
 export interface RoomSnapshot {
   code: string;
+  gameType?: "ludo" | "snake";
   phase: "lobby" | "playing" | "finished";
   revision: number;
   maxPlayers: number;
@@ -135,6 +140,7 @@ export const chatMessageSchema = z.object({
 
 export const roomSnapshotSchema: z.ZodType<RoomSnapshot> = z.object({
   code: roomCodeSchema,
+  gameType: z.enum(["ludo", "snake"]).optional(),
   phase: z.enum(["lobby", "playing", "finished"]),
   revision: z.number().int().nonnegative(),
   maxPlayers: z.number().int().min(2).max(4),

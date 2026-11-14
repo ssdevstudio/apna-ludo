@@ -271,3 +271,165 @@
   .yard-name-top{top:2px}
   .yard-name-bottom{bottom:2px}
 }
+
+/* ========================================================
+   SNAKES & LADDERS (SAANP SEEDHI) BOARD STYLES
+   ======================================================== */
+.snake-board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  aspect-ratio: 1;
+  position: relative;
+  width: 100%;
+  max-width: min(calc(100vw - 24px), calc(100dvh - 160px), 540px);
+  max-height: min(calc(100vw - 24px), calc(100dvh - 160px), 540px);
+  margin: 0 auto;
+  border: 4px solid var(--board-border);
+  border-radius: 12px;
+  box-shadow: var(--board-shadow);
+  background: #ffffff;
+  overflow: hidden;
+  user-select: none;
+}
+
+.snake-cell {
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 3px 4px;
+  box-sizing: border-box;
+  font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: background-color 0.2s ease;
+}
+
+/* 5 Vibrant Alternating Pastel Palettes */
+.snake-cell-palette-0 { background-color: #fff7ed; } /* Peach */
+.snake-cell-palette-1 { background-color: #ecfdf5; } /* Mint */
+.snake-cell-palette-2 { background-color: #eff6ff; } /* Soft Sky */
+.snake-cell-palette-3 { background-color: #fdf2f8; } /* Blossom */
+.snake-cell-palette-4 { background-color: #fefce8; } /* Light Gold */
+
+/* Dark Mode Palette */
+[data-theme="dark"] .snake-board {
+  background: #0f172a;
+}
+[data-theme="dark"] .snake-cell {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .snake-cell-palette-0 { background-color: #1c1917; }
+[data-theme="dark"] .snake-cell-palette-1 { background-color: #064e3b; }
+[data-theme="dark"] .snake-cell-palette-2 { background-color: #0f172a; }
+[data-theme="dark"] .snake-cell-palette-3 { background-color: #2e1065; }
+[data-theme="dark"] .snake-cell-palette-4 { background-color: #1e293b; }
+
+.tile-number {
+  font-size: clamp(9px, 1.8vw, 13px);
+  font-weight: 800;
+  color: #475569;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 2;
+}
+[data-theme="dark"] .tile-number {
+  color: #cbd5e1;
+}
+
+.winning-tile {
+  background: radial-gradient(circle, #fef08a 0%, #facc15 60%, #eab308 100%) !important;
+  box-shadow: inset 0 0 12px rgba(202, 138, 4, 0.8);
+  border: 2px solid #ca8a04 !important;
+}
+.winning-tile .tile-number {
+  color: #78350f !important;
+  font-weight: 900;
+}
+.trophy-badge {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  font-size: clamp(14px, 2.5vw, 22px);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  animation: trophyGlow 1.5s infinite alternate ease-in-out;
+}
+@keyframes trophyGlow {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1.15) rotate(5deg); }
+}
+
+.start-tile {
+  background: radial-gradient(circle, #bbf7d0 0%, #4ade80 70%, #22c55e 100%) !important;
+  border: 2px solid #16a34a !important;
+}
+.start-tile .tile-number {
+  color: #064e3b !important;
+  font-weight: 900;
+}
+.start-badge {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  font-size: clamp(12px, 2.2vw, 18px);
+}
+
+.snake-svg-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* Floating Banner for Ladder Climb / Snake Bite */
+.snake-event-banner {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-family: 'Fredoka', -apple-system, sans-serif;
+  font-size: clamp(14px, 3.2vw, 20px);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  z-index: 50;
+  pointer-events: none;
+  animation: bannerPopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  white-space: nowrap;
+}
+.banner-ladder {
+  background: linear-gradient(135deg, #059669, #10b981);
+  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border: 2px solid #34d399;
+}
+.banner-snake {
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
+  box-shadow: 0 8px 24px rgba(185, 28, 28, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border: 2px solid #f87171;
+}
+@keyframes bannerPopIn {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.snake-start-dock {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  color: #f1f5f9;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  z-index: 10;
+  pointer-events: none;
+}
+

@@ -22,6 +22,7 @@ import { CoinHeader } from "../ui/CoinHeader";
 import { Logo } from "../ui/Logo";
 import { PlayerSeat, PlayerCorner } from "../game/PlayerCard";
 import { LudoBoard } from "../game/LudoBoard";
+import { SnakeBoard } from "../game/SnakeBoard";
 import { ChatSidebar } from "../chat/ChatSidebar";
 import { EmojiReactionSystem } from "../chat/EmojiReactionSystem";
 
@@ -169,6 +170,11 @@ export function Room() {
       }
       if(snap.game?.lastAction?.type==="moved"){
         setTokenAnimation(snap.game.lastAction.tokenId??null);
+        if (snap.game.lastAction.ladderClimbed) {
+          playSound("ladder");
+        } else if (snap.game.lastAction.snakeBitten) {
+          playSound("snake");
+        }
         setTimeout(()=>setTokenAnimation(null),600);
       }
       if(snap.game?.lastAction?.type==="turn-skipped" && snap.game.lastAction.dice) {
@@ -310,6 +316,9 @@ export function Room() {
     <header className="room-header"><Logo compact/>
       <div className="room-header-center">
         <div className="room-code">
+          {snapshot?.gameType === "snake" && (
+            <span className="mode-badge" style={{background: "#059669", color: "#fff", marginRight: "4px"}}>🐍 SAANP SEEDHI</span>
+          )}
           {!isBotGame ? <>
             <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code ?? code ?? "").toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
           </> : <span className="mode-badge">SINGLE PLAYER</span>}
@@ -371,9 +380,15 @@ export function Room() {
           <span className="stat-color" style={{background:COLOR_HEX[p.color]}}/>
           <span className="stat-name">{p.name} {p.id===playerId?"(You)":""}</span>
           <span className="stat-info">
-            <span title="Home 🏠">🏠{p.tokens.filter(t=>t.progress===FINISH_PROGRESS).length}</span>
-            <span title="Track 🎲">🎲{p.tokens.filter(t=>t.progress>=0&&t.progress<FINISH_PROGRESS).length}</span>
-            <span title="Yard 🅿️">🅿️{p.tokens.filter(t=>t.progress===-1).length}</span>
+            {snapshot.game?.gameType === "snake" ? (
+              <span title="Board Progress">📍 {p.tokens[0]?.progress === 0 ? "START" : `${p.tokens[0]?.progress ?? 0} / 100`}</span>
+            ) : (
+              <>
+                <span title="Home 🏠">🏠{p.tokens.filter(t=>t.progress===FINISH_PROGRESS).length}</span>
+                <span title="Track 🎲">🎲{p.tokens.filter(t=>t.progress>=0&&t.progress<FINISH_PROGRESS).length}</span>
+                <span title="Yard 🅿️">🅿️{p.tokens.filter(t=>t.progress===-1).length}</span>
+              </>
+            )}
           </span>
         </div>)}</div>}
       </aside>
@@ -384,16 +399,63 @@ export function Room() {
           {renderCorner(trColor, 'top-right')}
           
           <div className="board-center">
-            {snapshot?.game ? <LudoBoard 
-              game={snapshot.game} 
-              myPlayerId={playerId} 
-              legalTokens={legalTokens} 
-              onMove={moveToken} 
-              tokenAnimation={tokenAnimation} 
-              boardRotation={boardRotation}
-              activeTokenId={tokenAnimation}
-              onCapture={handleCapture}
-            /> : <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}><div className="ludo-board" role="grid" aria-label="Empty Ludo board" style={{maxHeight:"620px"}}><div className="home-yard yard-red">{[0,1,2,3].map(i=><img key={i} src="/token-red.png" alt="red" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-blue">{[0,1,2,3].map(i=><img key={i} src="/token-blue.png" alt="blue" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-green">{[0,1,2,3].map(i=><img key={i} src="/token-green.png" alt="green" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div><div className="home-yard yard-yellow">{[0,1,2,3].map(i=><img key={i} src="/token-yellow.png" alt="yellow" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div></div></div>}
+            {snapshot?.gameType === "snake" ? (
+              snapshot?.game ? (
+                <SnakeBoard
+                  game={snapshot.game}
+                  myPlayerId={playerId}
+                  legalTokens={legalTokens}
+                  onMove={moveToken}
+                  tokenAnimation={tokenAnimation}
+                  boardRotation={boardRotation}
+                />
+              ) : (
+                <SnakeBoard
+                  game={{
+                    phase: "playing",
+                    revision: 0,
+                    players: (snapshot?.players ?? []).map((p) => ({
+                      id: p.id,
+                      name: p.name,
+                      color: p.color,
+                      status: "active",
+                      tokens: [{ id: `${p.id}:0`, progress: 0 }],
+                    })),
+                    currentPlayerId: "",
+                    dice: null,
+                    movableTokenIds: [],
+                    consecutiveSixes: 0,
+                    winners: [],
+                    lastAction: null,
+                    gameType: "snake",
+                  }}
+                  myPlayerId={playerId}
+                  legalTokens={[]}
+                  onMove={() => {}}
+                  boardRotation={boardRotation}
+                />
+              )
+            ) : snapshot?.game ? (
+              <LudoBoard 
+                game={snapshot.game} 
+                myPlayerId={playerId} 
+                legalTokens={legalTokens} 
+                onMove={moveToken} 
+                tokenAnimation={tokenAnimation} 
+                boardRotation={boardRotation}
+                activeTokenId={tokenAnimation}
+                onCapture={handleCapture}
+              />
+            ) : (
+              <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}>
+                <div className="ludo-board" role="grid" aria-label="Empty Ludo board" style={{maxHeight:"620px"}}>
+                  <div className="home-yard yard-red">{[0,1,2,3].map(i=><img key={i} src="/token-red.png" alt="red" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
+                  <div className="home-yard yard-blue">{[0,1,2,3].map(i=><img key={i} src="/token-blue.png" alt="blue" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
+                  <div className="home-yard yard-green">{[0,1,2,3].map(i=><img key={i} src="/token-green.png" alt="green" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
+                  <div className="home-yard yard-yellow">{[0,1,2,3].map(i=><img key={i} src="/token-yellow.png" alt="yellow" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
+                </div>
+              </div>
+            )}
           </div>
 
           {renderCorner(blColor, 'bottom-left')}

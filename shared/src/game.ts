@@ -10,13 +10,18 @@ import {
 } from "./board.js";
 
 export { PLAYER_COLORS, type PlayerColor, TRACK_LENGTH, HOME_START, FINISH_PROGRESS, TOKENS_PER_PLAYER } from "./board.js";
+import { calculateSnakeMove, canMoveTokenSnake, SNAKE_BOARD_SIZE } from "./snake.js";
 
 export type GamePhase = "playing" | "finished";
+export type GameType = "ludo" | "snake";
 export type PlayerGameStatus = "active" | "won" | "forfeited" | "timed_out";
 
 export interface TokenState {
   id: string;
-  /** -1: yard, 0..50: common track, 51..55: home lane, 56: home (FINISH_PROGRESS). */
+  /**
+   * For Ludo: -1: yard, 0..50: common track, 51..55: home lane, 56: home (FINISH_PROGRESS).
+   * For Snake: 0: start/off-board, 1..100: tile on the 10x10 board.
+   */
   progress: number;
 }
 
@@ -37,9 +42,12 @@ export interface LastAction {
   capturedTokenIds?: string[];
   starJumped?: boolean;
   reasonThreeSixes?: boolean;
+  ladderClimbed?: { from: number; to: number };
+  snakeBitten?: { from: number; to: number };
 }
 
 export interface GameState {
+  gameType?: GameType;
   phase: GamePhase;
   revision: number;
   players: GamePlayer[];
@@ -72,9 +80,10 @@ export class RuleError extends Error {
 
 export function createGame(
   players: ReadonlyArray<{ id: string; name: string; color: PlayerColor }>,
+  gameType: GameType = "ludo"
 ): GameState {
   if (players.length < 2 || players.length > 4) {
-    throw new Error("A Ludo game requires 2 to 4 players");
+    throw new Error("A game requires 2 to 4 players");
   }
   if (new Set(players.map((player) => player.id)).size !== players.length) {
     throw new Error("Player IDs must be unique");
@@ -83,15 +92,19 @@ export function createGame(
     throw new Error("Player colors must be unique");
   }
 
+  const tokenCount = gameType === "snake" ? 1 : TOKENS_PER_PLAYER;
+  const initialProgress = gameType === "snake" ? 0 : -1;
+
   return {
+    gameType,
     phase: "playing",
     revision: 0,
     players: players.map((player) => ({
       ...player,
       status: "active",
-      tokens: Array.from({ length: TOKENS_PER_PLAYER }, (_, index) => ({
+      tokens: Array.from({ length: tokenCount }, (_, index) => ({
         id: `${player.id}:${index}`,
-        progress: -1,
+        progress: initialProgress,
       })),
       missedTurnCount: 0,
     })),
@@ -134,7 +147,16 @@ export function canMoveToken(
   if (!Number.isInteger(dice) || dice < 1 || dice > 6) return false;
   const player = state.players.find((candidate) => candidate.id === playerId);
   const token = player?.tokens.find((candidate) => candidate.id === tokenId);
-  if (!player || player.status !== "active" || !token || token.progress === FINISH_PROGRESS) {
+  if (!player || player.status !== "active" || !token) {
+    return false;
+  }
+
+  if (state.gameType === "snake") {
+    if (token.progress === SNAKE_BOARD_SIZE) return false;
+    return canMoveTokenSnake(token.progress, dice);
+  }
+
+  if (token.progress === FINISH_PROGRESS) {
     return false;
   }
 
@@ -265,6 +287,45 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   const player = state.players[playerIndex]!;
   const tokenIndex = player.tokens.findIndex((token) => token.id === tokenId);
   const previousProgress = player.tokens[tokenIndex]!.progress;
+
+  if (state.gameType === "snake") {
+    const moveResult = calculateSnakeMove(previousProgress, state.dice!);
+    const players = state.players.map((candidate) => ({
+      ...candidate,
+      tokens: candidate.tokens.map((token) => ({ ...token })),
+    }));
+    players[playerIndex]!.tokens[tokenIndex]!.progress = moveResult.target;
+
+    const winners = [...state.winners];
+    let finished = false;
+    const updatedPlayer = players[playerIndex]!;
+    if (moveResult.target === SNAKE_BOARD_SIZE) {
+      updatedPlayer.status = "won";
+      winners.push(playerId);
+      finished = true;
+    }
+
+    const next: GameState = {
+      ...state,
+      players,
+      winners,
+      revision: state.revision + 1,
+      lastAction: {
+        type: "moved",
+        playerId,
+        tokenId,
+        dice: state.dice!,
+        ladderClimbed: moveResult.ladder,
+        snakeBitten: moveResult.snake,
+      },
+    };
+
+    if (finished) {
+      return finishTurn(next, playerId, false);
+    }
+    const extraTurn = state.dice === 6;
+    return finishTurn(next, playerId, extraTurn);
+  }
   
   const previousSquare = globalSquare(player.color, previousProgress);
   const isOnSafeSquare = previousSquare !== null && SAFE_SQUARE_SET.has(previousSquare);

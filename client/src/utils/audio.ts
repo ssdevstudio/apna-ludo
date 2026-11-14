@@ -58,11 +58,44 @@ export function toggleSound(): boolean {
   return setSoundEnabled(!soundEnabled.current);
 }
 
-export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp") {
+export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp"|"ladder"|"snake") {
   if (!soundEnabled.current) return;
   try {
     const ctx = getCtx();
     const n = ctx.currentTime;
+    if (type === "ladder") {
+      // Ascending uplifting ladder glissando
+      [440, 554.37, 659.25, 880, 1108.73, 1318.51].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.12, n + i * 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, n + i * 0.05 + 0.18);
+        o.start(n + i * 0.05); o.stop(n + i * 0.05 + 0.2);
+      });
+      return;
+    }
+    if (type === "snake") {
+      // Descending slide / hiss rattle
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(600, n);
+      o.frequency.exponentialRampToValueAtTime(120, n + 0.4);
+      g.gain.setValueAtTime(0.14, n);
+      g.gain.exponentialRampToValueAtTime(0.001, n + 0.45);
+      o.start(n); o.stop(n + 0.45);
+      const o2 = ctx.createOscillator(), g2 = ctx.createGain();
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.type = "triangle";
+      o2.frequency.setValueAtTime(320, n + 0.05);
+      o2.frequency.exponentialRampToValueAtTime(80, n + 0.45);
+      g2.gain.setValueAtTime(0.1, n + 0.05);
+      g2.gain.exponentialRampToValueAtTime(0.001, n + 0.5);
+      o2.start(n + 0.05); o2.stop(n + 0.5);
+      return;
+    }
     if (type==="coin") {
       // Sparkling double coin bell sound (Ludo King style)
       [987.77, 1318.51, 1760.00].forEach((f, i) => {

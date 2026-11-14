@@ -26,6 +26,7 @@ export function Landing() {
   const [maxPlayers,setMaxPlayers]=useState<2|3|4>(4);
   const [preferredColor,setPreferredColor]=useState<PlayerColor>("red");
   const [entryBet,setEntryBet]=useState<number>(500);
+  const [gameMode,setGameMode]=useState<"ludo" | "snake">("ludo");
   
   const [joinStep, setJoinStep] = useState<"code"|"preview">("code");
   const [previewData, setPreviewData] = useState<any>(null);
@@ -52,7 +53,7 @@ export function Landing() {
       const r=await fetch("/api/room",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name:name.trim(),maxPlayers,color:preferredColor,entryFee:entryBet})
+        body:JSON.stringify({name:name.trim(),maxPlayers,color:preferredColor,entryFee:entryBet,gameType:gameMode})
       });
       const d=await r.json();
       if (d.ok) {
@@ -77,7 +78,7 @@ export function Landing() {
       const r=await fetch("/api/room",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers,entryFee:entryBet})
+        body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers,entryFee:entryBet,gameType:gameMode})
       });
       const d=await r.json();
       if (d.ok) {
@@ -153,6 +154,27 @@ export function Landing() {
           </div>
           {showAvatars && <div className="avatar-grid">{AVATARS.map(a=><button key={a} className={avatar===a?"avatar-selected":""} onClick={()=>{setAvatar(a);setShowAvatars(false)}}>{a}</button>)}</div>}
           
+          {/* Game Mode Selector */}
+          <div className="game-mode-section" style={{marginTop:"12px"}}>
+            <label style={{fontSize:"12px",marginBottom:"4px",display:"block"}}>Select Game</label>
+            <div className="game-mode-toggle-group">
+              <button
+                type="button"
+                className={`mode-toggle-btn ${gameMode === "ludo" ? "active" : ""}`}
+                onClick={() => setGameMode("ludo")}
+              >
+                <span>🎲 Ludo</span>
+              </button>
+              <button
+                type="button"
+                className={`mode-toggle-btn mode-toggle-snake ${gameMode === "snake" ? "active" : ""}`}
+                onClick={() => setGameMode("snake")}
+              >
+                <span>🐍 Saanp Seedhi</span>
+              </button>
+            </div>
+          </div>
+
           <div style={{display:"flex",gap:"16px",marginTop:"12px"}}>
             <div style={{flex:1}}>
               <label style={{fontSize:"12px",marginBottom:"4px",display:"block"}}>Players</label>
@@ -204,7 +226,7 @@ export function Landing() {
         <button className="primary-button" type="button" onClick={playVsComputer} style={{background:"var(--teal)",marginTop:12}}>{tr("play.comp")} <span>🤖</span></button>
         <p className="trust-line"><span>◆</span> No sign-up <span>◆</span> 2–4 players <span>◆</span> Free to play</p>
       </div>
-      <MiniBoard/>
+      <MiniBoard mode={gameMode}/>
     </section>
     <section className="how" id="how">
       <p className="section-kicker">Three moves to game night</p>
@@ -236,7 +258,12 @@ export function Landing() {
           </form>
         ) : (
           <form onSubmit={handleJoin}>
-            <p style={{marginBottom:"12px",fontSize:"14px",color:"#666"}}>Room: <b>{code.toUpperCase()}</b> ({previewData?.currentPlayers}/{previewData?.maxPlayers} players)</p>
+            <p style={{marginBottom:"12px",fontSize:"14px",color:"#666",display:"flex",alignItems:"center",gap:"8px",flexWrap:"wrap"}}>
+              <span>Room: <b>{code.toUpperCase()}</b> ({previewData?.currentPlayers}/{previewData?.maxPlayers} players)</span>
+              {previewData?.gameType === "snake" && (
+                <span style={{background:"#059669",color:"#fff",fontSize:"11px",padding:"2px 8px",borderRadius:"999px",fontWeight:700}}>🐍 Saanp Seedhi</span>
+              )}
+            </p>
             <div className="color-picker-row" style={{justifyContent:"center",marginBottom:"16px",gap:"12px"}}>
               {COLORS.map(c=>{
                 const taken = previewData?.usedColors.includes(c);

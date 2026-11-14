@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, Fragment } from "react";
 import { GameState, PlayerColor, CELL_COUNT, STAR_CELLS, SAFE_CELLS, cellType, YARD_POSITIONS, progressToCellIndex } from "@apna-ludo/shared";
 import { playSound } from "../../utils/audio";
 
-const TokenSvg = ({ color }: { color: string }) => {
+export const TokenSvg = ({ color }: { color: string }) => {
   const colorMap = {
     red: { main: '#c13535', dark: '#7a1c1c', highlight: '#e06565' },
     green: { main: '#238352', dark: '#12452a', highlight: '#48b878' },

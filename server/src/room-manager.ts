@@ -30,6 +30,7 @@ type TypedServer = Server<ClientToServerEvents, ServerToClientEvents, InterServe
 
 export interface RoomData {
   code: string;
+  gameType?: "ludo" | "snake";
   maxPlayers: number;
   entryFee?: number;
   phase: "lobby" | "playing" | "finished";
@@ -112,6 +113,7 @@ function buildSnapshot(room: RoomData): RoomSnapshot {
   players.sort((a, b) => PLAYER_COLORS.indexOf(a.color) - PLAYER_COLORS.indexOf(b.color));
   return {
     code: room.code,
+    gameType: room.gameType ?? "ludo",
     phase: room.phase,
     revision: room.revision,
     maxPlayers: room.maxPlayers,
@@ -133,7 +135,8 @@ export function createRoom(
   maxPlayers: number,
   hostSocketId: string,
   preferredColor?: PlayerColor,
-  entryFee?: number
+  entryFee?: number,
+  gameType: "ludo" | "snake" = "ludo"
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   const code = generateRoomCode();
   const playerId = crypto.randomUUID();
@@ -153,6 +156,7 @@ export function createRoom(
 
   const room: RoomData = {
     code,
+    gameType,
     maxPlayers,
     entryFee: typeof entryFee === "number" && entryFee >= 0 ? entryFee : 0,
     phase: "lobby",
@@ -179,10 +183,11 @@ export function createRoomWithComputer(
   hostSocketId: string,
   preferredColor: PlayerColor = "red",
   maxPlayers: number = 2,
-  entryFee?: number
+  entryFee?: number,
+  gameType: "ludo" | "snake" = "ludo"
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   // Create room first
-  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor, entryFee);
+  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor, entryFee, gameType);
   if (!createResult.ok) return createResult;
   const room = rooms.get(createResult.room.code)!;
 
@@ -216,7 +221,7 @@ export function createRoomWithComputer(
     .map((id) => room.players.get(id)!)
     .filter((p) => p.connected || p.isBot)
     .map((p) => ({ id: p.id, name: p.name, color: p.color }));
-  room.game = createGame(gamePlayers);
+  room.game = createGame(gamePlayers, room.gameType);
   room.phase = "playing";
   room.revision += 1;
   emitSnapshot(io, room.code);
@@ -347,7 +352,7 @@ export function handleStart(
     .filter((p) => p.connected)
     .map((p) => ({ id: p.id, name: p.name, color: p.color }));
 
-  room.game = createGame(gamePlayers);
+  room.game = createGame(gamePlayers, room.gameType);
   room.phase = "playing";
   room.revision += 1;
   emitSnapshot(io, room.code);
@@ -550,7 +555,7 @@ export function handleRematch(io: TypedServer, socketId: string, expectedRevisio
       .filter((p) => p.connected || p.isBot)
       .map((p) => ({ id: p.id, name: p.name, color: p.color }));
 
-    room.game = createGame(gamePlayers);
+    room.game = createGame(gamePlayers, room.gameType);
     room.phase = "playing";
     room.revision += 1;
     emitSnapshot(io, room.code);
@@ -655,7 +660,7 @@ function doLeave(io: TypedServer, socketId: string, room: RoomData): void {
           .filter((p) => p.connected || p.isBot)
           .map((p) => ({ id: p.id, name: p.name, color: p.color }));
 
-        room.game = createGame(gamePlayers);
+        room.game = createGame(gamePlayers, room.gameType);
         room.phase = "playing";
         scheduleTurnTimeout(io, room);
         scheduleGameTimeout(io, room);
@@ -788,21 +793,23 @@ export function scheduleBotTurn(io: TypedServer, room: RoomData): void {
           bestId = id;
         }
       }
-      // Prefer capturing tokens: check if any move lands on an opponent
-      for (const id of movableIds) {
-        const t = updatedCp.tokens.find((tk: TokenState) => tk.id === id);
-        if (!t || t.progress === -1) continue;
-        const dest = t.progress + diceValue;
-        const destGlobal = globalSquare(updatedCp.color, dest);
-        if (destGlobal === null) continue;
-        const anyOpponent = [...r.game.players].some((opp: GamePlayer) => {
-          if (opp.id === cp.id) return false;
-          return opp.tokens.some((ot: TokenState) => {
-            const og = globalSquare(opp.color, ot.progress);
-            return og === destGlobal;
+      // Prefer capturing tokens: check if any move lands on an opponent (Ludo only)
+      if (r.game.gameType !== "snake") {
+        for (const id of movableIds) {
+          const t = updatedCp.tokens.find((tk: TokenState) => tk.id === id);
+          if (!t || t.progress === -1) continue;
+          const dest = t.progress + diceValue;
+          const destGlobal = globalSquare(updatedCp.color, dest);
+          if (destGlobal === null) continue;
+          const anyOpponent = [...r.game.players].some((opp: GamePlayer) => {
+            if (opp.id === cp.id) return false;
+            return opp.tokens.some((ot: TokenState) => {
+              const og = globalSquare(opp.color, ot.progress);
+              return og === destGlobal;
+            });
           });
-        });
-        if (anyOpponent) { bestId = id; break; }
+          if (anyOpponent) { bestId = id; break; }
+        }
       }
 
       room.botTimer = setTimeout(() => {

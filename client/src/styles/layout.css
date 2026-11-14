@@ -668,6 +668,62 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   transform: translateY(-1px);
 }
 
+/* Game Mode Toggle Section */
+.game-mode-section {
+  width: 100%;
+}
+.game-mode-toggle-group {
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 4px;
+  border-radius: 12px;
+}
+[data-theme="dark"] .game-mode-toggle-group {
+  background: rgba(255, 255, 255, 0.06);
+}
+.mode-toggle-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  font-family: 'Fredoka', -apple-system, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.mode-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+[data-theme="dark"] .mode-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.mode-toggle-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+[data-theme="dark"] .mode-toggle-btn.active {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.mode-toggle-snake.active {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  color: #ffffff !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 3px 10px rgba(5, 150, 105, 0.35) !important;
+}
+
 /* Daily Lucky Bonus Modal */
 .bonus-modal {
   background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
