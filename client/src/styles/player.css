@@ -128,6 +128,83 @@
 .corner-bottom-right { justify-self: end; grid-column: 2; grid-row: 3; flex-direction: row-reverse; }
 
 .corner-profile { display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; }
+
+/* Circular SVG Timer Ring Around Avatar - Ludo King Authentic */
+.avatar-ring-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-timer-svg {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  pointer-events: none;
+  transform: rotate(-90deg);
+  z-index: 5;
+}
+
+.avatar-timer-bg {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.15);
+  stroke-width: 4;
+}
+
+.avatar-timer-progress {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s linear, stroke 0.3s ease;
+}
+
+.avatar-timer-progress.timer-good {
+  stroke: #22c55e;
+  filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.6));
+}
+
+.avatar-timer-progress.timer-warn {
+  stroke: #f59e0b;
+  filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.7));
+}
+
+.avatar-timer-progress.timer-danger {
+  stroke: #ef4444;
+  filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.9));
+  animation: timerPulse 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes timerPulse {
+  0% { stroke-width: 4; opacity: 0.8; }
+  100% { stroke-width: 5.5; opacity: 1; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 1)); }
+}
+
+/* Felt Dice Tray Cushion with Golden Bezel */
+.dice-tray-cushion {
+  background: radial-gradient(circle at center, #15803d 0%, #14532d 100%);
+  padding: 3px;
+  border-radius: 12px;
+  border: 2px solid #eab308;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 3px 8px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dice-active .dice-tray-cushion {
+  border-color: #fbbf24;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 12px rgba(251, 191, 36, 0.8);
+  animation: diceTrayPulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes diceTrayPulse {
+  0% { transform: scale(1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 6px rgba(251, 191, 36, 0.5); }
+  100% { transform: scale(1.05); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 16px rgba(251, 191, 36, 0.9); }
+}
+
 .corner-dice {
   position: relative;
   display: flex;

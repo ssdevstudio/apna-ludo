@@ -22,6 +22,7 @@ import {
 import {
   createRoom,
   createRoomWithComputer,
+  matchmakeRoom,
   joinRoom,
   handleReady,
   handleStart,
@@ -118,6 +119,23 @@ app.post("/api/room", (req, res) => {
     } else {
       res.status(500).json(result);
     }
+  }
+});
+
+app.post("/api/matchmake", (req, res) => {
+  const rawName = req.body?.name;
+  const name = (typeof rawName === "string" ? rawName.trim() : "Player") || "Player";
+  if (name.length > 20) { res.status(400).json({ ok: false, error: "NAME_TOO_LONG" }); return; }
+  const maxPlayers = Math.min(4, Math.max(2, req.body?.maxPlayers || 2));
+  const entryFee = typeof req.body?.entryFee === "number" && req.body.entryFee >= 0 ? req.body.entryFee : 500;
+  const gameType = req.body?.gameType === "snake" ? "snake" : "ludo";
+  const gameMode = req.body?.gameMode === "quick" ? "quick" : "classic";
+  
+  const result = matchmakeRoom(io, name, req.body?.color, maxPlayers, entryFee, gameType, gameMode);
+  if (result.ok) {
+    res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
+  } else {
+    res.status(500).json(result);
   }
 });
 

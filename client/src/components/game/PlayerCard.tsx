@@ -52,10 +52,37 @@ export function PlayerCorner({
   const isBot = player.id.startsWith("bot-");
   const av = isBot ? "🤖" : avatar;
 
+  const validTime = timeLeft !== undefined ? Math.max(0, Math.min(10, timeLeft)) : 10;
+  const timerPct = validTime / 10;
+  const dashArray = 144.5;
+  const dashOffset = dashArray * (1 - timerPct);
+
   return (
     <div className={`player-corner corner-${position} corner-${player.color} ${isActive ? "active" : ""}`}>
       <div className="corner-profile" title={player.name} aria-label={player.name}>
-        <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
+        <div className="avatar-ring-container">
+          <span className="avatar" style={{ background: COLOR_HEX[player.color as PlayerColor] }}>{av}</span>
+          {isActive && timeLeft !== undefined && (
+            <svg className="avatar-timer-svg" viewBox="0 0 52 52">
+              <circle
+                className="avatar-timer-bg"
+                cx="26"
+                cy="26"
+                r="23"
+              />
+              <circle
+                className={`avatar-timer-progress ${timeLeft <= 3 ? "timer-danger" : timeLeft <= 6 ? "timer-warn" : "timer-good"}`}
+                cx="26"
+                cy="26"
+                r="23"
+                style={{
+                  strokeDasharray: dashArray,
+                  strokeDashoffset: dashOffset,
+                }}
+              />
+            </svg>
+          )}
+        </div>
       </div>
 
       {missedCount !== undefined && (
@@ -68,12 +95,6 @@ export function PlayerCorner({
         </div>
       )}
 
-      {isActive && timeLeft !== undefined && timeLeft <= 10 && (
-        <svg className={`corner-timer-svg ${timeLeft <= 3 ? "timer-danger" : timeLeft <= 6 ? "timer-warn" : ""}`} preserveAspectRatio="none">
-          <rect x="0" y="0" width="100%" height="100%" rx="40" pathLength="100" style={{'--timer-pct': (1 - (timeLeft/10)) * 100} as any} />
-        </svg>
-      )}
-
       {isActive && (canRoll || canMove) && (
         <PlayerTurnIndicator
           color={player.color as PlayerColor}
@@ -82,13 +103,15 @@ export function PlayerCorner({
       )}
 
       <div className={`corner-dice ${isActive && (canRoll || canMove || isRolling) ? 'dice-active' : ''}`}>
-        <button
-          className="corner-roll-btn"
-          onClick={onRoll}
-          disabled={!canRoll && !canMove}
-        >
-          <Die value={diceValue ?? 1} rolling={isRolling} />
-        </button>
+        <div className="dice-tray-cushion">
+          <button
+            className="corner-roll-btn"
+            onClick={onRoll}
+            disabled={!canRoll && !canMove}
+          >
+            <Die value={diceValue ?? 1} rolling={isRolling} />
+          </button>
+        </div>
       </div>
     </div>
   );

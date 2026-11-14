@@ -1585,4 +1585,301 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   background: #fff1f2 !important;
 }
 
+/* ========================================================
+   LUDO KING 4-QUADRANT DASHBOARD & GAME MODE CARDS
+   ======================================================== */
+.ludo-king-hub {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-summary-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-bg);
+  border: 2px solid var(--panel-border);
+  padding: 8px 16px;
+  border-radius: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.profile-summary-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border-color: #eab308;
+}
+.profile-pill-avatar {
+  font-size: 24px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.profile-pill-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.profile-pill-name {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.profile-pill-level {
+  font-size: 11px;
+  font-weight: 700;
+  color: #d97706;
+}
+
+.game-modes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+.mode-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  border-radius: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-align: center;
+  color: #ffffff;
+  overflow: hidden;
+}
+.mode-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+.mode-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.6);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.mode-card:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+.mode-card-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  text-transform: uppercase;
+}
+
+.mode-card-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s ease;
+}
+.mode-card:hover .mode-card-icon-wrap {
+  transform: scale(1.1) rotate(6deg);
+}
+
+.mode-card-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mode-card-desc {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* Card Themes */
+.mode-card--online {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+  border-color: #60a5fa;
+}
+.mode-card--friends {
+  background: linear-gradient(135deg, #581c87 0%, #7e22ce 50%, #a855f7 100%);
+  border-color: #c084fc;
+}
+.mode-card--computer {
+  background: linear-gradient(135deg, #064e3b 0%, #059669 50%, #10b981 100%);
+  border-color: #34d399;
+}
+.mode-card--pass {
+  background: linear-gradient(135deg, #7c2d12 0%, #c2410c 50%, #f97316 100%);
+  border-color: #fb923c;
+}
+
+/* Dedicated Saanp Seedhi Banner */
+.saanp-seedhi-banner {
+  position: relative;
+  background: linear-gradient(135deg, #065f46 0%, #0d9488 50%, #0284c7 100%);
+  border-radius: 20px;
+  border: 3px solid #2dd4bf;
+  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.25), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  padding: 18px 20px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.saanp-seedhi-banner:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(13, 148, 136, 0.35);
+}
+.saanp-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.saanp-banner-icon {
+  font-size: 38px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+.saanp-banner-text h3 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 2px 0;
+  letter-spacing: 0.5px;
+}
+.saanp-banner-text p {
+  font-size: 11px;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 600;
+}
+.saanp-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.saanp-action-btn {
+  background: #ffffff;
+  color: #065f46;
+  border: 0;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.saanp-action-btn:hover {
+  background: #f0fdf4;
+  transform: scale(1.05);
+}
+
+/* Friends Tab Bar */
+.friends-tab-bar {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.friends-tab-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.friends-tab-btn.active {
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 580px) {
+  .game-modes-grid {
+    gap: 10px;
+  }
+  .mode-card {
+    padding: 18px 10px;
+    border-radius: 16px;
+  }
+  .mode-card-icon-wrap {
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+    margin-bottom: 8px;
+  }
+  .mode-card-title {
+    font-size: 15px;
+  }
+  .mode-card-desc {
+    font-size: 10px;
+  }
+  .saanp-seedhi-banner {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px;
+    gap: 12px;
+  }
+  .saanp-banner-actions {
+    justify-content: stretch;
+  }
+  .saanp-action-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

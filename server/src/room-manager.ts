@@ -235,6 +235,74 @@ export function createRoomWithComputer(
   return { ok: true, room: buildSnapshot(room), playerId: createResult.playerId, reconnectToken: createResult.reconnectToken };
 }
 
+export function matchmakeRoom(
+  io: TypedServer,
+  name: string,
+  preferredColor?: PlayerColor,
+  maxPlayers: number = 2,
+  entryFee: number = 500,
+  gameType: "ludo" | "snake" = "ludo",
+  gameMode: "classic" | "quick" = "classic"
+): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
+  const targetFee = typeof entryFee === "number" && entryFee >= 0 ? entryFee : 0;
+  
+  // Find an existing public room matching the criteria
+  for (const [code, r] of rooms) {
+    const hasBots = Array.from(r.players.values()).some((p) => p.isBot);
+    if (
+      !hasBots &&
+      r.phase === "lobby" &&
+      (r.gameType ?? "ludo") === gameType &&
+      (r.gameMode ?? "classic") === gameMode &&
+      r.maxPlayers === maxPlayers &&
+      (r.entryFee ?? 0) === targetFee &&
+      r.players.size < r.maxPlayers
+    ) {
+      const usedColors = new Set<PlayerColor>();
+      for (const [, p] of r.players) usedColors.add(p.color);
+      let color = preferredColor;
+      if (!color || usedColors.has(color)) {
+        color = nextColor(usedColors);
+      }
+      if (color) {
+        const playerId = crypto.randomUUID();
+        const reconnectToken = crypto.randomBytes(32).toString("hex");
+        const player: RoomPlayerData = {
+          id: playerId,
+          name: name || "Player",
+          color,
+          ready: true,
+          connected: false,
+          isHost: false,
+          reconnectToken,
+          socketId: null,
+          isBot: false,
+          boundTokens: new Map(),
+        };
+        r.players.set(playerId, player);
+        r.playerOrder.push(playerId);
+        reconnectLookup.set(reconnectToken, { roomCode: code, playerId });
+        r.revision += 1;
+
+        if (r.players.size === r.maxPlayers && Array.from(r.players.values()).every((p) => p.ready)) {
+          const gamePlayers = r.playerOrder
+            .map((id) => r.players.get(id)!)
+            .map((p) => ({ id: p.id, name: p.name, color: p.color }));
+          r.game = createGame(gamePlayers, r.gameType, r.gameMode);
+          r.phase = "playing";
+          r.revision += 1;
+          scheduleTurnTimeout(io, r);
+        }
+
+        emitSnapshot(io, code);
+        return { ok: true, room: buildSnapshot(r), playerId, reconnectToken };
+      }
+    }
+  }
+
+  return createRoom(io, name, maxPlayers, "", preferredColor, targetFee, gameType, gameMode);
+}
+
 export function joinRoom(
   io: TypedServer,
   code: string,

@@ -166,4 +166,45 @@ describe("Socket.IO Ludo server", () => {
     expect(result.dice).toBeLessThanOrEqual(6);
     host.disconnect(); guest.disconnect();
   });
+
+  it("handles online matchmaking via /api/matchmake", async () => {
+    // Player 1 requests matchmaking
+    const res1 = await fetch(`${serverUrl}/api/matchmake`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Alice",
+        maxPlayers: 2,
+        entryFee: 1000,
+        gameType: "ludo",
+        gameMode: "quick",
+      }),
+    });
+    const data1: any = await res1.json();
+    expect(data1.ok).toBe(true);
+    expect(data1.room.code).toBeDefined();
+    expect(data1.room.entryFee).toBe(1000);
+    expect(data1.room.gameMode).toBe("quick");
+    expect(data1.room.players).toHaveLength(1);
+
+    // Player 2 requests matchmaking with matching parameters
+    const res2 = await fetch(`${serverUrl}/api/matchmake`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Bob",
+        maxPlayers: 2,
+        entryFee: 1000,
+        gameType: "ludo",
+        gameMode: "quick",
+      }),
+    });
+    const data2: any = await res2.json();
+    expect(data2.ok).toBe(true);
+    // Player 2 was placed into Player 1's room!
+    expect(data2.room.code).toBe(data1.room.code);
+    expect(data2.room.players).toHaveLength(2);
+    // And since both players are ready and 2/2 full, the match auto-started!
+    expect(data2.room.phase).toBe("playing");
+  });
 });

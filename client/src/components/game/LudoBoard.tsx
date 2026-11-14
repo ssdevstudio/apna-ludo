@@ -90,6 +90,8 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
   const visualProgressRef = useRef<Record<string, number>>({});
   const [, setForceRender] = useState(0);
   const [footprints, setFootprints] = useState<{id:string;color:PlayerColor;top:string;left:string}[]>([]);
+  const [capturedFlyingIds, setCapturedFlyingIds] = useState<Set<string>>(new Set());
+  const [captureBursts, setCaptureBursts] = useState<{id:string;top:string;left:string;color:PlayerColor}[]>([]);
 
   useEffect(() => {
     const tokensToAnimate:{id:string;color:PlayerColor;start:number;end:number}[] = [];
@@ -117,6 +119,35 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
       setForceRender(x => x + 1);
     }
 
+    const triggerCapture = (toCapture: {id:string;color:PlayerColor}[]) => {
+      toCapture.forEach(cap => {
+        const prevProg = visualProgressRef.current[cap.id];
+        if (prevProg !== undefined && prevProg >= 0) {
+          const cellIdx = tokenCellIndex(cap.color, prevProg) ?? 0;
+          const r = Math.floor(cellIdx / 15);
+          const c = cellIdx % 15;
+          const top = `${(r + 0.5) * (100 / 15)}%`;
+          const left = `${(c + 0.5) * (100 / 15)}%`;
+          const burstId = Math.random().toString();
+          setCaptureBursts(prev => [...prev, { id: burstId, top, left, color: cap.color }]);
+          setTimeout(() => {
+            setCaptureBursts(prev => prev.filter(b => b.id !== burstId));
+          }, 600);
+        }
+        setCapturedFlyingIds(prev => new Set(prev).add(cap.id));
+        visualProgressRef.current[cap.id] = -1;
+        setTimeout(() => {
+          setCapturedFlyingIds(prev => {
+            const next = new Set(prev);
+            next.delete(cap.id);
+            return next;
+          });
+        }, 600);
+      });
+      if (onCapture) onCapture();
+      setForceRender(x => x + 1);
+    };
+
     if (tokensToAnimate.length > 0) {
       const t = tokensToAnimate[0]!;
       let step = t.start;
@@ -137,21 +168,13 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
         } else {
           clearInterval(interval);
           if (tokensToCapture.length > 0) {
-            tokensToCapture.forEach(cap => {
-              visualProgressRef.current[cap.id] = -1;
-            });
-            if (onCapture) onCapture();
-            setForceRender(x => x + 1);
+            triggerCapture(tokensToCapture);
           }
         }
       }, 150);
       return () => clearInterval(interval);
     } else if (tokensToCapture.length > 0) {
-      tokensToCapture.forEach(cap => {
-        visualProgressRef.current[cap.id] = -1;
-      });
-      if (onCapture) onCapture();
-      setForceRender(x => x + 1);
+      triggerCapture(tokensToCapture);
     }
   }, [game]);
 
@@ -178,6 +201,11 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     <div className="ludo-board" role="grid" aria-label="15 by 15 Ludo board">
     {footprints.map(f => (
       <div key={f.id} className="footprint-anim" style={{ position: 'absolute', top: f.top, left: f.left, transform: 'translate(-50%, -50%)', zIndex: 6, width: '24px', height: '24px', pointerEvents: 'none', backgroundColor: 'white', borderRadius: '50%', opacity: 0.6, boxShadow: `0 0 4px var(--${f.color}), inset 0 0 4px var(--${f.color})`, animation: 'footprintFade 0.6s ease-out forwards' }} />
+    ))}
+    {captureBursts.map(b => (
+      <div key={b.id} className="capture-burst-anim" style={{ position: 'absolute', top: b.top, left: b.left, transform: 'translate(-50%, -50%)', zIndex: 35, pointerEvents: 'none' }}>
+        <span className="burst-sparkle">💥</span>
+      </div>
     ))}
     {game.players.map(p => {
       const isCurrent = game.currentPlayerId === p.id;
@@ -241,8 +269,19 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
         transform = styleObj.transform;
       }
       const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
-      const innerClass = `game-pawn-inner ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""}`;
-      const style: React.CSSProperties = { position: 'absolute', top, left, transform, transition: 'top 0.25s linear, left 0.25s linear, transform 0.25s linear', zIndex: isYard ? 5 : 10 + (allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (isYard ? -1 : tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0)).findIndex(x => x.id === t.id)), '--token-color': COLOR_HEX[t.color] } as any;
+      const isCapturedFlying = capturedFlyingIds.has(t.id);
+      const innerClass = `game-pawn-inner ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""} ${isCapturedFlying ? "pawn-spin-shrink" : ""}`;
+      const style: React.CSSProperties = {
+        position: 'absolute',
+        top,
+        left,
+        transform,
+        transition: isCapturedFlying
+          ? 'top 0.55s cubic-bezier(0.25, 1, 0.5, 1), left 0.55s cubic-bezier(0.25, 1, 0.5, 1), transform 0.55s ease'
+          : 'top 0.25s linear, left 0.25s linear, transform 0.25s linear',
+        zIndex: isCapturedFlying ? 40 : (isYard ? 5 : 10 + (allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (isYard ? -1 : tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0)).findIndex(x => x.id === t.id))),
+        '--token-color': COLOR_HEX[t.color]
+      } as any;
       if(isLegalToken) {
         return (
           <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
