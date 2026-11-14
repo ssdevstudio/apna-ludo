@@ -18,6 +18,7 @@ export const createRoomSchema = z.object({
   color: z.enum(PLAYER_COLORS).optional(),
   entryFee: z.number().int().nonnegative().optional(),
   gameType: z.enum(["ludo", "snake"]).optional(),
+  gameMode: z.enum(["classic", "quick"]).optional(),
   commandId: commandIdSchema.optional(),
 }).strict();
 
@@ -45,6 +46,11 @@ export const chatCommandSchema = z.object({
 
 export const roomReactSchema = z.object({
   emoji: z.string().min(1).max(10),
+  commandId: commandIdSchema.optional(),
+}).strict();
+
+export const roomQuickChatSchema = z.object({
+  text: z.string().trim().min(1).max(100),
   commandId: commandIdSchema.optional(),
 }).strict();
 
@@ -76,6 +82,7 @@ export const lastActionSchema = z.object({
 
 export const gameStateSchema: z.ZodType<GameState> = z.object({
   gameType: z.enum(["ludo", "snake"]).optional(),
+  gameMode: z.enum(["classic", "quick"]).optional(),
   phase: z.enum(["playing", "finished"]),
   revision: z.number().int().nonnegative(),
   players: z.array(gamePlayerSchema).min(2).max(4),
@@ -110,6 +117,7 @@ export interface ChatMessage {
 export interface RoomSnapshot {
   code: string;
   gameType?: "ludo" | "snake";
+  gameMode?: "classic" | "quick";
   phase: "lobby" | "playing" | "finished";
   revision: number;
   maxPlayers: number;
@@ -141,6 +149,7 @@ export const chatMessageSchema = z.object({
 export const roomSnapshotSchema: z.ZodType<RoomSnapshot> = z.object({
   code: roomCodeSchema,
   gameType: z.enum(["ludo", "snake"]).optional(),
+  gameMode: z.enum(["classic", "quick"]).optional(),
   phase: z.enum(["lobby", "playing", "finished"]),
   revision: z.number().int().nonnegative(),
   maxPlayers: z.number().int().min(2).max(4),
@@ -185,6 +194,7 @@ export interface ClientToServerEvents {
   "game:move": (payload: z.input<typeof moveTokenSchema>, ack: (result: CommandResult) => void) => void;
   "chat:send": (payload: z.input<typeof chatCommandSchema>, ack: (result: CommandResult) => void) => void;
   "room:react": (payload: z.input<typeof roomReactSchema>, ack: (result: CommandResult) => void) => void;
+  "room:quickChat": (payload: z.input<typeof roomQuickChatSchema>, ack: (result: CommandResult) => void) => void;
   "room:rematch": (payload: z.input<typeof roomCommandSchema>, ack: (result: CommandResult) => void) => void;
   "room:leave": (payload: z.input<typeof roomCommandSchema>, ack: (result: CommandResult) => void) => void;
 }
@@ -193,6 +203,7 @@ export interface ServerToClientEvents {
   "room:snapshot": (snapshot: RoomSnapshot) => void;
   "chat:message": (message: ChatMessage) => void;
   "room:reaction": (payload: { emoji: string; playerId: string }) => void;
+  "room:quickChat": (payload: { playerId: string; text: string }) => void;
   "room:rematchRequested": (payload: { playerId: string; playerName: string }) => void;
   "server:error": (error: { code: ErrorCode; message: string }) => void;
 }

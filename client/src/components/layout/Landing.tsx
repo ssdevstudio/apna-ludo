@@ -8,7 +8,10 @@ import { MiniBoard } from "../ui/MiniBoard";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { SettingsPanel } from "../modals/SettingsPanel";
 import { CoinHeader } from "../ui/CoinHeader";
-import { DailyBonusModal } from "../modals/DailyBonusModal";
+import { LuckySpinWheelModal } from "../modals/LuckySpinWheelModal";
+import { PassNPlayModal } from "../modals/PassNPlayModal";
+import { BoardThemeModal } from "../modals/BoardThemeModal";
+import { PlayerProfileModal } from "../modals/PlayerProfileModal";
 import { deductCoins, getProgression } from "../../utils/progression";
 
 export function Landing() {
@@ -27,6 +30,10 @@ export function Landing() {
   const [preferredColor,setPreferredColor]=useState<PlayerColor>("red");
   const [entryBet,setEntryBet]=useState<number>(500);
   const [gameMode,setGameMode]=useState<"ludo" | "snake">("ludo");
+  const [ruleMode,setRuleMode]=useState<"classic" | "quick">("classic");
+  const [passNPlayOpen,setPassNPlayOpen]=useState(false);
+  const [themeModalOpen,setThemeModalOpen]=useState(false);
+  const [profileModalOpen,setProfileModalOpen]=useState(false);
   
   const [joinStep, setJoinStep] = useState<"code"|"preview">("code");
   const [previewData, setPreviewData] = useState<any>(null);
@@ -53,7 +60,7 @@ export function Landing() {
       const r=await fetch("/api/room",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name:name.trim(),maxPlayers,color:preferredColor,entryFee:entryBet,gameType:gameMode})
+        body:JSON.stringify({name:name.trim(),maxPlayers,color:preferredColor,entryFee:entryBet,gameType:gameMode,gameMode:ruleMode})
       });
       const d=await r.json();
       if (d.ok) {
@@ -78,7 +85,7 @@ export function Landing() {
       const r=await fetch("/api/room",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers,entryFee:entryBet,gameType:gameMode})
+        body:JSON.stringify({name:name.trim(),vsComputer:true,color:preferredColor,maxPlayers,entryFee:entryBet,gameType:gameMode,gameMode:ruleMode})
       });
       const d=await r.json();
       if (d.ok) {
@@ -138,6 +145,8 @@ export function Landing() {
       </div>
       <CoinHeader onOpenBonus={() => setBonusOpen(true)} />
       <ThemeToggle />
+      <button className="icon-btn" onClick={()=>setProfileModalOpen(true)} title="My Profile" aria-label="Profile">👤</button>
+      <button className="icon-btn" onClick={()=>setThemeModalOpen(true)} title="Board Themes" aria-label="Board Themes">🎨</button>
       <button className="icon-btn" onClick={()=>setSettingsOpen(true)} title="Settings" aria-label="Settings">⚙️</button>
       <button className="text-button" onClick={()=>{setJoinOpen(true);setJoinStep("code");}}>Join a room <span>↗</span></button>
     </nav>
@@ -174,6 +183,29 @@ export function Landing() {
               </button>
             </div>
           </div>
+
+          {/* Rule Mode (Classic vs Quick Rush) */}
+          {gameMode === "ludo" && (
+            <div className="game-mode-section" style={{marginTop:"8px"}}>
+              <label style={{fontSize:"12px",marginBottom:"4px",display:"block"}}>Rule Mode</label>
+              <div className="game-mode-toggle-group">
+                <button
+                  type="button"
+                  className={`mode-toggle-btn ${ruleMode === "classic" ? "active" : ""}`}
+                  onClick={() => setRuleMode("classic")}
+                >
+                  Classic (4 Tokens)
+                </button>
+                <button
+                  type="button"
+                  className={`mode-toggle-btn ${ruleMode === "quick" ? "active" : ""}`}
+                  onClick={() => setRuleMode("quick")}
+                >
+                  ⚡ Quick (2 Tokens)
+                </button>
+              </div>
+            </div>
+          )}
 
           <div style={{display:"flex",gap:"16px",marginTop:"12px"}}>
             <div style={{flex:1}}>
@@ -223,7 +255,24 @@ export function Landing() {
           {error && <p className="form-error" role="alert">{error}</p>}
           <button type="button" className="join-inline" onClick={()=>{setJoinOpen(true);setJoinStep("code");}}>Already have a room code? <b>Join here</b></button>
         </form>
-        <button className="primary-button" type="button" onClick={playVsComputer} style={{background:"var(--teal)",marginTop:12}}>{tr("play.comp")} <span>🤖</span></button>
+        <div style={{display: "flex", gap: "10px", marginTop: "12px", width: "100%"}}>
+          <button
+            className="primary-button"
+            type="button"
+            onClick={playVsComputer}
+            style={{background:"var(--teal)", flex: 1}}
+          >
+            {tr("play.comp")} <span>🤖</span>
+          </button>
+          <button
+            className="primary-button"
+            type="button"
+            onClick={() => setPassNPlayOpen(true)}
+            style={{background:"linear-gradient(135deg, #0284c7, #38bdf8)", flex: 1}}
+          >
+            Pass N Play <span>👥</span>
+          </button>
+        </div>
         <p className="trust-line"><span>◆</span> No sign-up <span>◆</span> 2–4 players <span>◆</span> Free to play</p>
       </div>
       <MiniBoard mode={gameMode}/>
@@ -277,6 +326,16 @@ export function Landing() {
       </div>
     </div>}
     {settingsOpen && <SettingsPanel onClose={()=>setSettingsOpen(false)} />}
-    {bonusOpen && <DailyBonusModal isOpen={bonusOpen} onClose={()=>setBonusOpen(false)} />}
+    {bonusOpen && <LuckySpinWheelModal isOpen={bonusOpen} onClose={()=>setBonusOpen(false)} />}
+    {passNPlayOpen && <PassNPlayModal isOpen={passNPlayOpen} onClose={()=>setPassNPlayOpen(false)} />}
+    {themeModalOpen && <BoardThemeModal isOpen={themeModalOpen} onClose={()=>setThemeModalOpen(false)} />}
+    {profileModalOpen && (
+      <PlayerProfileModal
+        isOpen={profileModalOpen}
+        onClose={()=>setProfileModalOpen(false)}
+        playerName={name || "Player"}
+        avatar={avatar}
+      />
+    )}
   </main>;
 }

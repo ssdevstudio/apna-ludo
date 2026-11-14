@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Landing } from "./components/layout/Landing";
 import { Room } from "./components/layout/Room";
+import { LocalRoom } from "./components/layout/LocalRoom";
 import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Landing/>}/>
         <Route path="/room/:code" element={<Room/>}/>
+        <Route path="/local" element={<LocalRoom/>}/>
         <Route path="*" element={<Landing/>}/>
       </Routes>
     </ErrorBoundary>

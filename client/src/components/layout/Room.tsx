@@ -17,7 +17,11 @@ import { useTimer } from "../../hooks/useTimer";
 import { SettingsPanel } from "../modals/SettingsPanel";
 import { VictoryModal } from "../modals/VictoryModal";
 import { QuitGameModal } from "../modals/QuitGameModal";
-import { DailyBonusModal } from "../modals/DailyBonusModal";
+import { LuckySpinWheelModal } from "../modals/LuckySpinWheelModal";
+import { QuickChatModal } from "../modals/QuickChatModal";
+import { BoardThemeModal } from "../modals/BoardThemeModal";
+import { PlayerProfileModal } from "../modals/PlayerProfileModal";
+import { getActiveBoardTheme } from "../../utils/boardTheme";
 import { CoinHeader } from "../ui/CoinHeader";
 import { Logo } from "../ui/Logo";
 import { PlayerSeat, PlayerCorner } from "../game/PlayerCard";
@@ -60,6 +64,11 @@ export function Room() {
   const [rollingPlayerId, setRollingPlayerId] = useState<string | null>(null);
   const [tokenAnimation, setTokenAnimation] = useState<string|null>(null);
   const [soundOn, setSoundOn] = useState(soundEnabled.current);
+  const [quickChatOpen, setQuickChatOpen] = useState(false);
+  const [themeModalOpen, setThemeModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [boardTheme, setBoardTheme] = useState(getActiveBoardTheme);
+  const [speechBubbles, setSpeechBubbles] = useState<Record<string, string>>({});
   const [localDice, setLocalDice] = useState(6);
   const [lastRolls, setLastRolls] = useState<Record<string,number>>({});
   const chatEnd = useRef<HTMLDivElement>(null);
@@ -71,7 +80,12 @@ export function Room() {
   useEffect(() => {
     const handler = (e: any) => setSoundOn(e.detail);
     window.addEventListener("sound-toggled", handler);
-    return () => window.removeEventListener("sound-toggled", handler);
+    const themeHandler = () => setBoardTheme(getActiveBoardTheme());
+    window.addEventListener("board-theme-changed", themeHandler);
+    return () => {
+      window.removeEventListener("sound-toggled", handler);
+      window.removeEventListener("board-theme-changed", themeHandler);
+    };
   }, []);
 
   const [globalTimeLeft, setGlobalTimeLeft] = useState<number | null>(null);
@@ -201,6 +215,17 @@ export function Room() {
         setReactions(prev => prev.filter(r => r.id !== id));
       }, 3000);
     });
+    s.on("room:quickChat", (payload: { playerId: string; text: string }) => {
+      playSound("pop");
+      setSpeechBubbles((prev) => ({ ...prev, [payload.playerId]: payload.text }));
+      setTimeout(() => {
+        setSpeechBubbles((prev) => {
+          const copy = { ...prev };
+          delete copy[payload.playerId];
+          return copy;
+        });
+      }, 3500);
+    });
     s.on("room:rematchRequested", (payload) => {
       if (payload.playerId !== playerId) {
         playSound("turn");
@@ -259,6 +284,20 @@ export function Room() {
       }
     });
   };
+
+  const sendQuickChat = (text: string) => {
+    if (!socket || !playerId) return;
+    playSound("pop");
+    setSpeechBubbles((prev) => ({ ...prev, [playerId]: text }));
+    setTimeout(() => {
+      setSpeechBubbles((prev) => {
+        const copy = { ...prev };
+        delete copy[playerId];
+        return copy;
+      });
+    }, 3500);
+    socket.emit("room:quickChat", { text }, () => {});
+  };
   const leaveRoom=()=>{if(socket)socket.emit("room:leave",{},()=>{});sessionStorage.removeItem(`apna-token-${snapshot?.code??code}`);navigate("/");};
   const rematchRoom=()=>{if(socket)socket.emit("room:rematch",{expectedRevision:revisionRef.current},(res:any)=>{if(!res.ok) alert(res.code + ": " + res.message);});};
 
@@ -279,20 +318,29 @@ export function Room() {
     else if (p?.id && lastRolls[p.id]) displayDice = lastRolls[p.id];
 
     const gp = p && snapshot?.game?.players.find(gp2 => gp2.id === p.id);
-    return <PlayerCorner
-      key={color}
-      player={p}
-      position={pos}
-      isActive={visualActivePlayerId === p?.id && snapshot?.game?.phase === "playing"}
-      diceValue={displayDice}
-      isRolling={rollingPlayerId === p?.id}
-      canRoll={canRoll && isMe && !rollingPlayerId}
-      canMove={canMove && isMe}
-      onRoll={rollDice}
-      avatar={isMe ? myAvatar : ""}
-      timeLeft={timerRunning ? timeLeft : undefined}
-      missedCount={gp?.missedTurnCount ?? 0}
-    />
+    const bubble = speechBubbles[p?.id ?? ""];
+    return (
+      <div key={color} style={{ position: "relative" }}>
+        {bubble && (
+          <div className={`player-speech-bubble bubble-${pos}`}>
+            <span>{bubble}</span>
+          </div>
+        )}
+        <PlayerCorner
+          player={p}
+          position={pos}
+          isActive={visualActivePlayerId === p?.id && snapshot?.game?.phase === "playing"}
+          diceValue={displayDice}
+          isRolling={rollingPlayerId === p?.id}
+          canRoll={canRoll && isMe && !rollingPlayerId}
+          canMove={canMove && isMe}
+          onRoll={rollDice}
+          avatar={isMe ? myAvatar : ""}
+          timeLeft={timerRunning ? timeLeft : undefined}
+          missedCount={gp?.missedTurnCount ?? 0}
+        />
+      </div>
+    );
   };
 
   const baseColors = ['green', 'yellow', 'blue', 'red'] as const;
@@ -312,12 +360,15 @@ export function Room() {
   const entryFee = snapshot?.entryFee ?? Number(sessionStorage.getItem("apna-bet")) ?? 0;
   const potAmount = entryFee > 0 ? entryFee * (snapshot?.players?.length || 2) : 0;
 
-  return <main className="room-page">
+  return <main className="room-page" data-board-theme={boardTheme}>
     <header className="room-header"><Logo compact/>
       <div className="room-header-center">
         <div className="room-code">
           {snapshot?.gameType === "snake" && (
             <span className="mode-badge" style={{background: "#059669", color: "#fff", marginRight: "4px"}}>🐍 SAANP SEEDHI</span>
+          )}
+          {snapshot?.gameMode === "quick" && (
+            <span className="mode-badge" style={{background: "#f59e0b", color: "#fff", marginRight: "4px"}}>⚡ QUICK</span>
           )}
           {!isBotGame ? <>
             <span>ROOM</span><button onClick={copyInvite} aria-label="Copy room code">{(snapshot?.code ?? code ?? "").toUpperCase()} <small>{copied?tr("copy.code"):"COPY"}</small></button>
@@ -340,6 +391,9 @@ export function Room() {
         {drawerOpen && <div style={{position:"fixed", inset:0, zIndex:50}} onClick={()=>setDrawerOpen(false)} />}
         <div className={`drawer-items ${drawerOpen?"drawer--open":""}`}>
           <ThemeToggle />
+          <button className="icon-btn" onClick={()=>setProfileModalOpen(true)} aria-label="Profile" title="Player Profile">👤</button>
+          <button className="icon-btn" onClick={()=>setThemeModalOpen(true)} aria-label="Board Themes" title="Board Themes">🎨</button>
+          <button className="icon-btn" onClick={()=>setQuickChatOpen(true)} aria-label="Quick Phrases" title="Quick Chat">💬</button>
           <div className="reaction-wrapper" style={{position:"relative"}}>
             <button className="icon-btn" onClick={()=>setReactionPickerOpen(o=>!o)} aria-label="React">😄</button>
             {reactionPickerOpen && (
@@ -491,6 +545,27 @@ export function Room() {
         onRematch={rematchRoom} 
         onLeave={leaveRoom} 
       />}
-    {bonusOpen && <DailyBonusModal isOpen={bonusOpen} onClose={() => setBonusOpen(false)} />}
+    {bonusOpen && <LuckySpinWheelModal isOpen={bonusOpen} onClose={() => setBonusOpen(false)} />}
+    {quickChatOpen && (
+      <QuickChatModal
+        isOpen={quickChatOpen}
+        onClose={() => setQuickChatOpen(false)}
+        onSelectPhrase={sendQuickChat}
+      />
+    )}
+    {themeModalOpen && (
+      <BoardThemeModal
+        isOpen={themeModalOpen}
+        onClose={() => setThemeModalOpen(false)}
+      />
+    )}
+    {profileModalOpen && (
+      <PlayerProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        playerName={myPlayer?.name ?? "Player"}
+        avatar={myAvatar}
+      />
+    )}
   </main>;
 }

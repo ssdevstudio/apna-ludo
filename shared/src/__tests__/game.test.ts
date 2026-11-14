@@ -944,3 +944,24 @@ describe("lastAction tracking", () => {
     expect(next.lastAction).toEqual({ type: "forfeited", playerId: "p1" });
   });
 });
+
+describe("Quick Rush Mode (Ludo King clone feature)", () => {
+  it("initializes game with gameMode = quick", () => {
+    const state = createGame(makePlayers(2), "ludo", "quick");
+    expect(state.gameMode).toBe("quick");
+  });
+
+  it("declares player winner as soon as 2 tokens reach home in quick mode", () => {
+    let state = createGame(makePlayers(2), "ludo", "quick");
+    state.players[0]!.tokens[0]!.progress = 56;
+    state.players[0]!.tokens[1]!.progress = 55;
+
+    state = applyRoll(state, "p0", 1);
+    state = applyMove(state, "p0", "p0:1");
+
+    expect(state.players[0]!.tokens[1]!.progress).toBe(56);
+    expect(state.players[0]!.status).toBe("won");
+    expect(state.winners).toContain("p0");
+    expect(state.phase).toBe("finished");
+  });
+});

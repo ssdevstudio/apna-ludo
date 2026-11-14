@@ -14,6 +14,7 @@ import { calculateSnakeMove, canMoveTokenSnake, SNAKE_BOARD_SIZE } from "./snake
 
 export type GamePhase = "playing" | "finished";
 export type GameType = "ludo" | "snake";
+export type GameMode = "classic" | "quick";
 export type PlayerGameStatus = "active" | "won" | "forfeited" | "timed_out";
 
 export interface TokenState {
@@ -48,6 +49,7 @@ export interface LastAction {
 
 export interface GameState {
   gameType?: GameType;
+  gameMode?: GameMode;
   phase: GamePhase;
   revision: number;
   players: GamePlayer[];
@@ -80,7 +82,8 @@ export class RuleError extends Error {
 
 export function createGame(
   players: ReadonlyArray<{ id: string; name: string; color: PlayerColor }>,
-  gameType: GameType = "ludo"
+  gameType: GameType = "ludo",
+  gameMode: GameMode = "classic"
 ): GameState {
   if (players.length < 2 || players.length > 4) {
     throw new Error("A game requires 2 to 4 players");
@@ -97,6 +100,7 @@ export function createGame(
 
   return {
     gameType,
+    gameMode,
     phase: "playing",
     revision: 0,
     players: players.map((player) => ({
@@ -380,12 +384,14 @@ export function applyMove(state: GameState, playerId: string, tokenId: string): 
   let winners = [...state.winners];
   let finished = false;
   const updatedPlayer = players[playerIndex]!;
+  const tokensNeededToWin = state.gameMode === "quick" ? 2 : TOKENS_PER_PLAYER;
+  const finishedTokensCount = updatedPlayer.tokens.filter((token) => token.progress === FINISH_PROGRESS).length;
   
   if (state.tieBreakerActive && updatedPlayer.tokens.some((token) => token.progress === FINISH_PROGRESS)) {
     updatedPlayer.status = "won";
     winners.push(playerId);
     finished = true;
-  } else if (updatedPlayer.tokens.every((token) => token.progress === FINISH_PROGRESS)) {
+  } else if (finishedTokensCount >= tokensNeededToWin) {
     updatedPlayer.status = "won";
     winners.push(playerId);
     finished = true;

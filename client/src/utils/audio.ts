@@ -58,11 +58,32 @@ export function toggleSound(): boolean {
   return setSoundEnabled(!soundEnabled.current);
 }
 
-export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp"|"ladder"|"snake") {
+export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp"|"ladder"|"snake"|"pop"|"tick") {
   if (!soundEnabled.current) return;
   try {
     const ctx = getCtx();
     const n = ctx.currentTime;
+    if (type === "pop") {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sine";
+      o.frequency.setValueAtTime(650, n);
+      o.frequency.exponentialRampToValueAtTime(1200, n + 0.05);
+      g.gain.setValueAtTime(0.15, n);
+      g.gain.exponentialRampToValueAtTime(0.001, n + 0.08);
+      o.start(n); o.stop(n + 0.08);
+      return;
+    }
+    if (type === "tick") {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "triangle";
+      o.frequency.setValueAtTime(1400, n);
+      g.gain.setValueAtTime(0.08, n);
+      g.gain.exponentialRampToValueAtTime(0.001, n + 0.025);
+      o.start(n); o.stop(n + 0.025);
+      return;
+    }
     if (type === "ladder") {
       // Ascending uplifting ladder glissando
       [440, 554.37, 659.25, 880, 1108.73, 1318.51].forEach((f, i) => {

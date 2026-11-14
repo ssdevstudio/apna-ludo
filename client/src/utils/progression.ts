@@ -1,3 +1,5 @@
+export type VipFrame = "none" | "bronze" | "silver" | "gold" | "diamond";
+
 export interface PlayerProgression {
   coins: number;
   xp: number;
@@ -6,6 +8,7 @@ export interface PlayerProgression {
   matchesWon: number;
   tokensCaptured: number;
   lastDailyBonus: number;
+  vipFrame?: VipFrame;
 }
 
 const STORAGE_KEY = "apna_ludo_progression_v1";
@@ -188,4 +191,18 @@ export function claimDailyBonus(): { success: boolean; amount: number } {
   p.lastDailyBonus = Date.now();
   saveProgression(p);
   return { success: true, amount };
+}
+
+export function claimLuckySpin(amount: number): { success: boolean; newTotal: number } {
+  const p = getProgression();
+  p.coins += amount;
+  p.lastDailyBonus = Date.now();
+  saveProgression(p);
+  return { success: true, newTotal: p.coins };
+}
+
+export function setVipFrame(frame: VipFrame): void {
+  const p = getProgression();
+  p.vipFrame = frame;
+  saveProgression(p);
 }

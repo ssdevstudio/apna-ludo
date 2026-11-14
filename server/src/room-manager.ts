@@ -31,6 +31,7 @@ type TypedServer = Server<ClientToServerEvents, ServerToClientEvents, InterServe
 export interface RoomData {
   code: string;
   gameType?: "ludo" | "snake";
+  gameMode?: "classic" | "quick";
   maxPlayers: number;
   entryFee?: number;
   phase: "lobby" | "playing" | "finished";
@@ -114,6 +115,7 @@ function buildSnapshot(room: RoomData): RoomSnapshot {
   return {
     code: room.code,
     gameType: room.gameType ?? "ludo",
+    gameMode: room.gameMode ?? "classic",
     phase: room.phase,
     revision: room.revision,
     maxPlayers: room.maxPlayers,
@@ -136,7 +138,8 @@ export function createRoom(
   hostSocketId: string,
   preferredColor?: PlayerColor,
   entryFee?: number,
-  gameType: "ludo" | "snake" = "ludo"
+  gameType: "ludo" | "snake" = "ludo",
+  gameMode: "classic" | "quick" = "classic"
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   const code = generateRoomCode();
   const playerId = crypto.randomUUID();
@@ -157,6 +160,7 @@ export function createRoom(
   const room: RoomData = {
     code,
     gameType,
+    gameMode,
     maxPlayers,
     entryFee: typeof entryFee === "number" && entryFee >= 0 ? entryFee : 0,
     phase: "lobby",
@@ -184,10 +188,11 @@ export function createRoomWithComputer(
   preferredColor: PlayerColor = "red",
   maxPlayers: number = 2,
   entryFee?: number,
-  gameType: "ludo" | "snake" = "ludo"
+  gameType: "ludo" | "snake" = "ludo",
+  gameMode: "classic" | "quick" = "classic"
 ): CommandResult<{ room: RoomSnapshot; playerId: string; reconnectToken: string }> {
   // Create room first
-  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor, entryFee, gameType);
+  const createResult = createRoom(io, name, maxPlayers, hostSocketId, preferredColor, entryFee, gameType, gameMode);
   if (!createResult.ok) return createResult;
   const room = rooms.get(createResult.room.code)!;
 
@@ -221,7 +226,7 @@ export function createRoomWithComputer(
     .map((id) => room.players.get(id)!)
     .filter((p) => p.connected || p.isBot)
     .map((p) => ({ id: p.id, name: p.name, color: p.color }));
-  room.game = createGame(gamePlayers, room.gameType);
+  room.game = createGame(gamePlayers, room.gameType, room.gameMode);
   room.phase = "playing";
   room.revision += 1;
   emitSnapshot(io, room.code);
@@ -352,7 +357,7 @@ export function handleStart(
     .filter((p) => p.connected)
     .map((p) => ({ id: p.id, name: p.name, color: p.color }));
 
-  room.game = createGame(gamePlayers, room.gameType);
+  room.game = createGame(gamePlayers, room.gameType, room.gameMode);
   room.phase = "playing";
   room.revision += 1;
   emitSnapshot(io, room.code);
@@ -555,7 +560,7 @@ export function handleRematch(io: TypedServer, socketId: string, expectedRevisio
       .filter((p) => p.connected || p.isBot)
       .map((p) => ({ id: p.id, name: p.name, color: p.color }));
 
-    room.game = createGame(gamePlayers, room.gameType);
+    room.game = createGame(gamePlayers, room.gameType, room.gameMode);
     room.phase = "playing";
     room.revision += 1;
     emitSnapshot(io, room.code);
@@ -660,7 +665,7 @@ function doLeave(io: TypedServer, socketId: string, room: RoomData): void {
           .filter((p) => p.connected || p.isBot)
           .map((p) => ({ id: p.id, name: p.name, color: p.color }));
 
-        room.game = createGame(gamePlayers, room.gameType);
+        room.game = createGame(gamePlayers, room.gameType, room.gameMode);
         room.phase = "playing";
         scheduleTurnTimeout(io, room);
         scheduleGameTimeout(io, room);
@@ -838,5 +843,14 @@ export function broadcastReaction(io: TypedServer, code: string, socketId: strin
   const player = getPlayerInRoom(room, socketId);
   if (!player || !room.players.has(player.id)) return { ok: false, code: "NOT_IN_ROOM", message: "Not in room" };
   io.to(code).emit("room:reaction", { emoji, playerId: player.id });
+  return { ok: true };
+}
+
+export function broadcastQuickChat(io: TypedServer, code: string, socketId: string, text: string): CommandResult {
+  const room = rooms.get(code);
+  if (!room) return { ok: false, code: "ROOM_NOT_FOUND", message: "Room not found" };
+  const player = getPlayerInRoom(room, socketId);
+  if (!player || !room.players.has(player.id)) return { ok: false, code: "NOT_IN_ROOM", message: "Not in room" };
+  io.to(code).emit("room:quickChat", { text, playerId: player.id });
   return { ok: true };
 }

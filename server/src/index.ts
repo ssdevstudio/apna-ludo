@@ -11,6 +11,7 @@ import {
   moveTokenSchema,
   chatCommandSchema,
   roomReactSchema,
+  roomQuickChatSchema,
   commandMetaSchema,
   type ClientToServerEvents,
   type ServerToClientEvents,
@@ -34,6 +35,7 @@ import {
   getRoomData,
   getRoom,
   broadcastReaction,
+  broadcastQuickChat,
 } from "./room-manager.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -101,15 +103,16 @@ app.post("/api/room", (req, res) => {
   const isVsBot = vsComputerRaw === true;
   const entryFee = typeof req.body?.entryFee === "number" && req.body.entryFee >= 0 ? req.body.entryFee : 0;
   const gameType = req.body?.gameType === "snake" ? "snake" : "ludo";
+  const gameMode = req.body?.gameMode === "quick" ? "quick" : "classic";
   if (isVsBot) {
-    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers, entryFee, gameType);
+    const result = createRoomWithComputer(io, name, "", req.body?.color, maxPlayers, entryFee, gameType, gameMode);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {
       res.status(500).json(result);
     }
   } else {
-    const result = createRoom(io, name, maxPlayers, "", req.body?.color, entryFee, gameType);
+    const result = createRoom(io, name, maxPlayers, "", req.body?.color, entryFee, gameType, gameMode);
     if (result.ok) {
       res.json({ ok: true, room: result.room, playerId: result.playerId, reconnectToken: result.reconnectToken });
     } else {
@@ -156,6 +159,7 @@ app.get("/api/room/:code/preview", (req, res) => {
   res.json({ 
     ok: true, 
     gameType: room.gameType ?? "ludo",
+    gameMode: room.gameMode ?? "classic",
     entryFee: room.entryFee ?? 0,
     maxPlayers: room.maxPlayers, 
     currentPlayers: room.players.size,
@@ -196,7 +200,7 @@ io.on("connection", (socket) => {
       return;
     }
     const result = withIdempotency(parsed.data.commandId, () =>
-      createRoom(io, parsed.data.name, parsed.data.maxPlayers, socket.id, parsed.data.color, parsed.data.entryFee, parsed.data.gameType ?? "ludo"),
+      createRoom(io, parsed.data.name, parsed.data.maxPlayers, socket.id, parsed.data.color, parsed.data.entryFee, parsed.data.gameType ?? "ludo", parsed.data.gameMode ?? "classic"),
     );
     if (result.ok) {
       socket.data.roomCode = result.room.code;
@@ -216,7 +220,7 @@ io.on("connection", (socket) => {
       return;
     }
     const result = withIdempotency(parsed.data.commandId, () =>
-      createRoomWithComputer(io, parsed.data.name, socket.id, parsed.data.color ?? "red", parsed.data.maxPlayers ?? 2, parsed.data.entryFee, parsed.data.gameType ?? "ludo"),
+      createRoomWithComputer(io, parsed.data.name, socket.id, parsed.data.color ?? "red", parsed.data.maxPlayers ?? 2, parsed.data.entryFee, parsed.data.gameType ?? "ludo", parsed.data.gameMode ?? "classic"),
     );
     if (result.ok) {
       socket.data.roomCode = result.room.code;
@@ -345,6 +349,27 @@ io.on("connection", (socket) => {
     }
     const result = withIdempotency(parsed.data.commandId, () =>
       broadcastReaction(io, roomCode, socket.id, parsed.data.emoji)
+    );
+    ack(result);
+  });
+
+  socket.on("room:quickChat", (payload, ack) => {
+    const parsed = roomQuickChatSchema.safeParse(payload);
+    if (!parsed.success) {
+      ack({ ok: false, code: "INVALID_PAYLOAD", message: parsed.error.message, commandId: payload?.commandId });
+      return;
+    }
+    if (!checkRateLimit(socket.data, "chat")) {
+      ack({ ok: false, code: "RATE_LIMITED", message: "Too many messages — slow down" });
+      return;
+    }
+    const roomCode = socket.data.roomCode;
+    if (!roomCode) {
+      ack({ ok: false, code: "NOT_IN_ROOM", message: "Not in room", commandId: payload?.commandId });
+      return;
+    }
+    const result = withIdempotency(parsed.data.commandId, () =>
+      broadcastQuickChat(io, roomCode, socket.id, parsed.data.text)
     );
     ack(result);
   });
