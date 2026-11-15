@@ -41,6 +41,7 @@ export function SnakeBoard({
   const [, setForceRender] = useState(0);
   const [activeBanner, setActiveBanner] = useState<BannerEvent | null>(null);
   const [slidingToken, setSlidingToken] = useState<{ id: string; type: "ladder" | "snake" } | null>(null);
+  const [tile100Won, setTile100Won] = useState<{ id: string; color: PlayerColor } | null>(null);
 
   // Generate 100 cells in 10x10 grid order: row 0 (top) to row 9 (bottom)
   const cells = useMemo(() => {
@@ -118,7 +119,14 @@ export function SnakeBoard({
           step++;
           visualProgressRef.current[t.id] = step;
           setForceRender((x) => x + 1);
-          playSound("move");
+
+          if (step === SNAKE_BOARD_SIZE) {
+            playSound("home");
+            setTile100Won({ id: Math.random().toString(), color: t.color });
+            setTimeout(() => setTile100Won(null), 3000);
+          } else {
+            playSound("move");
+          }
         } else {
           clearInterval(hopInterval);
 
@@ -136,7 +144,13 @@ export function SnakeBoard({
               setSlidingToken({ id: t.id, type: "ladder" });
               visualProgressRef.current[t.id] = t.target;
               setForceRender((x) => x + 1);
-              playSound("ladder");
+              if (t.target === SNAKE_BOARD_SIZE) {
+                playSound("home");
+                setTile100Won({ id: Math.random().toString(), color: t.color });
+                setTimeout(() => setTile100Won(null), 3000);
+              } else {
+                playSound("ladder");
+              }
               setTimeout(() => setSlidingToken(null), 850);
             }, 300);
             setTimeout(() => setActiveBanner(null), 1800);
@@ -160,6 +174,11 @@ export function SnakeBoard({
           } else {
             visualProgressRef.current[t.id] = t.target;
             setForceRender((x) => x + 1);
+            if (t.target === SNAKE_BOARD_SIZE) {
+              playSound("home");
+              setTile100Won({ id: Math.random().toString(), color: t.color });
+              setTimeout(() => setTile100Won(null), 3000);
+            }
           }
         }
       }, 130);
@@ -208,6 +227,16 @@ export function SnakeBoard({
             style={{ transform: `rotate(-${boardRotation}deg)` }}
           >
             <span>{activeBanner.text}</span>
+          </div>
+        )}
+
+        {/* Floating Tile 100 Victory Celebration */}
+        {tile100Won && (
+          <div
+            className="tile-100-banner"
+            style={{ transform: `translate(-50%, -50%) rotate(-${boardRotation}deg)` }}
+          >
+            🏆 100 REACHED! VICTORY!
           </div>
         )}
 
@@ -549,12 +578,13 @@ export function SnakeBoard({
           const isSlidingLadder = slidingToken?.id === tokenId && slidingToken.type === "ladder";
           const isSlidingSnake = slidingToken?.id === tokenId && slidingToken.type === "snake";
           const isSliding = isSlidingLadder || isSlidingSnake;
+          const isAt100 = progress >= SNAKE_BOARD_SIZE;
 
           const innerClass = `game-pawn-inner ${
             isAnimating ? "pawn--animate token-hop" : ""
           } ${isSlidingLadder ? "pawn--sliding-ladder" : ""} ${
             isSlidingSnake ? "pawn--sliding-snake" : ""
-          }`;
+          } ${isAt100 ? "pawn--home" : ""}`;
 
           const style: React.CSSProperties = {
             position: "absolute",
@@ -564,7 +594,7 @@ export function SnakeBoard({
             transition: isSliding
               ? "top 0.8s cubic-bezier(0.25, 1, 0.5, 1), left 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s ease"
               : "top 0.16s ease-out, left 0.16s ease-out, transform 0.16s ease-out",
-            zIndex: 20 + (isLegal ? 5 : 0) + (isSliding ? 30 : 0),
+            zIndex: 20 + (isLegal ? 5 : 0) + (isSliding ? 30 : 0) + (isAt100 ? 15 : 0),
             "--token-color": COLOR_HEX[p.color],
           } as any;
 
@@ -577,6 +607,7 @@ export function SnakeBoard({
                 onClick={() => onMove(tokenId)}
                 aria-label={`Move ${p.color} pawn`}
               >
+                {isAt100 && <span className="home-crown-badge">👑</span>}
                 <span className={innerClass}>
                   <TokenSvg color={p.color} />
                 </span>
@@ -591,6 +622,7 @@ export function SnakeBoard({
               className="game-pawn-wrapper"
               aria-label={`${p.color} pawn`}
             >
+              {isAt100 && <span className="home-crown-badge">👑</span>}
               <div className={innerClass}>
                 <TokenSvg color={p.color} />
               </div>

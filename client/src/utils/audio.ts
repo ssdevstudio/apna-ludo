@@ -58,11 +58,45 @@ export function toggleSound(): boolean {
   return setSoundEnabled(!soundEnabled.current);
 }
 
-export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp"|"ladder"|"snake"|"pop"|"tick") {
+export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"click"|"enter"|"six"|"star"|"land"|"coin"|"levelUp"|"ladder"|"snake"|"pop"|"tick"|"home") {
   if (!soundEnabled.current) return;
   try {
     const ctx = getCtx();
     const n = ctx.currentTime;
+    if (type === "home") {
+      // Authentic Ludo King celebratory home pocketing fanfare & bell chime
+      [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = i < 3 ? "triangle" : "sine";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.18, n + i * 0.07);
+        g.gain.exponentialRampToValueAtTime(0.001, n + i * 0.07 + 0.35);
+        o.start(n + i * 0.07); o.stop(n + i * 0.07 + 0.4);
+      });
+      [2093.00, 2637.02].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.1, n + 0.42 + i * 0.08);
+        g.gain.exponentialRampToValueAtTime(0.001, n + 0.42 + i * 0.08 + 0.3);
+        o.start(n + 0.42 + i * 0.08); o.stop(n + 0.42 + i * 0.08 + 0.35);
+      });
+      return;
+    }
+    if (type === "enter") {
+      // Cheerful pop & spring when token leaves yard
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sine";
+      o.frequency.setValueAtTime(360, n);
+      o.frequency.exponentialRampToValueAtTime(920, n + 0.09);
+      g.gain.setValueAtTime(0.18, n);
+      g.gain.exponentialRampToValueAtTime(0.001, n + 0.15);
+      o.start(n); o.stop(n + 0.15);
+      return;
+    }
     if (type === "pop") {
       const o = ctx.createOscillator(), g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
@@ -215,7 +249,25 @@ export function playSound(type: "dice"|"move"|"capture"|"win"|"lose"|"turn"|"cli
     osc.connect(gain); gain.connect(ctx.destination); gain.gain.setValueAtTime(.12, n);
     gain.gain.exponentialRampToValueAtTime(.001, n+.22);
     if (type==="move") { osc.frequency.setValueAtTime(500,n); osc.frequency.exponentialRampToValueAtTime(800,n+.08); osc.start(n); osc.stop(n+.1); }
-    else if (type==="capture") { osc.type="sawtooth"; osc.frequency.setValueAtTime(400,n); osc.frequency.exponentialRampToValueAtTime(150,n+.25); osc.start(n); osc.stop(n+.3); }
+    else if (type==="capture") {
+      // Powerful Ludo King impact crash & sweep
+      osc.type="sawtooth";
+      osc.frequency.setValueAtTime(520,n);
+      osc.frequency.exponentialRampToValueAtTime(110,n+.28);
+      gain.gain.setValueAtTime(0.22, n);
+      gain.gain.exponentialRampToValueAtTime(.001,n+.32);
+      osc.start(n); osc.stop(n+.35);
+
+      // Low impact punch
+      const sub = ctx.createOscillator(), subGain = ctx.createGain();
+      sub.connect(subGain); subGain.connect(ctx.destination);
+      sub.type = "sine";
+      sub.frequency.setValueAtTime(160, n);
+      sub.frequency.exponentialRampToValueAtTime(45, n + 0.3);
+      subGain.gain.setValueAtTime(0.3, n);
+      subGain.gain.exponentialRampToValueAtTime(0.001, n + 0.35);
+      sub.start(n); sub.stop(n + 0.35);
+    }
     else if (type==="turn") { osc.frequency.value=660; gain.gain.setValueAtTime(.1,n); gain.gain.exponentialRampToValueAtTime(.001,n+.1); osc.start(n); osc.stop(n+.1); }
     else { osc.frequency.value=800; osc.start(n); osc.stop(n+.05); }
   } catch {}

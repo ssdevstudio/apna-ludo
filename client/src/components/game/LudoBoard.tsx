@@ -80,6 +80,79 @@ export const COLOR_HEX: Record<PlayerColor, string> = { red: '#c13535', green: '
 const STAR_CELLS_SET=new Set(STAR_CELLS);
 const SAFE_CELLS_SET=new Set(SAFE_CELLS);
 
+/**
+ * Positions tokens precisely inside their respective color triangle
+ * in the center 3x3 region of the 15x15 Ludo board (Ludo King style).
+ */
+export function getHomeTriangleCoords(color: PlayerColor, index: number, total: number): { left: string; top: string } {
+  if (color === 'red') {
+    // Red: Bottom triangle pointing UP into center (50%, 50%)
+    if (total <= 1) return { left: '50%', top: '56.5%' };
+    if (total === 2) return index === 0 ? { left: '46.5%', top: '57%' } : { left: '53.5%', top: '57%' };
+    if (total === 3) {
+      if (index === 0) return { left: '45%', top: '58%' };
+      if (index === 1) return { left: '55%', top: '58%' };
+      return { left: '50%', top: '54%' };
+    }
+    const slots = [
+      { left: '44%', top: '58%' },
+      { left: '56%', top: '58%' },
+      { left: '47%', top: '54%' },
+      { left: '53%', top: '54%' },
+    ];
+    return slots[index % 4] ?? { left: '50%', top: '56.5%' };
+  }
+  if (color === 'yellow') {
+    // Yellow: Top triangle pointing DOWN into center (50%, 50%)
+    if (total <= 1) return { left: '50%', top: '43.5%' };
+    if (total === 2) return index === 0 ? { left: '46.5%', top: '43%' } : { left: '53.5%', top: '43%' };
+    if (total === 3) {
+      if (index === 0) return { left: '45%', top: '42%' };
+      if (index === 1) return { left: '55%', top: '42%' };
+      return { left: '50%', top: '46%' };
+    }
+    const slots = [
+      { left: '44%', top: '42%' },
+      { left: '56%', top: '42%' },
+      { left: '47%', top: '46%' },
+      { left: '53%', top: '46%' },
+    ];
+    return slots[index % 4] ?? { left: '50%', top: '43.5%' };
+  }
+  if (color === 'green') {
+    // Green: Left triangle pointing RIGHT into center (50%, 50%)
+    if (total <= 1) return { left: '43.5%', top: '50%' };
+    if (total === 2) return index === 0 ? { left: '43%', top: '46.5%' } : { left: '43%', top: '53.5%' };
+    if (total === 3) {
+      if (index === 0) return { left: '42%', top: '45%' };
+      if (index === 1) return { left: '42%', top: '55%' };
+      return { left: '46%', top: '50%' };
+    }
+    const slots = [
+      { left: '42%', top: '44%' },
+      { left: '42%', top: '56%' },
+      { left: '46%', top: '47%' },
+      { left: '46%', top: '53%' },
+    ];
+    return slots[index % 4] ?? { left: '43.5%', top: '50%' };
+  }
+  // blue: Right triangle pointing LEFT into center (50%, 50%)
+  if (total <= 1) return { left: '56.5%', top: '50%' };
+  if (total === 2) return index === 0 ? { left: '57%', top: '46.5%' } : { left: '57%', top: '53.5%' };
+  if (total === 3) {
+    if (index === 0) return { left: '58%', top: '45%' };
+    if (index === 1) return { left: '58%', top: '55%' };
+    return { left: '54%', top: '50%' };
+  }
+  const slots = [
+    { left: '58%', top: '44%' },
+    { left: '58%', top: '56%' },
+    { left: '54%', top: '47%' },
+    { left: '54%', top: '53%' },
+  ];
+  return slots[index % 4] ?? { left: '56.5%', top: '50%' };
+}
+
 function tokenCellIndex(color:PlayerColor,progress:number,tokenIdx=0):number|null{
   if(progress===-1){ return YARD_POSITIONS[color]?.[tokenIdx]??null; }
   return progressToCellIndex(color,progress);
@@ -92,6 +165,10 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
   const [footprints, setFootprints] = useState<{id:string;color:PlayerColor;top:string;left:string}[]>([]);
   const [capturedFlyingIds, setCapturedFlyingIds] = useState<Set<string>>(new Set());
   const [captureBursts, setCaptureBursts] = useState<{id:string;top:string;left:string;color:PlayerColor}[]>([]);
+  const [captureBanner, setCaptureBanner] = useState<{id:string;text:string}|null>(null);
+  const [justPocketedId, setJustPocketedId] = useState<string|null>(null);
+  const [homeCelebrationBanner, setHomeCelebrationBanner] = useState<{id:string;text:string;color:PlayerColor}|null>(null);
+  const [homeConfetti, setHomeConfetti] = useState<{id:string;top:string;left:string;dx:number;dy:number;rot:number;color:string;size:number;symbol:string}[]>([]);
 
   useEffect(() => {
     const tokensToAnimate:{id:string;color:PlayerColor;start:number;end:number}[] = [];
@@ -144,6 +221,10 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
           });
         }, 600);
       });
+      // Knockout celebration banner & punchy sound
+      setCaptureBanner({ id: Math.random().toString(), text: "💥 KNOCKOUT! +1 EXTRA ROLL 🎲" });
+      setTimeout(() => setCaptureBanner(null), 1800);
+      playSound("capture");
       if (onCapture) onCapture();
       setForceRender(x => x + 1);
     };
@@ -164,7 +245,43 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
           setFootprints(prev => [...prev.slice(-4), { id: Math.random().toString(), color: t.color, top, left }]);
 
           setForceRender(x => x + 1);
-          playSound("move");
+
+          // If reached center home (progress 56 / pil jana)
+          if (step === 56) {
+            playSound("home");
+            setJustPocketedId(t.id);
+            setTimeout(() => setJustPocketedId(null), 1400);
+
+            setHomeCelebrationBanner({
+              id: Math.random().toString(),
+              text: "🎉 HOME! +1 BONUS ROLL 🎲",
+              color: t.color,
+            });
+            setTimeout(() => setHomeCelebrationBanner(null), 2000);
+
+            // Generate 16 radial celebration confetti particles
+            const symbols = ["✨", "⭐", "🎉", "🌟", "🪙"];
+            const colors = [COLOR_HEX[t.color], "#ffd700", "#ffffff", "#f59e0b", "#38bdf8"];
+            const particles = Array.from({ length: 16 }).map((_, i) => {
+              const angle = (i / 16) * 2 * Math.PI;
+              const dist = 40 + Math.random() * 55;
+              return {
+                id: Math.random().toString(),
+                top: "50%",
+                left: "50%",
+                dx: Math.cos(angle) * dist,
+                dy: Math.sin(angle) * dist,
+                rot: (Math.random() - 0.5) * 360,
+                color: colors[i % colors.length]!,
+                size: 14 + Math.floor(Math.random() * 12),
+                symbol: symbols[i % symbols.length]!,
+              };
+            });
+            setHomeConfetti(particles);
+            setTimeout(() => setHomeConfetti([]), 1400);
+          } else {
+            playSound("move");
+          }
         } else {
           clearInterval(interval);
           if (tokensToCapture.length > 0) {
@@ -207,6 +324,44 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
         <span className="burst-sparkle">💥</span>
       </div>
     ))}
+
+    {/* Knockout Floating Toast Banner */}
+    {captureBanner && (
+      <div className="capture-event-banner" style={{ transform: `translate(-50%, -50%) rotate(-${boardRotation}deg)` }}>
+        <span>{captureBanner.text}</span>
+      </div>
+    )}
+
+    {/* Home Pocket Celebration Banner & Confetti Particles */}
+    {homeCelebrationBanner && (
+      <div className={`home-pocket-banner banner-color-${homeCelebrationBanner.color}`} style={{ transform: `translate(-50%, -50%) rotate(-${boardRotation}deg)` }}>
+        <div className="home-banner-sparkle">⭐</div>
+        <div className="home-banner-text-box">
+          <span className="home-banner-main">HOME!</span>
+          <span className="home-banner-sub">+1 EXTRA ROLL 🎲</span>
+        </div>
+        <div className="home-banner-sparkle">⭐</div>
+      </div>
+    )}
+
+    {homeConfetti.map(c => (
+      <span
+        key={c.id}
+        className="home-confetti-particle"
+        style={{
+          top: c.top,
+          left: c.left,
+          color: c.color,
+          fontSize: `${c.size}px`,
+          ['--p-dx' as any]: `${c.dx}px`,
+          ['--p-dy' as any]: `${c.dy}px`,
+          ['--p-rot' as any]: `${c.rot}deg`,
+        }}
+      >
+        {c.symbol}
+      </span>
+    ))}
+
     {game.players.map(p => {
       const isCurrent = game.currentPlayerId === p.id;
       const isOut = p.status === "forfeited" || p.status === "timed_out";
@@ -255,22 +410,50 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
     })}
     {allTokens.map((t) => {
       const isYard = t.progress === -1;
+      const isHome = t.progress >= 56;
       let top, left, transform;
+
       if (isYard) {
         const pos = YARD_CIRCLE_COORDS[t.color][t.ordinal - 1];
         top = pos?.top; left = pos?.left;
         transform = `translate(-50%, -90%) rotate(-${boardRotation}deg)`;
+      } else if (isHome) {
+        const homeColorTokens = allTokens.filter(x => x.color === t.color && x.progress >= 56);
+        const homeSlotIdx = homeColorTokens.findIndex(x => x.id === t.id);
+        const slot = getHomeTriangleCoords(t.color, homeSlotIdx >= 0 ? homeSlotIdx : 0, homeColorTokens.length);
+        top = slot.top;
+        left = slot.left;
+        transform = `translate(-50%, -90%) scale(0.76) rotate(-${boardRotation}deg)`;
       } else {
         const idx = tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0;
         top = `${(Math.floor(idx / 15) + 0.5) * (100 / 15)}%`;
         left = `${(idx % 15 + 0.5) * (100 / 15)}%`;
-        const tokensHere = allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === idx);
+        const tokensHere = allTokens.filter(x => x.progress >= 0 && x.progress < 56 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === idx);
         const styleObj = getTrackTokenStyle(tokensHere.findIndex(x => x.id === t.id), tokensHere.length);
         transform = styleObj.transform;
       }
+
       const isLegalToken = legalTokens.includes(t.id) && me?.tokens.some(mt => mt.id === t.id);
       const isCapturedFlying = capturedFlyingIds.has(t.id);
-      const innerClass = `game-pawn-inner ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""} ${isCapturedFlying ? "pawn-spin-shrink" : ""}`;
+      const isJustPocketed = justPocketedId === t.id;
+      const isYardBouncing = isYard && isLegalToken && game.dice === 6;
+
+      const innerClass = `game-pawn-inner ${tokenAnimation===t.id ? "pawn--animate token-hop" : ""} ${isCapturedFlying ? "pawn-spin-shrink" : ""} ${isHome ? "pawn--home" : ""} ${isJustPocketed ? "pawn--home-landing" : ""} ${isYardBouncing ? "yard-pawn--bouncing" : ""}`;
+      
+      const homeColorTokens = isHome ? allTokens.filter(x => x.color === t.color && x.progress >= 56) : [];
+      const homeSlotIdx = isHome ? homeColorTokens.findIndex(x => x.id === t.id) : 0;
+      const tokensOnTrack = (!isYard && !isHome) ? allTokens.filter(x => x.progress >= 0 && x.progress < 56 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0)) : [];
+      
+      const zIndexVal = isCapturedFlying
+        ? 45
+        : isJustPocketed
+        ? 40
+        : isHome
+        ? 20 + (homeSlotIdx >= 0 ? homeSlotIdx : 0)
+        : isYard
+        ? 5
+        : 10 + tokensOnTrack.findIndex(x => x.id === t.id);
+
       const style: React.CSSProperties = {
         position: 'absolute',
         top,
@@ -279,18 +462,30 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
         transition: isCapturedFlying
           ? 'top 0.55s cubic-bezier(0.25, 1, 0.5, 1), left 0.55s cubic-bezier(0.25, 1, 0.5, 1), transform 0.55s ease'
           : 'top 0.25s linear, left 0.25s linear, transform 0.25s linear',
-        zIndex: isCapturedFlying ? 40 : (isYard ? 5 : 10 + (allTokens.filter(x => x.progress >= 0 && tokenCellIndex(x.color, x.progress, x.ordinal - 1) === (isYard ? -1 : tokenCellIndex(t.color, t.progress, t.ordinal - 1) ?? 0)).findIndex(x => x.id === t.id))),
+        zIndex: zIndexVal,
         '--token-color': COLOR_HEX[t.color]
       } as any;
+
+      const handleTokenClick = () => {
+        if (isYard) {
+          playSound("enter");
+        }
+        onMove(t.id);
+      };
+
       if(isLegalToken) {
         return (
-          <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={()=>onMove(t.id)} aria-label={`Move ${t.color} token`}>
+          <button key={t.id} style={style} className="game-pawn-wrapper legal-token" onClick={handleTokenClick} aria-label={`Move ${t.color} token`}>
+            {isYardBouncing && <div className="yard-token-ring-pulse" />}
+            {isHome && <span className="home-crown-badge">👑</span>}
             <span className={innerClass}><TokenSvg color={t.color} /></span>
           </button>
         );
       }
       return (
         <div key={t.id} style={style} className="game-pawn-wrapper" aria-label={`${t.color} token`}>
+          {isYardBouncing && <div className="yard-token-ring-pulse" />}
+          {isHome && <span className="home-crown-badge">👑</span>}
           <div className={innerClass}><TokenSvg color={t.color} /></div>
         </div>
       );
