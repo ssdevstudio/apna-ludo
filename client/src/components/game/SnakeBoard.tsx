@@ -40,6 +40,7 @@ export function SnakeBoard({
   const visualProgressRef = useRef<Record<string, number>>({});
   const [, setForceRender] = useState(0);
   const [activeBanner, setActiveBanner] = useState<BannerEvent | null>(null);
+  const [slidingToken, setSlidingToken] = useState<{ id: string; type: "ladder" | "snake" } | null>(null);
 
   // Generate 100 cells in 10x10 grid order: row 0 (top) to row 9 (bottom)
   const cells = useMemo(() => {
@@ -132,9 +133,11 @@ export function SnakeBoard({
               color: t.color,
             });
             setTimeout(() => {
+              setSlidingToken({ id: t.id, type: "ladder" });
               visualProgressRef.current[t.id] = t.target;
               setForceRender((x) => x + 1);
               playSound("ladder");
+              setTimeout(() => setSlidingToken(null), 850);
             }, 300);
             setTimeout(() => setActiveBanner(null), 1800);
           } else if (t.snake) {
@@ -147,9 +150,11 @@ export function SnakeBoard({
               color: t.color,
             });
             setTimeout(() => {
+              setSlidingToken({ id: t.id, type: "snake" });
               visualProgressRef.current[t.id] = t.target;
               setForceRender((x) => x + 1);
               playSound("snake");
+              setTimeout(() => setSlidingToken(null), 850);
             }, 300);
             setTimeout(() => setActiveBanner(null), 1800);
           } else {
@@ -541,8 +546,14 @@ export function SnakeBoard({
 
           const isLegal = legalTokens.includes(tokenId) && me?.id === p.id;
           const isAnimating = tokenAnimation === tokenId;
+          const isSlidingLadder = slidingToken?.id === tokenId && slidingToken.type === "ladder";
+          const isSlidingSnake = slidingToken?.id === tokenId && slidingToken.type === "snake";
+          const isSliding = isSlidingLadder || isSlidingSnake;
+
           const innerClass = `game-pawn-inner ${
             isAnimating ? "pawn--animate token-hop" : ""
+          } ${isSlidingLadder ? "pawn--sliding-ladder" : ""} ${
+            isSlidingSnake ? "pawn--sliding-snake" : ""
           }`;
 
           const style: React.CSSProperties = {
@@ -550,9 +561,10 @@ export function SnakeBoard({
             top,
             left,
             transform,
-            transition:
-              "top 0.22s ease-out, left 0.22s ease-out, transform 0.22s ease-out",
-            zIndex: 20 + (isLegal ? 5 : 0),
+            transition: isSliding
+              ? "top 0.8s cubic-bezier(0.25, 1, 0.5, 1), left 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s ease"
+              : "top 0.16s ease-out, left 0.16s ease-out, transform 0.16s ease-out",
+            zIndex: 20 + (isLegal ? 5 : 0) + (isSliding ? 30 : 0),
             "--token-color": COLOR_HEX[p.color],
           } as any;
 

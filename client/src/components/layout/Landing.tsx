@@ -11,6 +11,7 @@ import { BoardThemeModal } from "../modals/BoardThemeModal";
 import { PlayerProfileModal } from "../modals/PlayerProfileModal";
 import { PlayFriendsModal } from "../modals/PlayFriendsModal";
 import { PlayComputerModal } from "../modals/PlayComputerModal";
+import { SnakeModeModal } from "../modals/SnakeModeModal";
 import { getProgression } from "../../utils/progression";
 
 export function Landing() {
@@ -28,6 +29,8 @@ export function Landing() {
   const [playComputerOpen, setPlayComputerOpen] = useState(false);
   const [computerGameType, setComputerGameType] = useState<"ludo" | "snake">("ludo");
   const [passNPlayOpen, setPassNPlayOpen] = useState(false);
+  const [passNPlayGameType, setPassNPlayGameType] = useState<"ludo" | "snake">("ludo");
+  const [snakeModeModalOpen, setSnakeModeModalOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [bonusOpen, setBonusOpen] = useState(false);
   const [themeModalOpen, setThemeModalOpen] = useState(false);
@@ -223,22 +226,22 @@ export function Landing() {
               <button
                 type="button"
                 className="mode-card mode-card--snake"
-                onClick={() => {
-                  setComputerGameType("snake");
-                  setPlayComputerOpen(true);
-                }}
+                onClick={() => setSnakeModeModalOpen(true)}
               >
                 <span className="mode-card-badge">100 TILES</span>
                 <div className="mode-card-icon-wrap">🐍</div>
                 <h3 className="mode-card-title">SAANP SEEDHI</h3>
-                <p className="mode-card-desc">Ladders &amp; Snakes (Bot or Friends)</p>
+                <p className="mode-card-desc">Ladders &amp; Snakes (Bot, Friends, Local)</p>
               </button>
 
               {/* Card 4: Pass N Play */}
               <button
                 type="button"
                 className="mode-card mode-card--pass"
-                onClick={() => setPassNPlayOpen(true)}
+                onClick={() => {
+                  setPassNPlayGameType("ludo");
+                  setPassNPlayOpen(true);
+                }}
               >
                 <span className="mode-card-badge">SAME DEVICE</span>
                 <div className="mode-card-icon-wrap">📱</div>
@@ -373,6 +376,29 @@ export function Landing() {
         <PassNPlayModal
           isOpen={passNPlayOpen}
           onClose={() => setPassNPlayOpen(false)}
+          defaultGameType={passNPlayGameType}
+        />
+      )}
+
+      {snakeModeModalOpen && (
+        <SnakeModeModal
+          isOpen={snakeModeModalOpen}
+          onClose={() => setSnakeModeModalOpen(false)}
+          onSelectVsComputer={() => {
+            setSnakeModeModalOpen(false);
+            setComputerGameType("snake");
+            setPlayComputerOpen(true);
+          }}
+          onSelectPlayWithFriends={() => {
+            setSnakeModeModalOpen(false);
+            setFriendsGameType("snake");
+            setPlayFriendsOpen(true);
+          }}
+          onSelectPassNPlay={() => {
+            setSnakeModeModalOpen(false);
+            setPassNPlayGameType("snake");
+            setPassNPlayOpen(true);
+          }}
         />
       )}
 

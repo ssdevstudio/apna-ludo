@@ -6,12 +6,17 @@ import { playSound } from "../../utils/audio";
 interface PassNPlayModalProps {
   isOpen: boolean;
   onClose: () => void;
+  defaultGameType?: "ludo" | "snake";
 }
 
-export function PassNPlayModal({ isOpen, onClose }: PassNPlayModalProps) {
+export function PassNPlayModal({
+  isOpen,
+  onClose,
+  defaultGameType = "ludo",
+}: PassNPlayModalProps) {
   const navigate = useNavigate();
   const [playerCount, setPlayerCount] = useState<2 | 3 | 4>(2);
-  const [gameType, setGameType] = useState<"ludo" | "snake">("ludo");
+  const [gameType, setGameType] = useState<"ludo" | "snake">(defaultGameType);
   const [gameMode, setGameMode] = useState<"classic" | "quick">("classic");
 
   const [playerNames, setPlayerNames] = useState<Record<number, string>>({
