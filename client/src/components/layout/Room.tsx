@@ -27,6 +27,7 @@ import { Logo } from "../ui/Logo";
 import { PlayerSeat, PlayerCorner } from "../game/PlayerCard";
 import { LudoBoard } from "../game/LudoBoard";
 import { SnakeBoard } from "../game/SnakeBoard";
+import { WaitingLobby } from "../game/WaitingLobby";
 import { ChatSidebar } from "../chat/ChatSidebar";
 import { EmojiReactionSystem } from "../chat/EmojiReactionSystem";
 
@@ -308,8 +309,9 @@ export function Room() {
   const allChatMessages = chatMsgs;
 
   const renderCorner = (color: PlayerColor, pos: 'top-left'|'top-right'|'bottom-left'|'bottom-right') => {
+    const isLobby = snapshot?.phase === "lobby";
     const p = snapshot?.game ? snapshot.game.players.find(p=>p.color===color) : snapshot?.players.find(p=>p.color===color);
-    const isActive = snapshot?.phase === "playing" && snapshot?.game?.currentPlayerId === p?.id;
+    const isActive = !isLobby && snapshot?.phase === "playing" && snapshot?.game?.currentPlayerId === p?.id;
     const isMe = p?.id === playerId;
     const visualActivePlayerId = rollingPlayerId ? rollingPlayerId : snapshot?.game?.currentPlayerId;
     
@@ -329,15 +331,16 @@ export function Room() {
         <PlayerCorner
           player={p}
           position={pos}
-          isActive={visualActivePlayerId === p?.id && snapshot?.game?.phase === "playing"}
+          isActive={!isLobby && visualActivePlayerId === p?.id && snapshot?.game?.phase === "playing"}
           diceValue={displayDice}
-          isRolling={rollingPlayerId === p?.id}
-          canRoll={canRoll && isMe && !rollingPlayerId}
-          canMove={canMove && isMe}
+          isRolling={!isLobby && rollingPlayerId === p?.id}
+          canRoll={!isLobby && canRoll && isMe && !rollingPlayerId}
+          canMove={!isLobby && canMove && isMe}
           onRoll={rollDice}
           avatar={isMe ? myAvatar : ""}
-          timeLeft={timerRunning ? timeLeft : undefined}
+          timeLeft={!isLobby && timerRunning ? timeLeft : undefined}
           missedCount={gp?.missedTurnCount ?? 0}
+          hideDice={isLobby}
         />
       </div>
     );
@@ -356,9 +359,35 @@ export function Room() {
   const brColor = shifted[2];
   const blColor = shifted[3];
   const boardRotation = shift * 90;
-  const isBotGame = snapshot?.players.some(p => p.id.startsWith("bot-") || (p as any).isBot);
+  const isBotGame = Boolean(snapshot?.players?.some(p => p.id.startsWith("bot-") || (p as any).isBot));
   const entryFee = snapshot?.entryFee ?? Number(sessionStorage.getItem("apna-bet")) ?? 0;
   const potAmount = entryFee > 0 ? entryFee * (snapshot?.players?.length || 2) : 0;
+
+  const lobbyGame: any = {
+    phase: "playing",
+    revision: snapshot?.revision ?? 0,
+    players: (snapshot?.players && snapshot.players.length > 0 ? snapshot.players : [
+      { id: "p1", name: "Player 1", color: "red", ready: true, connected: true, isHost: true },
+    ]).map((p) => ({
+      id: p.id,
+      name: p.name,
+      color: p.color,
+      status: "active",
+      tokens: Array.from({ length: snapshot?.gameType === "snake" ? 1 : 4 }, (_, idx) => ({
+        id: `${p.id}:${idx}`,
+        progress: snapshot?.gameType === "snake" ? 0 : -1,
+      })),
+      missedTurnCount: 0,
+    })),
+    currentPlayerId: "",
+    dice: null,
+    movableTokenIds: [],
+    consecutiveSixes: 0,
+    winners: [],
+    lastAction: null,
+    gameType: snapshot?.gameType ?? "ludo",
+    gameMode: snapshot?.gameMode ?? "classic",
+  };
 
   return <main className="room-page" data-board-theme={boardTheme}>
     <header className="room-header"><Logo compact/>
@@ -448,50 +477,23 @@ export function Room() {
       </aside>
 
       <section className="table-area">
-        <div className="board-container">
+        <div className="board-container" style={{ position: "relative" }}>
           {renderCorner(tlColor, 'top-left')}
           {renderCorner(trColor, 'top-right')}
           
           <div className="board-center">
             {snapshot?.gameType === "snake" ? (
-              snapshot?.game ? (
-                <SnakeBoard
-                  game={snapshot.game}
-                  myPlayerId={playerId}
-                  legalTokens={legalTokens}
-                  onMove={moveToken}
-                  tokenAnimation={tokenAnimation}
-                  boardRotation={boardRotation}
-                />
-              ) : (
-                <SnakeBoard
-                  game={{
-                    phase: "playing",
-                    revision: 0,
-                    players: (snapshot?.players ?? []).map((p) => ({
-                      id: p.id,
-                      name: p.name,
-                      color: p.color,
-                      status: "active",
-                      tokens: [{ id: `${p.id}:0`, progress: 0 }],
-                    })),
-                    currentPlayerId: "",
-                    dice: null,
-                    movableTokenIds: [],
-                    consecutiveSixes: 0,
-                    winners: [],
-                    lastAction: null,
-                    gameType: "snake",
-                  }}
-                  myPlayerId={playerId}
-                  legalTokens={[]}
-                  onMove={() => {}}
-                  boardRotation={boardRotation}
-                />
-              )
-            ) : snapshot?.game ? (
+              <SnakeBoard
+                game={snapshot?.game ?? lobbyGame}
+                myPlayerId={playerId}
+                legalTokens={legalTokens}
+                onMove={moveToken}
+                tokenAnimation={tokenAnimation}
+                boardRotation={boardRotation}
+              />
+            ) : (
               <LudoBoard 
-                game={snapshot.game} 
+                game={snapshot?.game ?? lobbyGame} 
                 myPlayerId={playerId} 
                 legalTokens={legalTokens} 
                 onMove={moveToken} 
@@ -500,28 +502,39 @@ export function Room() {
                 activeTokenId={tokenAnimation}
                 onCapture={handleCapture}
               />
-            ) : (
-              <div className="board-shell" style={{ transform: `rotate(${boardRotation}deg)`, transition: 'transform 0.5s ease-in-out' }}>
-                <div className="ludo-board" role="grid" aria-label="Empty Ludo board" style={{maxHeight:"620px"}}>
-                  <div className="home-yard yard-red">{[0,1,2,3].map(i=><img key={i} src="/token-red.png" alt="red" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
-                  <div className="home-yard yard-blue">{[0,1,2,3].map(i=><img key={i} src="/token-blue.png" alt="blue" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
-                  <div className="home-yard yard-green">{[0,1,2,3].map(i=><img key={i} src="/token-green.png" alt="green" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
-                  <div className="home-yard yard-yellow">{[0,1,2,3].map(i=><img key={i} src="/token-yellow.png" alt="yellow" className="yard-token" style={{transform:`rotate(-${boardRotation}deg)`}}/>)}</div>
-                </div>
-              </div>
             )}
           </div>
 
           {renderCorner(blColor, 'bottom-left')}
           {renderCorner(brColor, 'bottom-right')}
+
+          {snapshot?.phase === "lobby" && (
+            <WaitingLobby
+              snapshot={snapshot}
+              playerId={playerId}
+              myAvatar={myAvatar}
+              isHost={me?.isHost ?? false}
+              onStart={startGame}
+              onToggleReady={toggleReady}
+              onCopyInvite={copyInvite}
+              copied={copied}
+              potAmount={potAmount}
+              isBotGame={isBotGame}
+            />
+          )}
         </div>
 
-        <div className="lobby-controls">
-          {snapshot?.phase==="lobby"?<>
-            <div className="lobby-note"><span>✦</span><div><b>Your private table is ready</b><small>Invite friends via the room code above.</small></div></div>
-            {me?.isHost?<button className="primary-button start-button" onClick={startGame} disabled={(snapshot?.players??[]).length !== snapshot?.maxPlayers || !(snapshot?.players??[]).every(p=>p.ready)}>{tr("start.game")} <span>→</span></button>:<button className="primary-button start-button" onClick={toggleReady}>{me?.ready?tr("unready"):tr("ready")}</button>}
-          </>:finished?<div className="lobby-note"><span>🏆</span><div><b>{iWon?tr("win.msg"):`Winner: ${snapshot?.game?.players.find(p=>p.id===winners[0])?.name??"Someone"}`}</b><small><button className="text-button" onClick={leaveRoom} style={{fontSize:10}}>{tr("back.home")}</button></small></div></div>:null}
-        </div>
+        {finished && (
+          <div className="lobby-controls">
+            <div className="lobby-note">
+              <span>🏆</span>
+              <div>
+                <b>{iWon ? tr("win.msg") : `Winner: ${snapshot?.game?.players.find(p=>p.id===winners[0])?.name??"Someone"}`}</b>
+                <small><button className="text-button" onClick={leaveRoom} style={{fontSize:10}}>{tr("back.home")}</button></small>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
       <ChatSidebar 
         chatOpen={chatOpen}

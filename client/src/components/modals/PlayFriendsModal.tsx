@@ -11,6 +11,7 @@ interface PlayFriendsModalProps {
   playerName: string;
   avatar: string;
   initialCode?: string;
+  defaultGameType?: "ludo" | "snake";
 }
 
 export function PlayFriendsModal({
@@ -20,13 +21,14 @@ export function PlayFriendsModal({
   playerName,
   avatar,
   initialCode = "",
+  defaultGameType = "ludo",
 }: PlayFriendsModalProps) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"create" | "join">(initialCode ? "join" : "create");
   
   // Create Room state
   const [maxPlayers, setMaxPlayers] = useState<2 | 3 | 4>(4);
-  const [gameType, setGameType] = useState<"ludo" | "snake">("ludo");
+  const [gameType, setGameType] = useState<"ludo" | "snake">(defaultGameType);
   const [gameMode, setGameMode] = useState<"classic" | "quick">("classic");
   const [createColor, setCreateColor] = useState<PlayerColor>("red");
   const [entryFee, setEntryFee] = useState<number>(500);

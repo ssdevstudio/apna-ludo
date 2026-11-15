@@ -9,7 +9,6 @@ import { LuckySpinWheelModal } from "../modals/LuckySpinWheelModal";
 import { PassNPlayModal } from "../modals/PassNPlayModal";
 import { BoardThemeModal } from "../modals/BoardThemeModal";
 import { PlayerProfileModal } from "../modals/PlayerProfileModal";
-import { PlayOnlineModal } from "../modals/PlayOnlineModal";
 import { PlayFriendsModal } from "../modals/PlayFriendsModal";
 import { PlayComputerModal } from "../modals/PlayComputerModal";
 import { getProgression } from "../../utils/progression";
@@ -24,8 +23,8 @@ export function Landing() {
   const [showAvatars, setShowAvatars] = useState(false);
 
   // Modals
-  const [playOnlineOpen, setPlayOnlineOpen] = useState(false);
   const [playFriendsOpen, setPlayFriendsOpen] = useState(Boolean(initialCode));
+  const [friendsGameType, setFriendsGameType] = useState<"ludo" | "snake">("ludo");
   const [playComputerOpen, setPlayComputerOpen] = useState(false);
   const [computerGameType, setComputerGameType] = useState<"ludo" | "snake">("ludo");
   const [passNPlayOpen, setPassNPlayOpen] = useState(false);
@@ -190,23 +189,14 @@ export function Landing() {
 
             {/* The 4 Iconic Ludo King Quadrants */}
             <div className="game-modes-grid">
-              {/* Card 1: Play Online */}
-              <button
-                type="button"
-                className="mode-card mode-card--online"
-                onClick={() => setPlayOnlineOpen(true)}
-              >
-                <span className="mode-card-badge">🔥 LIVE</span>
-                <div className="mode-card-icon-wrap">🌐</div>
-                <h3 className="mode-card-title">PLAY ONLINE</h3>
-                <p className="mode-card-desc">Match Players Worldwide</p>
-              </button>
-
-              {/* Card 2: Play With Friends */}
+              {/* Card 1: Play With Friends */}
               <button
                 type="button"
                 className="mode-card mode-card--friends"
-                onClick={() => setPlayFriendsOpen(true)}
+                onClick={() => {
+                  setFriendsGameType("ludo");
+                  setPlayFriendsOpen(true);
+                }}
               >
                 <span className="mode-card-badge">ROOM CODE</span>
                 <div className="mode-card-icon-wrap">👥</div>
@@ -214,7 +204,7 @@ export function Landing() {
                 <p className="mode-card-desc">Private Room &amp; Custom Bets</p>
               </button>
 
-              {/* Card 3: Vs Computer */}
+              {/* Card 2: Vs Computer */}
               <button
                 type="button"
                 className="mode-card mode-card--computer"
@@ -227,6 +217,21 @@ export function Landing() {
                 <div className="mode-card-icon-wrap">🤖</div>
                 <h3 className="mode-card-title">VS COMPUTER</h3>
                 <p className="mode-card-desc">Practice with Smart AI</p>
+              </button>
+
+              {/* Card 3: Saanp Seedhi */}
+              <button
+                type="button"
+                className="mode-card mode-card--snake"
+                onClick={() => {
+                  setComputerGameType("snake");
+                  setPlayComputerOpen(true);
+                }}
+              >
+                <span className="mode-card-badge">100 TILES</span>
+                <div className="mode-card-icon-wrap">🐍</div>
+                <h3 className="mode-card-title">SAANP SEEDHI</h3>
+                <p className="mode-card-desc">Ladders &amp; Snakes (Bot or Friends)</p>
               </button>
 
               {/* Card 4: Pass N Play */}
@@ -265,10 +270,13 @@ export function Landing() {
                 <button
                   type="button"
                   className="saanp-action-btn"
-                  onClick={() => setPlayOnlineOpen(true)}
+                  onClick={() => {
+                    setFriendsGameType("snake");
+                    setPlayFriendsOpen(true);
+                  }}
                   style={{ background: "#065f46", color: "#ffffff" }}
                 >
-                  Play Online 🌐
+                  Play with Friends 👥
                 </button>
               </div>
             </div>
@@ -338,16 +346,6 @@ export function Landing() {
       </footer>
 
       {/* Game Launcher Modals */}
-      {playOnlineOpen && (
-        <PlayOnlineModal
-          isOpen={playOnlineOpen}
-          onClose={() => setPlayOnlineOpen(false)}
-          onOpenBonus={() => setBonusOpen(true)}
-          playerName={name}
-          avatar={avatar}
-        />
-      )}
-
       {playFriendsOpen && (
         <PlayFriendsModal
           isOpen={playFriendsOpen}
@@ -356,6 +354,7 @@ export function Landing() {
           playerName={name}
           avatar={avatar}
           initialCode={initialCode}
+          defaultGameType={friendsGameType}
         />
       )}
 

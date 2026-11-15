@@ -32,6 +32,7 @@ export function PlayerCorner({
   avatar,
   timeLeft,
   missedCount,
+  hideDice = false,
 }: {
   player?: GamePlayer | RoomPlayerSnapshot;
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -44,6 +45,7 @@ export function PlayerCorner({
   avatar: string;
   timeLeft?: number;
   missedCount?: number;
+  hideDice?: boolean;
 }) {
   if (!player) {
     return <div className={`player-corner corner-${position} empty`}></div>;
@@ -102,17 +104,19 @@ export function PlayerCorner({
         />
       )}
 
-      <div className={`corner-dice ${isActive && (canRoll || canMove || isRolling) ? 'dice-active' : ''}`}>
-        <div className="dice-tray-cushion">
-          <button
-            className="corner-roll-btn"
-            onClick={onRoll}
-            disabled={!canRoll && !canMove}
-          >
-            <Die value={diceValue ?? 1} rolling={isRolling} />
-          </button>
+      {!hideDice && (
+        <div className={`corner-dice ${isActive && (canRoll || canMove || isRolling) ? 'dice-active' : ''}`}>
+          <div className="dice-tray-cushion">
+            <button
+              className="corner-roll-btn"
+              onClick={onRoll}
+              disabled={!canRoll && !canMove}
+            >
+              <Die value={diceValue ?? 1} rolling={isRolling} />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
