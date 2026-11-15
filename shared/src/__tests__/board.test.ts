@@ -6,7 +6,7 @@ import {
   STAR_CELLS, START_CELLS, SAFE_CELLS, CELL_COUNT, STAR_JUMP,
   GRID_SIZE, CENTER_CELL, PLAYER_COLORS, cellType,
   progressToCellIndex, progressToPathIndex, pathIndexToCell,
-  START_OFFSETS,
+  START_OFFSETS, OPPOSITE_COLORS, getOppositeColor,
 } from "../board.js";
 
 describe("Board validation — path integrity", () => {
@@ -259,5 +259,27 @@ describe("Board validation — movement integrity", () => {
 describe("Board validation — no missing/duplicate coordinates", () => {
   it("all 225 grid cells in range", () => {
     expect(CELL_COUNT).toBe(225);
+  });
+});
+
+describe("2-Player Opposite (Cross) Color Geometry (Ludo King rule)", () => {
+  it("maps Red to Yellow and Yellow to Red", () => {
+    expect(getOppositeColor("red")).toBe("yellow");
+    expect(getOppositeColor("yellow")).toBe("red");
+    expect(OPPOSITE_COLORS.red).toBe("yellow");
+  });
+
+  it("maps Green to Blue and Blue to Green", () => {
+    expect(getOppositeColor("green")).toBe("blue");
+    expect(getOppositeColor("blue")).toBe("green");
+    expect(OPPOSITE_COLORS.green).toBe("blue");
+  });
+
+  it("every opposite pair is exactly 26 squares apart (symmetrical 180° cross)", () => {
+    for (const color of PLAYER_COLORS) {
+      const opp = getOppositeColor(color);
+      const diff = (START_OFFSETS[opp] - START_OFFSETS[color] + 52) % 52;
+      expect(diff).toBe(26); // exactly half the 52-square loop
+    }
   });
 });

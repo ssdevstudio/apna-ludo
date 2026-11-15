@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlayerColor, PLAYER_COLORS } from "@apna-ludo/shared";
+import { PlayerColor, PLAYER_COLORS, OPPOSITE_COLORS } from "@apna-ludo/shared";
 import { playSound } from "../../utils/audio";
 import { deductCoins } from "../../utils/progression";
 
@@ -178,6 +178,11 @@ export function PlayComputerModal({
                 />
               ))}
             </div>
+            {maxPlayers === 2 && (
+              <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--teal)" }}>
+                Bot Seat: <b style={{ textTransform: "uppercase" }}>{OPPOSITE_COLORS[preferredColor]}</b> (Cross / Diagonally Opposite)
+              </p>
+            )}
           </div>
         </div>
 

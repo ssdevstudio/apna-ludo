@@ -10,6 +10,8 @@ import {
   type CommandResult,
   type TokenState,
   PLAYER_COLORS,
+  getOppositeColor,
+  OPPOSITE_COLORS,
   createGame,
   applyRoll,
   applyMove,
@@ -198,12 +200,22 @@ export function createRoomWithComputer(
 
   const usedColors = new Set<PlayerColor>();
   usedColors.add(preferredColor);
-  const availableColors = PLAYER_COLORS.filter(c => !usedColors.has(c));
+
+  // In 2-player match, the opponent is ALWAYS diagonally opposite (cross) - Ludo King authentic rule
+  let botColorList: PlayerColor[] = [];
+  if (maxPlayers === 2) {
+    botColorList = [getOppositeColor(preferredColor)];
+  } else {
+    // For 3 or 4 players, prioritize opposite color first for fair board balance
+    const opposite = getOppositeColor(preferredColor);
+    const rest = PLAYER_COLORS.filter(c => c !== preferredColor && c !== opposite);
+    botColorList = [opposite, ...rest];
+  }
 
   // Add computer players
   for (let i = 0; i < maxPlayers - 1; i++) {
     const botId = `bot-${crypto.randomUUID().slice(0, 8)}`;
-    const botColor = availableColors[i]!;
+    const botColor = botColorList[i]!;
     const botPlayer: RoomPlayerData = {
       id: botId,
       name: `Bot ${i + 1}`,
@@ -342,7 +354,11 @@ export function joinRoom(
   for (const [, p] of room.players) usedColors.add(p.color);
   
   let color = preferredColor;
-  if (!color || usedColors.has(color)) {
+  // In 2-player room, the joining player MUST always take the diagonally opposite (cross) color!
+  if (room.maxPlayers === 2 && room.players.size === 1) {
+    const hostColor = Array.from(room.players.values())[0]!.color;
+    color = getOppositeColor(hostColor);
+  } else if (!color || usedColors.has(color)) {
     color = nextColor(usedColors);
   }
 

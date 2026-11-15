@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlayerColor, PLAYER_COLORS } from "@apna-ludo/shared";
+import { PlayerColor, PLAYER_COLORS, getOppositeColor, OPPOSITE_COLORS } from "@apna-ludo/shared";
 import { playSound } from "../../utils/audio";
 import { deductCoins, getProgression } from "../../utils/progression";
 
@@ -124,8 +124,13 @@ export function PlayFriendsModal({
           return;
         }
         setPreviewData(data);
-        const available = PLAYER_COLORS.find((c) => !data.usedColors.includes(c));
-        if (available) setJoinColor(available);
+        if (data.maxPlayers === 2 && data.usedColors && data.usedColors.length > 0) {
+          const hostColor = data.usedColors[0] as PlayerColor;
+          setJoinColor(getOppositeColor(hostColor));
+        } else {
+          const available = PLAYER_COLORS.find((c) => !data.usedColors.includes(c));
+          if (available) setJoinColor(available);
+        }
         setJoinStep("preview");
       } else {
         setError(data.error === "ROOM_NOT_FOUND" ? "Room not found." : "Failed to fetch room.");
@@ -273,6 +278,11 @@ export function PlayFriendsModal({
                     />
                   ))}
                 </div>
+                {maxPlayers === 2 && (
+                  <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--teal)" }}>
+                    Opponent Seat: <b style={{ textTransform: "uppercase" }}>{OPPOSITE_COLORS[createColor]}</b> (Cross Corner)
+                  </p>
+                )}
               </div>
             </div>
 
@@ -376,18 +386,27 @@ export function PlayFriendsModal({
                   <div className="color-picker-row" style={{ justifyContent: "center", gap: "12px" }}>
                     {PLAYER_COLORS.map((c) => {
                       const taken = previewData?.usedColors.includes(c);
+                      const is2P = previewData?.maxPlayers === 2 && previewData.usedColors && previewData.usedColors.length > 0;
+                      const hostColor = is2P ? (previewData.usedColors[0] as PlayerColor) : null;
+                      const isOpposite = hostColor ? c === getOppositeColor(hostColor) : true;
+                      const disabled = taken || (is2P && !isOpposite);
                       return (
                         <button
                           key={c}
                           type="button"
-                          disabled={taken}
-                          title={taken ? "Color already taken" : ""}
-                          className={`color-btn ${c} ${joinColor === c ? "active" : ""} ${taken ? "taken" : ""}`}
+                          disabled={disabled}
+                          title={taken ? "Color already taken" : is2P && !isOpposite ? "In 2-player mode, you play diagonally opposite (cross) the host" : ""}
+                          className={`color-btn ${c} ${joinColor === c ? "active" : ""} ${disabled ? "taken" : ""}`}
                           onClick={() => setJoinColor(c)}
                         />
                       );
                     })}
                   </div>
+                  {previewData?.maxPlayers === 2 && (
+                    <p style={{ margin: "6px 0 0", fontSize: "11px", color: "var(--teal)", textAlign: "center" }}>
+                      2-Player Mode: Diagonally Opposite (Cross) Seat Selected
+                    </p>
+                  )}
                 </div>
 
                 {error && <p className="form-error" role="alert" style={{ margin: "8px 0" }}>{error}</p>}

@@ -16,6 +16,22 @@ export const PLAYER_COLORS: [PlayerColor, ...PlayerColor[]] = [
 ];
 
 /**
+ * Diagonally opposite (cross) colors for fair 2-player matches (Ludo King authentic rule):
+ * - Red (Bottom-Left) <-> Yellow (Top-Right)
+ * - Green (Top-Left) <-> Blue (Bottom-Right)
+ */
+export const OPPOSITE_COLORS: Record<PlayerColor, PlayerColor> = {
+  red: "yellow",
+  yellow: "red",
+  green: "blue",
+  blue: "green",
+};
+
+export function getOppositeColor(color: PlayerColor): PlayerColor {
+  return OPPOSITE_COLORS[color];
+}
+
+/**
  * Every cell on the board has exactly one type.
  */
 export type CellType =

@@ -30,10 +30,12 @@ export function PassNPlayModal({
 
   const handleStart = () => {
     playSound("click");
+    // In 2-player match, players sit diagonally opposite (Red vs Yellow) - authentic Ludo King
+    const localColors = playerCount === 2 ? (["red", "yellow"] as PlayerColor[]) : (PLAYER_COLORS as PlayerColor[]);
     const activePlayers = Array.from({ length: playerCount }).map((_, idx) => ({
       id: `local-p${idx + 1}`,
       name: playerNames[idx]?.trim() || `Player ${idx + 1}`,
-      color: PLAYER_COLORS[idx] as PlayerColor,
+      color: localColors[idx] as PlayerColor,
     }));
 
     const config = {
@@ -130,7 +132,8 @@ export function PassNPlayModal({
           <label>Player Names &amp; Colors</label>
           <div className="player-inputs-list">
             {Array.from({ length: playerCount }).map((_, idx) => {
-              const color = PLAYER_COLORS[idx]!;
+              const localColors = playerCount === 2 ? (["red", "yellow"] as PlayerColor[]) : (PLAYER_COLORS as PlayerColor[]);
+              const color = localColors[idx]!;
               return (
                 <div key={idx} className="player-name-row">
                   <span className={`player-color-dot dot-${color}`} />
