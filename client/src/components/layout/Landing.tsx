@@ -13,6 +13,7 @@ import { PlayFriendsModal } from "../modals/PlayFriendsModal";
 import { PlayComputerModal } from "../modals/PlayComputerModal";
 import { SnakeModeModal } from "../modals/SnakeModeModal";
 import { getProgression } from "../../utils/progression";
+import { playSound } from "../../utils/audio";
 
 export function Landing() {
   const initialCode = new URLSearchParams(window.location.search).get("join") || "";
@@ -24,6 +25,7 @@ export function Landing() {
   const [showAvatars, setShowAvatars] = useState(false);
 
   // Modals
+  const [activeGameTab, setActiveGameTab] = useState<"ludo" | "snake">("ludo");
   const [playFriendsOpen, setPlayFriendsOpen] = useState(Boolean(initialCode));
   const [friendsGameType, setFriendsGameType] = useState<"ludo" | "snake">("ludo");
   const [playComputerOpen, setPlayComputerOpen] = useState(false);
@@ -190,108 +192,177 @@ export function Landing() {
               </div>
             )}
 
-            {/* The 4 Iconic Ludo King Quadrants */}
-            <div className="game-modes-grid">
-              {/* Card 1: Play With Friends */}
+            {/* Game Selector Tabs: Ludo vs Saanp Seedhi */}
+            <div className="game-switcher-bar">
               <button
                 type="button"
-                className="mode-card mode-card--friends"
+                className={`game-switcher-tab ${activeGameTab === "ludo" ? "tab-active-ludo" : ""}`}
                 onClick={() => {
-                  setFriendsGameType("ludo");
-                  setPlayFriendsOpen(true);
+                  playSound("click");
+                  setActiveGameTab("ludo");
                 }}
               >
-                <span className="mode-card-badge">ROOM CODE</span>
-                <div className="mode-card-icon-wrap">👥</div>
-                <h3 className="mode-card-title">PLAY WITH FRIENDS</h3>
-                <p className="mode-card-desc">Private Room &amp; Custom Bets</p>
+                <span className="tab-icon">🎲</span>
+                <span className="tab-title">LUDO</span>
+                <span className="tab-badge">3 MODES</span>
               </button>
-
-              {/* Card 2: Vs Computer */}
               <button
                 type="button"
-                className="mode-card mode-card--computer"
+                className={`game-switcher-tab ${activeGameTab === "snake" ? "tab-active-snake" : ""}`}
                 onClick={() => {
-                  setComputerGameType("ludo");
-                  setPlayComputerOpen(true);
+                  playSound("click");
+                  setActiveGameTab("snake");
                 }}
               >
-                <span className="mode-card-badge">OFFLINE</span>
-                <div className="mode-card-icon-wrap">🤖</div>
-                <h3 className="mode-card-title">VS COMPUTER</h3>
-                <p className="mode-card-desc">Practice with Smart AI</p>
-              </button>
-
-              {/* Card 3: Saanp Seedhi */}
-              <button
-                type="button"
-                className="mode-card mode-card--snake"
-                onClick={() => setSnakeModeModalOpen(true)}
-              >
-                <span className="mode-card-badge">100 TILES</span>
-                <div className="mode-card-icon-wrap">🐍</div>
-                <h3 className="mode-card-title">SAANP SEEDHI</h3>
-                <p className="mode-card-desc">Ladders &amp; Snakes (Bot, Friends, Local)</p>
-              </button>
-
-              {/* Card 4: Pass N Play */}
-              <button
-                type="button"
-                className="mode-card mode-card--pass"
-                onClick={() => {
-                  setPassNPlayGameType("ludo");
-                  setPassNPlayOpen(true);
-                }}
-              >
-                <span className="mode-card-badge">SAME DEVICE</span>
-                <div className="mode-card-icon-wrap">📱</div>
-                <h3 className="mode-card-title">PASS N PLAY</h3>
-                <p className="mode-card-desc">2–4 Players on One Screen</p>
+                <span className="tab-icon">🐍</span>
+                <span className="tab-title">SAANP SEEDHI</span>
+                <span className="tab-badge tab-badge-green">2 MODES</span>
               </button>
             </div>
 
-            {/* Dedicated Saanp Seedhi Banner */}
-            <div className="saanp-seedhi-banner">
-              <div className="saanp-banner-content">
-                <span className="saanp-banner-icon">🐍</span>
-                <div className="saanp-banner-text">
-                  <h3>SAANP SEEDHI (100 TILES)</h3>
-                  <p>Classic 8 Ladders &amp; 8 Snakes. Roll the dice to 100!</p>
+            {/* LUDO MODES: Play with Friends, Vs Computer, Pass N Play */}
+            {activeGameTab === "ludo" && (
+              <>
+                <div className="game-modes-grid ludo-grid">
+                  {/* Card 1: Play With Friends */}
+                  <button
+                    type="button"
+                    className="mode-card mode-card--friends"
+                    onClick={() => {
+                      setFriendsGameType("ludo");
+                      setPlayFriendsOpen(true);
+                    }}
+                  >
+                    <span className="mode-card-badge">ROOM CODE</span>
+                    <div className="mode-card-icon-wrap">👥</div>
+                    <h3 className="mode-card-title">PLAY WITH FRIENDS</h3>
+                    <p className="mode-card-desc">Private Room &amp; Custom Bets</p>
+                  </button>
+
+                  {/* Card 2: Vs Computer */}
+                  <button
+                    type="button"
+                    className="mode-card mode-card--computer"
+                    onClick={() => {
+                      setComputerGameType("ludo");
+                      setPlayComputerOpen(true);
+                    }}
+                  >
+                    <span className="mode-card-badge">OFFLINE</span>
+                    <div className="mode-card-icon-wrap">🤖</div>
+                    <h3 className="mode-card-title">VS COMPUTER</h3>
+                    <p className="mode-card-desc">Practice with Smart AI</p>
+                  </button>
+
+                  {/* Card 3: Pass N Play (Full Width) */}
+                  <button
+                    type="button"
+                    className="mode-card mode-card--pass"
+                    onClick={() => {
+                      setPassNPlayGameType("ludo");
+                      setPassNPlayOpen(true);
+                    }}
+                  >
+                    <span className="mode-card-badge">SAME DEVICE</span>
+                    <div className="mode-card-icon-wrap">📱</div>
+                    <div className="mode-card-text">
+                      <h3 className="mode-card-title">PASS N PLAY</h3>
+                      <p className="mode-card-desc">2–4 Players on One Screen • Local Multiplayer</p>
+                    </div>
+                  </button>
                 </div>
-              </div>
-              <div className="saanp-banner-actions">
-                <button
-                  type="button"
-                  className="saanp-action-btn"
+
+                {/* Quick Switcher Banner to Saanp Seedhi */}
+                <div
+                  className="game-cross-banner banner-to-snake"
                   onClick={() => {
-                    setComputerGameType("snake");
-                    setPlayComputerOpen(true);
+                    playSound("click");
+                    setActiveGameTab("snake");
                   }}
                 >
-                  Play vs Bot 🤖
-                </button>
-                <button
-                  type="button"
-                  className="saanp-action-btn"
+                  <div className="cross-banner-left">
+                    <span className="cross-banner-icon">🐍</span>
+                    <div>
+                      <b>Play Saanp Seedhi (Snakes &amp; Ladders)</b>
+                      <p>Classic 100-Tile board with 8 Ladders &amp; 8 Snakes!</p>
+                    </div>
+                  </div>
+                  <span className="cross-banner-btn">Play Saanp Seedhi ➔</span>
+                </div>
+              </>
+            )}
+
+            {/* SAANP SEEDHI MODES: Play vs Bot & Play with Friends (Only 2 options as requested) */}
+            {activeGameTab === "snake" && (
+              <>
+                <div className="game-modes-grid snake-grid">
+                  {/* Option 1: Play vs Bot */}
+                  <button
+                    type="button"
+                    className="mode-card mode-card--computer"
+                    onClick={() => {
+                      setComputerGameType("snake");
+                      setPlayComputerOpen(true);
+                    }}
+                  >
+                    <span className="mode-card-badge">OFFLINE BOT</span>
+                    <div className="mode-card-icon-wrap">🤖</div>
+                    <h3 className="mode-card-title">PLAY VS BOT</h3>
+                    <p className="mode-card-desc">Practice on 100-Tile Board with Smart AI</p>
+                  </button>
+
+                  {/* Option 2: Play With Friends */}
+                  <button
+                    type="button"
+                    className="mode-card mode-card--friends"
+                    onClick={() => {
+                      setFriendsGameType("snake");
+                      setPlayFriendsOpen(true);
+                    }}
+                  >
+                    <span className="mode-card-badge">ROOM CODE</span>
+                    <div className="mode-card-icon-wrap">👥</div>
+                    <h3 className="mode-card-title">PLAY WITH FRIENDS</h3>
+                    <p className="mode-card-desc">Private Table with Room Code &amp; Bets</p>
+                  </button>
+                </div>
+
+                {/* Quick Switcher Banner to Ludo */}
+                <div
+                  className="game-cross-banner banner-to-ludo"
                   onClick={() => {
-                    setFriendsGameType("snake");
-                    setPlayFriendsOpen(true);
+                    playSound("click");
+                    setActiveGameTab("ludo");
                   }}
-                  style={{ background: "#065f46", color: "#ffffff" }}
                 >
-                  Play with Friends 👥
-                </button>
-              </div>
-            </div>
+                  <div className="cross-banner-left">
+                    <span className="cross-banner-icon">🎲</span>
+                    <div>
+                      <b>Play Classic Ludo</b>
+                      <p>4 tokens home rush, extra rolls on 6 &amp; knockout thrill!</p>
+                    </div>
+                  </div>
+                  <span className="cross-banner-btn">Play Ludo ➔</span>
+                </div>
+              </>
+            )}
           </div>
 
           <p className="trust-line" style={{ marginTop: "16px" }}>
-            <span>◆</span> Extra Roll on 6 &amp; Knockout <span>◆</span> Safe Star Cells <span>◆</span> 5 Life Dots System
+            {activeGameTab === "ludo" ? (
+              <>
+                <span>◆</span> Extra Roll on 6 &amp; Knockout <span>◆</span> Safe Star Cells <span>◆</span> 5 Life Dots System
+              </>
+            ) : (
+              <>
+                <span>◆</span> Exact Roll to 100 <span>◆</span> Extra Roll on 6 <span>◆</span> 8 Ladders &amp; 8 Snakes
+              </>
+            )}
           </p>
         </div>
 
-        {/* Live Board Preview */}
-        <MiniBoard mode="ludo" />
+        {/* Live Board Preview: dynamically switches between Ludo and Snake */}
+        <MiniBoard mode={activeGameTab} />
       </section>
 
       {/* How it Works Section */}
