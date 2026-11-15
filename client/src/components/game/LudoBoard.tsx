@@ -296,10 +296,10 @@ export function LudoBoard({game,myPlayerId,legalTokens,onMove,tokenAnimation,boa
   }, [game]);
 
   const YARD_CIRCLE_COORDS: Record<PlayerColor, { left: string, top: string }[]> = {
-    red: [{ left: '13.333%', top: '73.333%' }, { left: '26.666%', top: '73.333%' }, { left: '13.333%', top: '86.666%' }, { left: '26.666%', top: '86.666%' }],
-    green: [{ left: '13.333%', top: '13.333%' }, { left: '26.666%', top: '13.333%' }, { left: '13.333%', top: '26.666%' }, { left: '26.666%', top: '26.666%' }],
-    yellow: [{ left: '73.333%', top: '13.333%' }, { left: '86.666%', top: '13.333%' }, { left: '73.333%', top: '26.666%' }, { left: '86.666%', top: '26.666%' }],
-    blue: [{ left: '73.333%', top: '73.333%' }, { left: '86.666%', top: '73.333%' }, { left: '73.333%', top: '86.666%' }, { left: '86.666%', top: '86.666%' }],
+    red: [{ left: '13.48%', top: '73.52%' }, { left: '26.35%', top: '73.52%' }, { left: '13.48%', top: '86.40%' }, { left: '26.35%', top: '86.40%' }],
+    green: [{ left: '13.48%', top: '13.47%' }, { left: '26.35%', top: '13.47%' }, { left: '13.48%', top: '26.35%' }, { left: '26.35%', top: '26.35%' }],
+    yellow: [{ left: '73.52%', top: '13.47%' }, { left: '86.40%', top: '13.47%' }, { left: '73.52%', top: '26.35%' }, { left: '86.40%', top: '26.35%' }],
+    blue: [{ left: '73.52%', top: '73.52%' }, { left: '86.40%', top: '73.52%' }, { left: '73.52%', top: '86.40%' }, { left: '86.40%', top: '86.40%' }],
   };
 
   const getTrackTokenStyle = (index: number, count: number): React.CSSProperties => {

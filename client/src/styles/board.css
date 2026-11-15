@@ -552,10 +552,10 @@
 }
 
 @keyframes homeLandingBurst {
-  0% { transform: translate(-50%, -90%) scale(0.3); opacity: 0; filter: brightness(2.2) drop-shadow(0 0 25px #ffd700); }
-  45% { transform: translate(-50%, -130%) scale(1.35) rotate(-10deg); opacity: 1; filter: brightness(1.7) drop-shadow(0 0 35px #ffd700); }
-  75% { transform: translate(-50%, -85%) scale(0.72) rotate(4deg); }
-  100% { transform: translate(-50%, -90%) scale(0.78) rotate(0deg); filter: drop-shadow(0 0 8px rgba(255,215,0,0.95)); }
+  0% { transform: scale(0.3); opacity: 0; filter: brightness(2.2) drop-shadow(0 0 25px #ffd700); }
+  45% { transform: translateY(-16px) scale(1.3) rotate(-10deg); opacity: 1; filter: brightness(1.7) drop-shadow(0 0 35px #ffd700); }
+  75% { transform: translateY(2px) scale(0.85) rotate(4deg); }
+  100% { transform: translateY(0) scale(1) rotate(0deg); filter: drop-shadow(0 0 8px rgba(255,215,0,0.95)); }
 }
 
 /* Floating Home Pocket Banner ("🎉 HOME! +1 BONUS ROLL 🎲") */
@@ -682,27 +682,28 @@
 }
 
 @keyframes yardPawnBounce {
-  0% { transform: translate(-50%, -90%) scale(1); filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-  100% { transform: translate(-50%, -115%) scale(1.18); filter: drop-shadow(0 12px 14px rgba(34, 197, 94, 0.85)) brightness(1.22); }
+  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); }
+  100% { transform: translateY(-8px) scale(1.12); filter: drop-shadow(0 8px 12px rgba(34, 197, 94, 0.85)) brightness(1.18); }
 }
 
 .yard-token-ring-pulse {
   position: absolute;
-  width: 44px;
-  height: 22px;
+  width: 32px;
+  height: 16px;
   border-radius: 50%;
-  top: 10px;
-  left: -22px;
-  border: 3px solid #22c55e;
-  box-shadow: 0 0 15px #22c55e, inset 0 0 10px #22c55e;
+  bottom: 0px;
+  left: 50%;
+  transform: translate(-50%, 40%);
+  border: 2.5px solid #22c55e;
+  box-shadow: 0 0 12px #22c55e, inset 0 0 8px #22c55e;
   animation: yardRingWave 1s cubic-bezier(0, 0, 0.2, 1) infinite;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
 }
 
 @keyframes yardRingWave {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
+  0% { transform: translate(-50%, 40%) scale(0.5); opacity: 1; }
+  100% { transform: translate(-50%, 40%) scale(1.6); opacity: 0; }
 }
 
 /* Saanp Seedhi Tile 100 Celebration */
